@@ -62,6 +62,49 @@ Clustering and other data-mining methods may support exploration or feature engi
 - Train the chosen final approach, generate the Kaggle submission, and document results.
 - Complete the final report with methodology, model comparison, findings, limitations, and reproducibility notes.
 
+## 数据处理、EDA 与 Baseline
+
+### 数据流
+
+原始文件不能直接被后续流程覆盖；所有转换均由脚本完成，并按以下层级保存：
+
+```text
+data/raw/        → 原始 Kaggle 主数据和 auxiliary 数据，只读保存
+data/interim/    → 格式统一、完成基础清洗的主表和辅助表
+data/processed/  → 已按实验方案合并特征、可直接训练模型的数据表
+```
+
+典型输出包括 `train_clean`、`test_clean`、清洗后的 HDB/MRT/学校/商场/COE 表，以及不同特征版本的 `train_features`、`test_features`。这些数据文件不进入 Git，因为它们都必须能够由脚本从 `data/raw/` 重新生成。
+
+### EDA 的作用
+
+EDA（探索性数据分析）不是独立的预测方法，而是用来理解数据、发现质量问题并决定特征和验证策略。至少应检查：
+
+- 租金的分布和极端值；
+- 不同年月的租金趋势；
+- 不同城镇、房型和房屋模型的租金差异；
+- 建筑面积、房龄与租金的关系；
+- 训练集和测试集在时间、区域和房型上的分布差异。
+
+若租金存在明显时间趋势，应优先采用时间切分验证，而不是仅使用随机切分。
+
+### Baseline 与特征逐步接入
+
+Baseline 的目标是先建立一个可靠的参照。它使用基础清洗后的主数据训练监督回归模型，并以 `MONTHLY_RENT` 为目标；首版不必接入 auxiliary 数据。CatBoost 或 LightGBM 是合适的首个模型选择。
+
+后续在完全相同的验证集上逐步比较特征版本：
+
+1. **Baseline**：清洗后的主表字段；
+2. **时间与房屋特征**：租赁年月、房龄、面积、费用等；
+3. **地理特征**：HDB 坐标、区域、到 MRT 的距离；
+4. **设施特征**：学校和商场距离或密度；
+5. **宏观特征**：COE 与经过聚合筛选的市场指标；
+6. **最终模型**：只保留能稳定改善验证 RMSE 的特征，并可测试模型集成。
+
+每个版本都应记录特征集合、模型参数和验证 RMSE。聚类可作为区域或社区类型的额外特征，但不能替代带有租金标签训练的监督回归模型。
+
+`postprocessing` 指模型预测后的结果处理，例如将不合理的负租金截断；它不用于存放清洗后的数据。
+
 ## Repository layout
 
 - `src/data/`: cleaning and data-integration scripts
