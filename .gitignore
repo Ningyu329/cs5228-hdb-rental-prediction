@@ -1,0 +1,21 @@
+# Private competition data and generated artifacts
+data/raw/
+data/interim/
+data/processed/
+submissions/
+models/
+
+# Archives and tabular exports
+*.zip
+*.csv
+
+# Python and notebook artifacts
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+
+# Credentials and local settings
+.env
+kaggle.json
+.DS_Store
