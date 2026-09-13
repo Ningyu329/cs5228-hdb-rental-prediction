@@ -73,6 +73,31 @@ Clustering and other data-mining methods may support exploration or feature engi
 
 Raw Kaggle competition data, local models, and submission files are excluded from Git. Each authorised team member should obtain competition data through Kaggle.
 
+## 文件结构说明
+
+```text
+project/
+├── data/
+│   ├── raw/                 # Kaggle 原始数据及辅助数据；只读，不修改，不上传 Git
+│   ├── interim/             # 清洗、地址匹配等中间结果；可由脚本重新生成，不上传 Git
+│   └── processed/           # 最终用于建模的特征数据；可由脚本重新生成，不上传 Git
+├── src/
+│   ├── data/                # 数据审计、清洗、合并辅助数据的脚本
+│   ├── features/            # 日期、地址、地理距离、COE 等特征工程脚本
+│   ├── models/              # 训练、验证、预测和生成提交文件的脚本
+│   └── utils/               # 可复用的路径、评估、日志等辅助函数
+├── notebooks/               # EDA 和展示用 Notebook；正式流程应迁移到 src/
+├── configs/                 # 模型参数、数据路径和实验配置
+├── reports/
+│   ├── figures/             # 报告与 slides 使用的图表
+│   └── progress_report/     # 中期报告 slides 和相关材料
+├── submissions/             # 本地生成的 Kaggle 提交文件；不上传 Git
+├── README.md                # 项目目标、流程和协作说明
+└── .gitignore               # 排除数据、模型、提交文件和凭据
+```
+
+原则：原始数据只保存在 `data/raw/`；所有清洗、特征工程和训练结果都应能由 `src/` 中的脚本复现。Notebook 用于探索和呈现，不应是唯一的正式实现；密钥、Kaggle 凭据和私有竞赛数据不得提交到仓库。
+
 ## Collaboration workflow
 
 1. Create a focused branch from `main`.
