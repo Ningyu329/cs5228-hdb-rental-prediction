@@ -84,7 +84,8 @@ def clean_main_rows(rows: list[dict[str, str]], *, has_target: bool) -> tuple[li
             "RENT_MONTH": str(date.month),
             "RENT_MONTH_INDEX": str((date.year - 2021) * 12 + date.month),
         }
-        cleaned["FLAT_AGE"] = str(date.year - int(cleaned["LEASE_COMMENCE_DATE"]))
+        flat_age = date.year - int(cleaned["LEASE_COMMENCE_DATE"])
+        cleaned["FLAT_AGE"] = str(flat_age) if flat_age >= 0 else ""
         if has_target:
             cleaned["MONTHLY_RENT"] = canonical_number(row["MONTHLY_RENT"])
         output.append(cleaned)
