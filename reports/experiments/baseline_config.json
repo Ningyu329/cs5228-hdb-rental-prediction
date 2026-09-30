@@ -1,0 +1,44 @@
+{
+  "selected_model": {
+    "backend": "sklearn_ridge_fallback",
+    "alpha": 10.0,
+    "solver": "lsqr",
+    "tol": 0.0001,
+    "fit_intercept": false,
+    "one_hot_min_frequency": 2
+  },
+  "features": [
+    "TOWN",
+    "BLOCK",
+    "STREET",
+    "FLAT_TYPE",
+    "FLAT_MODEL",
+    "FLOOR_AREA_SQM",
+    "LEASE_COMMENCE_DATE",
+    "RENT_YEAR",
+    "RENT_MONTH",
+    "RENT_MONTH_INDEX",
+    "FLAT_AGE"
+  ],
+  "categorical_features": [
+    "TOWN",
+    "BLOCK",
+    "STREET",
+    "FLAT_TYPE",
+    "FLAT_MODEL"
+  ],
+  "numeric_features": [
+    "FLOOR_AREA_SQM",
+    "LEASE_COMMENCE_DATE",
+    "RENT_YEAR",
+    "RENT_MONTH",
+    "RENT_MONTH_INDEX",
+    "FLAT_AGE"
+  ],
+  "primary_validation": "latest approval months in labelled training data",
+  "validation_months": 3,
+  "random_split": {
+    "test_size": 0.2,
+    "random_state": 42
+  }
+}

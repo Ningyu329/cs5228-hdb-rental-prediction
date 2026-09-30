@@ -34,6 +34,20 @@
 - 先建立简单基线，再用主表特征训练 CatBoost 或 LightGBM 等监督回归基线模型。
 - 记录验证 RMSE、模型配置和特征集合，并生成格式正确的测试集预测文件。
 
+当前阶段可运行：
+
+```bash
+python src/eda/run_eda.py
+python src/models/train_baseline.py
+```
+
+EDA 输出在 `reports/figures/` 和 `reports/tables/`；baseline 的 RMSE 与配置在
+`reports/experiments/`，测试集预测在 `submissions/`。提交文件使用竞赛要求的
+`Id,Predicted` 两列，其中 `Id` 按 `test.csv` 原始行顺序从 0 编号。首要验证集是训练数据的最后
+3 个批准月份，随机 80/20 切分只作为辅助参考。`train_baseline.py` 在安装
+CatBoost 时优先使用 CatBoost；若当前环境没有 CatBoost，则自动运行可复现的
+one-hot Ridge fallback，并在结果中标明实际模型。
+
 ### 3. 中期进展汇报幻灯片
 
 - 说明问题定义、数据概况和数据清洗决策。
@@ -86,7 +100,9 @@ data/processed/  → 已按实验方案合并特征、可直接训练模型的�
 - 建筑面积、房龄与租金的关系；
 - 训练集和测试集在时间、区域和房型上的分布差异。
 
-若租金存在明显时间趋势，应优先采用时间切分验证，而不是仅使用随机切分。
+由于测试集包含训练集之后的批准月份，应优先采用按批准月份切分的验证方案。这是
+为了模拟未来月份的分布变化，并不意味着把数据当成纯时间序列；每条记录仍是一个
+带有时间属性的横截面租赁观测，且没有可识别的具体 flat ID。
 
 ### 基线模型与特征逐步接入
 
