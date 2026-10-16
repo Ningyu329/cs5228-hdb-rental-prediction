@@ -1,0 +1,259 @@
+{
+  "model": "sklearn_ridge_fallback",
+  "configuration": {
+    "alpha": 10.0,
+    "solver": "lsqr",
+    "tol": 0.0001,
+    "fit_intercept": false,
+    "one_hot_min_frequency": 2,
+    "numeric_imputer": "median",
+    "numeric_scaler": "StandardScaler"
+  },
+  "environment": {
+    "python": "3.14.7",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "sklearn": "1.9.0"
+  },
+  "train_sha256": "2171ee03007d67272fa4d37a7db830d1faaf6c0e3750bc7f76ba82f45db020a0",
+  "location_manifest_sha256": "5334135f2f1f89acb83fe9300a3a67a35eeec7b87ef4b1360566a1bca8f92d37",
+  "mrt_mode": "snapshot",
+  "previous_reference_rmse": 562.588783822548,
+  "validation_months": 3,
+  "random_seed": 42,
+  "random_test_size": 0.2,
+  "splits": [
+    {
+      "split": "temporal",
+      "fit_rows": 141076,
+      "validation_rows": 8924,
+      "fit_start": "2021-01",
+      "fit_end": "2024-12",
+      "validation_start": "2025-01",
+      "validation_end": "2025-03"
+    },
+    {
+      "split": "temporal_backtest_1",
+      "fit_rows": 132802,
+      "validation_rows": 8274,
+      "fit_start": "2021-01",
+      "fit_end": "2024-09",
+      "validation_start": "2024-10",
+      "validation_end": "2024-12"
+    },
+    {
+      "split": "temporal_backtest_2",
+      "fit_rows": 124016,
+      "validation_rows": 8786,
+      "fit_start": "2021-01",
+      "fit_end": "2024-06",
+      "validation_start": "2024-07",
+      "validation_end": "2024-09"
+    },
+    {
+      "split": "random",
+      "fit_rows": 120000,
+      "validation_rows": 30000,
+      "fit_start": "2021-01",
+      "fit_end": "2025-03",
+      "validation_start": "2021-01",
+      "validation_end": "2025-03"
+    }
+  ],
+  "feature_sets": {
+    "main_only": {
+      "categorical": [
+        "TOWN",
+        "BLOCK",
+        "STREET",
+        "FLAT_TYPE",
+        "FLAT_MODEL"
+      ],
+      "numeric": [
+        "FLOOR_AREA_SQM",
+        "LEASE_COMMENCE_DATE",
+        "RENT_YEAR",
+        "RENT_MONTH",
+        "RENT_MONTH_INDEX",
+        "FLAT_AGE"
+      ],
+      "uses_mrt": false
+    },
+    "hdb": {
+      "categorical": [
+        "TOWN",
+        "BLOCK",
+        "STREET",
+        "FLAT_TYPE",
+        "FLAT_MODEL",
+        "SUBZONE",
+        "PLANNING_AREA",
+        "REGION"
+      ],
+      "numeric": [
+        "FLOOR_AREA_SQM",
+        "LEASE_COMMENCE_DATE",
+        "RENT_YEAR",
+        "RENT_MONTH",
+        "RENT_MONTH_INDEX",
+        "FLAT_AGE",
+        "LATITUDE",
+        "LONGITUDE",
+        "YEAR_COMPLETED",
+        "MAX_FLOOR",
+        "BUILDING_AGE",
+        "YEAR_COMPLETED_MISSING",
+        "BUILDING_AGE_MISSING",
+        "ADDRESS_MATCHED",
+        "LOCATION_COORDINATES_VALID"
+      ],
+      "uses_mrt": false
+    },
+    "hdb_mrt": {
+      "categorical": [
+        "TOWN",
+        "BLOCK",
+        "STREET",
+        "FLAT_TYPE",
+        "FLAT_MODEL",
+        "SUBZONE",
+        "PLANNING_AREA",
+        "REGION"
+      ],
+      "numeric": [
+        "FLOOR_AREA_SQM",
+        "LEASE_COMMENCE_DATE",
+        "RENT_YEAR",
+        "RENT_MONTH",
+        "RENT_MONTH_INDEX",
+        "FLAT_AGE",
+        "LATITUDE",
+        "LONGITUDE",
+        "YEAR_COMPLETED",
+        "MAX_FLOOR",
+        "BUILDING_AGE",
+        "YEAR_COMPLETED_MISSING",
+        "BUILDING_AGE_MISSING",
+        "ADDRESS_MATCHED",
+        "LOCATION_COORDINATES_VALID",
+        "NEAREST_OPEN_MRT_DISTANCE_KM",
+        "OPEN_MRT_COUNT_WITHIN_500M",
+        "OPEN_MRT_COUNT_WITHIN_1000M"
+      ],
+      "uses_mrt": true
+    },
+    "hdb_mrt_school": {
+      "categorical": [
+        "TOWN",
+        "BLOCK",
+        "STREET",
+        "FLAT_TYPE",
+        "FLAT_MODEL",
+        "SUBZONE",
+        "PLANNING_AREA",
+        "REGION"
+      ],
+      "numeric": [
+        "FLOOR_AREA_SQM",
+        "LEASE_COMMENCE_DATE",
+        "RENT_YEAR",
+        "RENT_MONTH",
+        "RENT_MONTH_INDEX",
+        "FLAT_AGE",
+        "LATITUDE",
+        "LONGITUDE",
+        "YEAR_COMPLETED",
+        "MAX_FLOOR",
+        "BUILDING_AGE",
+        "YEAR_COMPLETED_MISSING",
+        "BUILDING_AGE_MISSING",
+        "ADDRESS_MATCHED",
+        "LOCATION_COORDINATES_VALID",
+        "NEAREST_OPEN_MRT_DISTANCE_KM",
+        "OPEN_MRT_COUNT_WITHIN_500M",
+        "OPEN_MRT_COUNT_WITHIN_1000M",
+        "NEAREST_SCHOOL_DISTANCE_KM",
+        "SCHOOL_COUNT_WITHIN_500M",
+        "SCHOOL_COUNT_WITHIN_1000M"
+      ],
+      "uses_mrt": true
+    },
+    "hdb_mrt_school_mall": {
+      "categorical": [
+        "TOWN",
+        "BLOCK",
+        "STREET",
+        "FLAT_TYPE",
+        "FLAT_MODEL",
+        "SUBZONE",
+        "PLANNING_AREA",
+        "REGION"
+      ],
+      "numeric": [
+        "FLOOR_AREA_SQM",
+        "LEASE_COMMENCE_DATE",
+        "RENT_YEAR",
+        "RENT_MONTH",
+        "RENT_MONTH_INDEX",
+        "FLAT_AGE",
+        "LATITUDE",
+        "LONGITUDE",
+        "YEAR_COMPLETED",
+        "MAX_FLOOR",
+        "BUILDING_AGE",
+        "YEAR_COMPLETED_MISSING",
+        "BUILDING_AGE_MISSING",
+        "ADDRESS_MATCHED",
+        "LOCATION_COORDINATES_VALID",
+        "NEAREST_OPEN_MRT_DISTANCE_KM",
+        "OPEN_MRT_COUNT_WITHIN_500M",
+        "OPEN_MRT_COUNT_WITHIN_1000M",
+        "NEAREST_SCHOOL_DISTANCE_KM",
+        "SCHOOL_COUNT_WITHIN_500M",
+        "SCHOOL_COUNT_WITHIN_1000M",
+        "NEAREST_MALL_DISTANCE_KM",
+        "MALL_COUNT_WITHIN_500M",
+        "MALL_COUNT_WITHIN_1000M"
+      ],
+      "uses_mrt": true
+    },
+    "hdb_school_mall": {
+      "categorical": [
+        "TOWN",
+        "BLOCK",
+        "STREET",
+        "FLAT_TYPE",
+        "FLAT_MODEL",
+        "SUBZONE",
+        "PLANNING_AREA",
+        "REGION"
+      ],
+      "numeric": [
+        "FLOOR_AREA_SQM",
+        "LEASE_COMMENCE_DATE",
+        "RENT_YEAR",
+        "RENT_MONTH",
+        "RENT_MONTH_INDEX",
+        "FLAT_AGE",
+        "LATITUDE",
+        "LONGITUDE",
+        "YEAR_COMPLETED",
+        "MAX_FLOOR",
+        "BUILDING_AGE",
+        "YEAR_COMPLETED_MISSING",
+        "BUILDING_AGE_MISSING",
+        "ADDRESS_MATCHED",
+        "LOCATION_COORDINATES_VALID",
+        "NEAREST_SCHOOL_DISTANCE_KM",
+        "SCHOOL_COUNT_WITHIN_500M",
+        "SCHOOL_COUNT_WITHIN_1000M",
+        "NEAREST_MALL_DISTANCE_KM",
+        "MALL_COUNT_WITHIN_500M",
+        "MALL_COUNT_WITHIN_1000M"
+      ],
+      "uses_mrt": false
+    }
+  },
+  "best_primary_variant": "hdb_mrt_school",
+  "best_primary_variant_without_mrt": "hdb"
+}

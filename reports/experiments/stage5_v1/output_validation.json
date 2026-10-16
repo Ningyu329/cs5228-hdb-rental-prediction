@@ -1,0 +1,13 @@
+{
+  "experiment_rows": 46,
+  "verified_prediction_values": 363776,
+  "source_hashes_match": true,
+  "selected_candidate": "blend_housing",
+  "selection_uses_only_earlier_windows": true,
+  "diagnostic_model_reload_matches": true,
+  "figures": [
+    "figures/01_model_comparison.png",
+    "figures/02_group_importance.png",
+    "figures/03_monthly_bias.png"
+  ]
+}

@@ -1,0 +1,179 @@
+{
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1",
+    "sklearn": "1.9.1",
+    "catboost": "1.2.10",
+    "lightgbm": "4.7.0"
+  },
+  "train_sha256": "2171ee03007d67272fa4d37a7db830d1faaf6c0e3750bc7f76ba82f45db020a0",
+  "implementation_sha256": {
+    "src\\models\\run_tree_tuning.py": "4ac58e1a32ef53f9d2b2c5f45ac6f31642b2eed6089d2576fc50f63227cba3a5",
+    "src\\models\\run_stage5.py": "fa1782e146eedd8eea9694788607201180b01b85d720cfbef2357406e76e7e6a",
+    "src\\models\\run_location_ablation.py": "4ca9872b3ead4d84271802efc9f5a7b7cc92269b136696ca305a9afa9611c90b",
+    "src\\models\\train_baseline.py": "63fd08f617549563e01fe6bf65ff4ae0ef16187e717a1711a7384c2543fe5fb5",
+    "src\\features\\build_stage5_features.py": "834a7c189a94cc9777414dc4610503653abe91a98099572e28633fccf38a3a29"
+  },
+  "reference_sha256": {
+    "reports\\experiments\\stage5_v1\\predictions_temporal_backtest_2.csv": "95f69cb198b0fbd66a4e2e4add8a8b8748907abb112c71d56e854fbe668ec32d",
+    "reports\\experiments\\stage5_v1\\predictions_temporal_backtest_1.csv": "a6af478710623ec4ee27962be6c3c7a62d5a433b113cbd41f8b21381dbc9f2c3",
+    "reports\\experiments\\stage5_v1\\predictions_temporal.csv": "72dfffeb2e0b25fa076d67192b057912ba647971ece0055c5d093fba6d4c832d",
+    "reports\\experiments\\stage5_v1\\experiment_manifest.json": "45420c12b4973102ccca05813e74d845c2293ce9a7a92b8a191f1e38c7c07bd1"
+  },
+  "grid": {
+    "catboost_original": {
+      "family": "catboost",
+      "cap": 400,
+      "patience": 40,
+      "params": {
+        "depth": 6,
+        "learning_rate": 0.06,
+        "l2_leaf_reg": 5.0
+      }
+    },
+    "catboost_d6_long": {
+      "family": "catboost",
+      "cap": 1200,
+      "patience": 80,
+      "params": {
+        "depth": 6,
+        "learning_rate": 0.04,
+        "l2_leaf_reg": 5.0
+      }
+    },
+    "catboost_d8_regularized": {
+      "family": "catboost",
+      "cap": 800,
+      "patience": 80,
+      "params": {
+        "depth": 8,
+        "learning_rate": 0.05,
+        "l2_leaf_reg": 10.0
+      }
+    },
+    "lightgbm_original": {
+      "family": "lightgbm",
+      "cap": 400,
+      "patience": 40,
+      "params": {
+        "num_leaves": 31,
+        "learning_rate": 0.04,
+        "min_child_samples": 40,
+        "reg_lambda": 5.0,
+        "colsample_bytree": 0.9
+      }
+    },
+    "lightgbm_31_slow": {
+      "family": "lightgbm",
+      "cap": 1200,
+      "patience": 80,
+      "params": {
+        "num_leaves": 31,
+        "learning_rate": 0.02,
+        "min_child_samples": 40,
+        "reg_lambda": 5.0,
+        "colsample_bytree": 0.9
+      }
+    },
+    "lightgbm_63_regularized": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "patience": 80,
+      "params": {
+        "num_leaves": 63,
+        "learning_rate": 0.04,
+        "min_child_samples": 80,
+        "reg_lambda": 10.0,
+        "colsample_bytree": 0.9
+      }
+    },
+    "lightgbm_63_flexible": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "patience": 80,
+      "params": {
+        "num_leaves": 63,
+        "learning_rate": 0.04,
+        "min_child_samples": 20,
+        "reg_lambda": 5.0,
+        "colsample_bytree": 0.9
+      }
+    },
+    "lightgbm_15_regularized": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "patience": 80,
+      "params": {
+        "num_leaves": 15,
+        "learning_rate": 0.04,
+        "min_child_samples": 80,
+        "reg_lambda": 10.0,
+        "colsample_bytree": 0.9
+      }
+    }
+  },
+  "threads": 4,
+  "workers": 3,
+  "seed": 42,
+  "schema": {
+    "categorical": [
+      "TOWN",
+      "BLOCK",
+      "STREET",
+      "FLAT_TYPE",
+      "FLAT_MODEL",
+      "SUBZONE",
+      "PLANNING_AREA",
+      "REGION",
+      "BLOCK_ADDRESS",
+      "FLAT_AGE_BAND"
+    ],
+    "numeric": [
+      "FLOOR_AREA_SQM",
+      "LEASE_COMMENCE_DATE",
+      "RENT_YEAR",
+      "RENT_MONTH",
+      "RENT_MONTH_INDEX",
+      "FLAT_AGE",
+      "LATITUDE",
+      "LONGITUDE",
+      "YEAR_COMPLETED",
+      "MAX_FLOOR",
+      "BUILDING_AGE",
+      "YEAR_COMPLETED_MISSING",
+      "BUILDING_AGE_MISSING",
+      "ADDRESS_MATCHED",
+      "LOCATION_COORDINATES_VALID",
+      "LOG_FLOOR_AREA",
+      "RENT_MONTH_SIN",
+      "RENT_MONTH_COS",
+      "FLAT_TYPE_ROOMS",
+      "AREA_PER_ROOM"
+    ]
+  },
+  "screen": "2024-04..2024-06; fit <=2024-03; best new configuration per family",
+  "selection": {
+    "selected_candidate": "blend__catboost_d8_regularized__lightgbm_15_regularized__cat50",
+    "weights": {
+      "catboost_d8_regularized": 0.5,
+      "lightgbm_15_regularized": 0.5
+    },
+    "challengers": {
+      "catboost": "catboost_d8_regularized",
+      "lightgbm": "lightgbm_15_regularized"
+    },
+    "selection_splits": [
+      "temporal_backtest_2",
+      "temporal_backtest_1"
+    ],
+    "primary_used": false,
+    "primary_previously_inspected": true
+  },
+  "primary_used_for_selection": false,
+  "primary_previously_inspected": true,
+  "test_data_read": false,
+  "final_submission_generated": false,
+  "cache_directory": "models\\tree_tuning_cache\\26c5de62d087a279",
+  "diagnostic_training_end": "2024-12"
+}

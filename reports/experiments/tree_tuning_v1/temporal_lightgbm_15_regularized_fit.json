@@ -1,0 +1,9 @@
+{
+  "iterations": 481,
+  "cap": 1000,
+  "hit_cap": false,
+  "inner_fit_end": "2024-09",
+  "inner_validation_start": "2024-10",
+  "inner_validation_end": "2024-12",
+  "seconds": 14.910481199622154
+}

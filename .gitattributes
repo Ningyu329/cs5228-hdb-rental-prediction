@@ -1,0 +1,10 @@
+# Stable bytes for source hashes in experiment manifests.
+*.py text eol=lf
+# Historical manifests hashed this existing baseline helper with CRLF.
+src/models/train_baseline.py text eol=crlf
+# Manifests themselves are hashed by later experiments. Preserve their bytes,
+# including original CRLF, instead of rewriting historical fingerprints.
+reports/location_features/*.json -text whitespace=cr-at-eol
+reports/experiments/*/*.json -text whitespace=cr-at-eol
+reports/experiments/*/*.csv -text whitespace=cr-at-eol
+*.png binary

@@ -3,11 +3,26 @@ data/raw/
 data/interim/
 data/processed/
 submissions/
-models/
+/models/
 
 # Archives and tabular exports
 *.zip
 *.csv
+
+# Reviewed aggregate experiment results only (never row-level predictions).
+!reports/experiments/location_ablation_v1/ablation_results.csv
+!reports/experiments/location_ablation_v1/group_errors.csv
+!reports/experiments/stage5_v1/results.csv
+!reports/experiments/stage5_v1/selection_backtests.csv
+!reports/experiments/stage5_v1/group_errors.csv
+!reports/experiments/stage5_v1/group_permutation_importance.csv
+!reports/experiments/stage5_v1/native_feature_importance.csv
+!reports/experiments/tree_tuning_v1/backtest_results.csv
+!reports/experiments/tree_tuning_v1/comparison.csv
+!reports/experiments/tree_tuning_v1/group_errors.csv
+!reports/experiments/tree_tuning_v1/results.csv
+!reports/experiments/tree_tuning_v1/screening.csv
+!reports/experiments/tree_tuning_v1/selection_backtests.csv
 
 # Python and notebook artifacts
 __pycache__/
@@ -15,6 +30,8 @@ __pycache__/
 .ipynb_checkpoints/
 .venv/
 .matplotlib/
+.codex-build/
+.codex-finalizer/
 
 # Credentials and local settings
 .env

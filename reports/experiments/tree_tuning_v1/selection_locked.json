@@ -1,0 +1,17 @@
+{
+  "selected_candidate": "blend__catboost_d8_regularized__lightgbm_15_regularized__cat50",
+  "weights": {
+    "catboost_d8_regularized": 0.5,
+    "lightgbm_15_regularized": 0.5
+  },
+  "challengers": {
+    "catboost": "catboost_d8_regularized",
+    "lightgbm": "lightgbm_15_regularized"
+  },
+  "selection_splits": [
+    "temporal_backtest_2",
+    "temporal_backtest_1"
+  ],
+  "primary_used": false,
+  "primary_previously_inspected": true
+}

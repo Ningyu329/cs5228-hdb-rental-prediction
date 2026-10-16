@@ -86,7 +86,13 @@ def town_flat_median_predict(fit_df: pd.DataFrame, query_df: pd.DataFrame) -> np
     return prediction
 
 
-def build_ridge_pipeline() -> Pipeline:
+def build_ridge_pipeline(
+    categorical_features: list[str] | None = None,
+    numeric_features: list[str] | None = None,
+) -> Pipeline:
+    """Keep the original baseline defaults, with explicit schemas for ablations."""
+    categorical_features = CATEGORICAL_FEATURES if categorical_features is None else categorical_features
+    numeric_features = NUMERIC_FEATURES if numeric_features is None else numeric_features
     transformer = ColumnTransformer(
         transformers=[
             (
@@ -96,7 +102,7 @@ def build_ridge_pipeline() -> Pipeline:
                     min_frequency=2,
                     sparse_output=True,
                 ),
-                CATEGORICAL_FEATURES,
+                categorical_features,
             ),
             (
                 "numeric",
@@ -106,7 +112,7 @@ def build_ridge_pipeline() -> Pipeline:
                         ("scale", StandardScaler()),
                     ]
                 ),
-                NUMERIC_FEATURES,
+                numeric_features,
             ),
         ],
         remainder="drop",

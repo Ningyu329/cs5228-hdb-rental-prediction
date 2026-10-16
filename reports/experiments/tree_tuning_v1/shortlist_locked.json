@@ -1,0 +1,7 @@
+{
+  "challengers": {
+    "catboost": "catboost_d8_regularized",
+    "lightgbm": "lightgbm_15_regularized"
+  },
+  "screen_only": true
+}

@@ -1,0 +1,378 @@
+{
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1",
+    "sklearn": "1.9.1",
+    "catboost": "1.2.10",
+    "lightgbm": "4.7.0"
+  },
+  "source_sha256": {
+    "data\\processed\\train_location_features.csv": "2171ee03007d67272fa4d37a7db830d1faaf6c0e3750bc7f76ba82f45db020a0",
+    "data\\interim\\auxiliary\\sg-coe-prices_clean.csv": "c3be80240786645495d950297cc4ad8133e9e0f8b71629bd8115cfc41b348940",
+    "data\\interim\\auxiliary\\sg-stock-prices_clean.csv": "dca2e3bb0b20ca5ff2c6ba1b21ac337c7e2769ea6f4f367727c451ee65fd8d42"
+  },
+  "tree_iterations_cap": 400,
+  "threads": 4,
+  "random_seed": 42,
+  "workers": 3,
+  "catboost": {
+    "depth": 6,
+    "learning_rate": 0.06,
+    "l2_leaf_reg": 5.0
+  },
+  "lightgbm": {
+    "num_leaves": 31,
+    "learning_rate": 0.04,
+    "min_child_samples": 40,
+    "reg_lambda": 5.0,
+    "colsample_bytree": 0.9
+  },
+  "early_stopping": {
+    "inner_months": 3,
+    "patience": 40,
+    "outer_query_used": false
+  },
+  "macro": {
+    "coe_rows": 539,
+    "stock_rows": 91642,
+    "stock_missing_close_rows": 85,
+    "stock_symbols": 77,
+    "monthly_rows": 68,
+    "coe_rule": "mean premium across rounds; sum bids / sum quota for each month/category",
+    "stock_rule": "equal-weight symbol monthly CLOSE returns, mean daily volatility and positive return share; no price fill",
+    "lag_months": 2
+  },
+  "feature_sets": {
+    "main": {
+      "categorical": [
+        "TOWN",
+        "BLOCK",
+        "STREET",
+        "FLAT_TYPE",
+        "FLAT_MODEL"
+      ],
+      "numeric": [
+        "FLOOR_AREA_SQM",
+        "LEASE_COMMENCE_DATE",
+        "RENT_YEAR",
+        "RENT_MONTH",
+        "RENT_MONTH_INDEX",
+        "FLAT_AGE"
+      ]
+    },
+    "housing": {
+      "categorical": [
+        "TOWN",
+        "BLOCK",
+        "STREET",
+        "FLAT_TYPE",
+        "FLAT_MODEL",
+        "SUBZONE",
+        "PLANNING_AREA",
+        "REGION",
+        "BLOCK_ADDRESS",
+        "FLAT_AGE_BAND"
+      ],
+      "numeric": [
+        "FLOOR_AREA_SQM",
+        "LEASE_COMMENCE_DATE",
+        "RENT_YEAR",
+        "RENT_MONTH",
+        "RENT_MONTH_INDEX",
+        "FLAT_AGE",
+        "LATITUDE",
+        "LONGITUDE",
+        "YEAR_COMPLETED",
+        "MAX_FLOOR",
+        "BUILDING_AGE",
+        "YEAR_COMPLETED_MISSING",
+        "BUILDING_AGE_MISSING",
+        "ADDRESS_MATCHED",
+        "LOCATION_COORDINATES_VALID",
+        "LOG_FLOOR_AREA",
+        "RENT_MONTH_SIN",
+        "RENT_MONTH_COS",
+        "FLAT_TYPE_ROOMS",
+        "AREA_PER_ROOM"
+      ]
+    },
+    "amenities": {
+      "categorical": [
+        "TOWN",
+        "BLOCK",
+        "STREET",
+        "FLAT_TYPE",
+        "FLAT_MODEL",
+        "SUBZONE",
+        "PLANNING_AREA",
+        "REGION",
+        "BLOCK_ADDRESS",
+        "FLAT_AGE_BAND"
+      ],
+      "numeric": [
+        "FLOOR_AREA_SQM",
+        "LEASE_COMMENCE_DATE",
+        "RENT_YEAR",
+        "RENT_MONTH",
+        "RENT_MONTH_INDEX",
+        "FLAT_AGE",
+        "LATITUDE",
+        "LONGITUDE",
+        "YEAR_COMPLETED",
+        "MAX_FLOOR",
+        "BUILDING_AGE",
+        "YEAR_COMPLETED_MISSING",
+        "BUILDING_AGE_MISSING",
+        "ADDRESS_MATCHED",
+        "LOCATION_COORDINATES_VALID",
+        "LOG_FLOOR_AREA",
+        "RENT_MONTH_SIN",
+        "RENT_MONTH_COS",
+        "FLAT_TYPE_ROOMS",
+        "AREA_PER_ROOM",
+        "NEAREST_SCHOOL_DISTANCE_KM",
+        "SCHOOL_COUNT_WITHIN_500M",
+        "SCHOOL_COUNT_WITHIN_1000M",
+        "NEAREST_MALL_DISTANCE_KM",
+        "MALL_COUNT_WITHIN_500M",
+        "MALL_COUNT_WITHIN_1000M"
+      ]
+    },
+    "coe": {
+      "categorical": [
+        "TOWN",
+        "BLOCK",
+        "STREET",
+        "FLAT_TYPE",
+        "FLAT_MODEL",
+        "SUBZONE",
+        "PLANNING_AREA",
+        "REGION",
+        "BLOCK_ADDRESS",
+        "FLAT_AGE_BAND"
+      ],
+      "numeric": [
+        "FLOOR_AREA_SQM",
+        "LEASE_COMMENCE_DATE",
+        "RENT_YEAR",
+        "RENT_MONTH",
+        "RENT_MONTH_INDEX",
+        "FLAT_AGE",
+        "LATITUDE",
+        "LONGITUDE",
+        "YEAR_COMPLETED",
+        "MAX_FLOOR",
+        "BUILDING_AGE",
+        "YEAR_COMPLETED_MISSING",
+        "BUILDING_AGE_MISSING",
+        "ADDRESS_MATCHED",
+        "LOCATION_COORDINATES_VALID",
+        "LOG_FLOOR_AREA",
+        "RENT_MONTH_SIN",
+        "RENT_MONTH_COS",
+        "FLAT_TYPE_ROOMS",
+        "AREA_PER_ROOM",
+        "NEAREST_SCHOOL_DISTANCE_KM",
+        "SCHOOL_COUNT_WITHIN_500M",
+        "SCHOOL_COUNT_WITHIN_1000M",
+        "NEAREST_MALL_DISTANCE_KM",
+        "MALL_COUNT_WITHIN_500M",
+        "MALL_COUNT_WITHIN_1000M",
+        "COE_A_PREMIUM",
+        "COE_A_BID_QUOTA_RATIO",
+        "COE_B_PREMIUM",
+        "COE_B_BID_QUOTA_RATIO",
+        "COE_C_PREMIUM",
+        "COE_C_BID_QUOTA_RATIO",
+        "COE_E_PREMIUM",
+        "COE_E_BID_QUOTA_RATIO"
+      ]
+    },
+    "market": {
+      "categorical": [
+        "TOWN",
+        "BLOCK",
+        "STREET",
+        "FLAT_TYPE",
+        "FLAT_MODEL",
+        "SUBZONE",
+        "PLANNING_AREA",
+        "REGION",
+        "BLOCK_ADDRESS",
+        "FLAT_AGE_BAND"
+      ],
+      "numeric": [
+        "FLOOR_AREA_SQM",
+        "LEASE_COMMENCE_DATE",
+        "RENT_YEAR",
+        "RENT_MONTH",
+        "RENT_MONTH_INDEX",
+        "FLAT_AGE",
+        "LATITUDE",
+        "LONGITUDE",
+        "YEAR_COMPLETED",
+        "MAX_FLOOR",
+        "BUILDING_AGE",
+        "YEAR_COMPLETED_MISSING",
+        "BUILDING_AGE_MISSING",
+        "ADDRESS_MATCHED",
+        "LOCATION_COORDINATES_VALID",
+        "LOG_FLOOR_AREA",
+        "RENT_MONTH_SIN",
+        "RENT_MONTH_COS",
+        "FLAT_TYPE_ROOMS",
+        "AREA_PER_ROOM",
+        "NEAREST_SCHOOL_DISTANCE_KM",
+        "SCHOOL_COUNT_WITHIN_500M",
+        "SCHOOL_COUNT_WITHIN_1000M",
+        "NEAREST_MALL_DISTANCE_KM",
+        "MALL_COUNT_WITHIN_500M",
+        "MALL_COUNT_WITHIN_1000M",
+        "COE_A_PREMIUM",
+        "COE_A_BID_QUOTA_RATIO",
+        "COE_B_PREMIUM",
+        "COE_B_BID_QUOTA_RATIO",
+        "COE_C_PREMIUM",
+        "COE_C_BID_QUOTA_RATIO",
+        "COE_E_PREMIUM",
+        "COE_E_BID_QUOTA_RATIO",
+        "STOCK_EQ_WEIGHT_RETURN",
+        "STOCK_MEAN_DAILY_VOL",
+        "STOCK_POSITIVE_RETURN_SHARE",
+        "STOCK_SYMBOL_COUNT"
+      ]
+    },
+    "mrt_snapshot": {
+      "categorical": [
+        "TOWN",
+        "BLOCK",
+        "STREET",
+        "FLAT_TYPE",
+        "FLAT_MODEL",
+        "SUBZONE",
+        "PLANNING_AREA",
+        "REGION",
+        "BLOCK_ADDRESS",
+        "FLAT_AGE_BAND"
+      ],
+      "numeric": [
+        "FLOOR_AREA_SQM",
+        "LEASE_COMMENCE_DATE",
+        "RENT_YEAR",
+        "RENT_MONTH",
+        "RENT_MONTH_INDEX",
+        "FLAT_AGE",
+        "LATITUDE",
+        "LONGITUDE",
+        "YEAR_COMPLETED",
+        "MAX_FLOOR",
+        "BUILDING_AGE",
+        "YEAR_COMPLETED_MISSING",
+        "BUILDING_AGE_MISSING",
+        "ADDRESS_MATCHED",
+        "LOCATION_COORDINATES_VALID",
+        "LOG_FLOOR_AREA",
+        "RENT_MONTH_SIN",
+        "RENT_MONTH_COS",
+        "FLAT_TYPE_ROOMS",
+        "AREA_PER_ROOM",
+        "NEAREST_SCHOOL_DISTANCE_KM",
+        "SCHOOL_COUNT_WITHIN_500M",
+        "SCHOOL_COUNT_WITHIN_1000M",
+        "NEAREST_MALL_DISTANCE_KM",
+        "MALL_COUNT_WITHIN_500M",
+        "MALL_COUNT_WITHIN_1000M",
+        "COE_A_PREMIUM",
+        "COE_A_BID_QUOTA_RATIO",
+        "COE_B_PREMIUM",
+        "COE_B_BID_QUOTA_RATIO",
+        "COE_C_PREMIUM",
+        "COE_C_BID_QUOTA_RATIO",
+        "COE_E_PREMIUM",
+        "COE_E_BID_QUOTA_RATIO",
+        "STOCK_EQ_WEIGHT_RETURN",
+        "STOCK_MEAN_DAILY_VOL",
+        "STOCK_POSITIVE_RETURN_SHARE",
+        "STOCK_SYMBOL_COUNT",
+        "NEAREST_OPEN_MRT_DISTANCE_KM",
+        "OPEN_MRT_COUNT_WITHIN_500M",
+        "OPEN_MRT_COUNT_WITHIN_1000M"
+      ]
+    }
+  },
+  "constant_fee_values": 1,
+  "constant_furnished_values": 1,
+  "selection_rule": "lowest pooled squared error on two earlier time windows; exclude MRT snapshot; equal blending weights fixed at 0.5",
+  "cache_signature": "8f8f8924740e56b6",
+  "candidate_grid": {
+    "catboost": [
+      "main",
+      "housing",
+      "amenities"
+    ],
+    "lightgbm": [
+      "main",
+      "housing",
+      "amenities",
+      "coe",
+      "market",
+      "mrt_snapshot"
+    ],
+    "blend": [
+      "main",
+      "housing",
+      "amenities"
+    ]
+  },
+  "selected_candidate": "blend_housing",
+  "selected_components": [
+    "catboost_housing",
+    "lightgbm_housing"
+  ],
+  "primary_best_observed": "blend_main",
+  "diagnostic_model_training_end": "2024-12",
+  "splits": [
+    {
+      "split": "temporal_backtest_2",
+      "fit_rows": 124016,
+      "validation_rows": 8786,
+      "fit_start": "2021-01",
+      "fit_end": "2024-06",
+      "validation_start": "2024-07",
+      "validation_end": "2024-09"
+    },
+    {
+      "split": "temporal_backtest_1",
+      "fit_rows": 132802,
+      "validation_rows": 8274,
+      "fit_start": "2021-01",
+      "fit_end": "2024-09",
+      "validation_start": "2024-10",
+      "validation_end": "2024-12"
+    },
+    {
+      "split": "temporal",
+      "fit_rows": 141076,
+      "validation_rows": 8924,
+      "fit_start": "2021-01",
+      "fit_end": "2024-12",
+      "validation_start": "2025-01",
+      "validation_end": "2025-03"
+    },
+    {
+      "split": "random",
+      "fit_rows": 120000,
+      "validation_rows": 30000,
+      "fit_start": "2021-01",
+      "fit_end": "2025-03",
+      "validation_start": "2021-01",
+      "validation_end": "2025-03"
+    }
+  ],
+  "implementation_sha256": {
+    "src\\models\\run_stage5.py": "fa1782e146eedd8eea9694788607201180b01b85d720cfbef2357406e76e7e6a",
+    "src\\features\\build_stage5_features.py": "834a7c189a94cc9777414dc4610503653abe91a98099572e28633fccf38a3a29",
+    "src\\models\\train_baseline.py": "63fd08f617549563e01fe6bf65ff4ae0ef16187e717a1711a7384c2543fe5fb5"
+  }
+}

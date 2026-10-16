@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "result_rows": 38,
+  "screening_configs": 8,
+  "checked_prediction_values": 326504,
+  "portable_model_reload": {
+    "catboost_d8_regularized": "matched all primary rows",
+    "lightgbm_15_regularized": "matched all primary rows"
+  },
+  "input_and_code_hashes": "matched",
+  "primary_selection": "excluded by selection function and locked artifact",
+  "group_error_rows": 292,
+  "test_data_read": false
+}
