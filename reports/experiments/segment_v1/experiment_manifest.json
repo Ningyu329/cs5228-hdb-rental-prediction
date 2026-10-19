@@ -1,0 +1,231 @@
+{
+  "source_sha256": "1542050dcdad6937613b69f293ca07daaa209834195e4172dcb900c6921bf32b",
+  "implementation_sha256": {
+    "src/data/audit_cleaning.py": "559cb7f3f45ae7fa90f1bf2868966af868e3718d8f9ecb93963c85c8db3c22cb",
+    "src/data/clean_data.py": "601d7c33608fb8b2d2371b3248b32d3557a49cd1cdc441108d13de709618b2a2",
+    "src/eda/run_eda.py": "134b20e1d0ff8b579abf8588cb13970e218b5359d297ac04531fd839df25a567",
+    "src/features/build_location_features.py": "ec0bd4b09bab800c716f644f19b7c3e6b680cba627cd436215c52f8d0d409eb6",
+    "src/features/build_stage5_features.py": "834a7c189a94cc9777414dc4610503653abe91a98099572e28633fccf38a3a29",
+    "src/features/build_temporal_features.py": "c26768291295e6b8f9b96701cfe621df05b0dfe5e4bbb67b872ef771737bba7d",
+    "src/features/segment_calibration.py": "8c63adf36406747d106c2a482322f483e78a5dd6e64bc407a7783575364b2b88",
+    "src/models/export_rmse_submission.py": "fb2fdd2b7c1d1765a1adc7038bfd149d3496156c470dc83fe225462cab6fb3ff",
+    "src/models/inspect_rmse_improvement.py": "d8cf0a9199e5bafeb46c71622994ab6bfbc650205a4b12280d398a844decf80b",
+    "src/models/inspect_stage5.py": "a1a14b75a56c8921ac1d183c1fa07fdbd7e3afef0b3823d2ad98988fbb2239ba",
+    "src/models/inspect_tree_tuning.py": "20e00ecdf2eb1272ddbb3640356b0a910cb70561a5383586e5f9be1957c1a558",
+    "src/models/run_location_ablation.py": "4ca9872b3ead4d84271802efc9f5a7b7cc92269b136696ca305a9afa9611c90b",
+    "src/models/run_rmse_improvement.py": "8346b1fdf897e422d20df23e0c8435651dcf07fa453904f7def1d31d1c5a385d",
+    "src/models/run_segment_experiments.py": "986d96a1cc11a443187cc395765cdb099eb7446f3318f2fdd013780564e22c0b",
+    "src/models/run_stage5.py": "fa1782e146eedd8eea9694788607201180b01b85d720cfbef2357406e76e7e6a",
+    "src/models/run_tree_tuning.py": "4ac58e1a32ef53f9d2b2c5f45ac6f31642b2eed6089d2576fc50f63227cba3a5",
+    "src/models/train_baseline.py": "63fd08f617549563e01fe6bf65ff4ae0ef16187e717a1711a7384c2543fe5fb5"
+  },
+  "reference_manifest_sha256": "0bab32d66e5d0070cbc1894f910077b0f16cfa76896ff9f958ce74be9ee5e4bc",
+  "reference_lock_sha256": "a667a17a991379c60c8ff057581af233d9bd1a580d402f61f03f20154d6888a5",
+  "macro_sha256": {
+    "data/interim/auxiliary/sg-coe-prices_clean.csv": "c3be80240786645495d950297cc4ad8133e9e0f8b71629bd8115cfc41b348940",
+    "data/interim/auxiliary/sg-stock-prices_clean.csv": "dca2e3bb0b20ca5ff2c6ba1b21ac337c7e2769ea6f4f367727c451ee65fd8d42"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1",
+    "sklearn": "1.9.1",
+    "catboost": "1.2.10",
+    "lightgbm": "4.7.0"
+  },
+  "threads": 3,
+  "seed": 42,
+  "calibration": {
+    "q3_2024": [
+      "cal_q1_2024",
+      "cal_q2_2024"
+    ],
+    "q4_2024": [
+      "cal_q2_2024",
+      "q3_2024"
+    ],
+    "primary_2025": [
+      "q3_2024",
+      "q4_2024"
+    ],
+    "long_6m": [
+      "cal_q1_2024",
+      "cal_q2_2024"
+    ]
+  },
+  "calibration_window_months": 6,
+  "selection_splits": [
+    "q3_2024",
+    "q4_2024"
+  ],
+  "selection_rule": "pooled SSE; incumbent retained unless improvement > 1e-8 RMSE",
+  "primary_used_for_selection": false,
+  "primary_previously_inspected": true,
+  "diagnostic_splits": [
+    "primary_2025",
+    "long_6m"
+  ],
+  "initial_grid": {
+    "locked_448_control": {
+      "kind": "base"
+    },
+    "bias_global_s100": {
+      "kind": "correction",
+      "columns": [],
+      "shrink": 100,
+      "trend": false
+    },
+    "bias_global_s500": {
+      "kind": "correction",
+      "columns": [],
+      "shrink": 500,
+      "trend": false
+    },
+    "bias_flat_s100": {
+      "kind": "correction",
+      "columns": [
+        "FLAT_TYPE"
+      ],
+      "shrink": 100,
+      "trend": false
+    },
+    "bias_flat_s500": {
+      "kind": "correction",
+      "columns": [
+        "FLAT_TYPE"
+      ],
+      "shrink": 500,
+      "trend": false
+    },
+    "bias_town_s100": {
+      "kind": "correction",
+      "columns": [
+        "TOWN"
+      ],
+      "shrink": 100,
+      "trend": false
+    },
+    "bias_town_s500": {
+      "kind": "correction",
+      "columns": [
+        "TOWN"
+      ],
+      "shrink": 500,
+      "trend": false
+    },
+    "bias_town_flat_s100": {
+      "kind": "correction",
+      "columns": [
+        "TOWN",
+        "FLAT_TYPE"
+      ],
+      "shrink": 100,
+      "trend": false
+    },
+    "bias_town_flat_s500": {
+      "kind": "correction",
+      "columns": [
+        "TOWN",
+        "FLAT_TYPE"
+      ],
+      "shrink": 500,
+      "trend": false
+    },
+    "trend_global_s100": {
+      "kind": "correction",
+      "columns": [],
+      "shrink": 100,
+      "trend": true
+    },
+    "trend_global_s500": {
+      "kind": "correction",
+      "columns": [],
+      "shrink": 500,
+      "trend": true
+    },
+    "trend_flat_s100": {
+      "kind": "correction",
+      "columns": [
+        "FLAT_TYPE"
+      ],
+      "shrink": 100,
+      "trend": true
+    },
+    "trend_flat_s500": {
+      "kind": "correction",
+      "columns": [
+        "FLAT_TYPE"
+      ],
+      "shrink": 500,
+      "trend": true
+    },
+    "trend_town_flat_s100": {
+      "kind": "correction",
+      "columns": [
+        "TOWN",
+        "FLAT_TYPE"
+      ],
+      "shrink": 100,
+      "trend": true
+    },
+    "trend_town_flat_s500": {
+      "kind": "correction",
+      "columns": [
+        "TOWN",
+        "FLAT_TYPE"
+      ],
+      "shrink": 500,
+      "trend": true
+    }
+  },
+  "expert": {
+    "group": "FLAT_TYPE",
+    "max_groups": 4,
+    "min_train_rows": 3000,
+    "min_inner_rows": 100,
+    "selection": "largest past OOF SSE, not outer labels",
+    "blend_weights": [
+      0.25,
+      0.5,
+      1.0
+    ],
+    "cap": 1000
+  },
+  "macro": {
+    "aggregation": {
+      "coe_rows": 539,
+      "stock_rows": 91642,
+      "stock_missing_close_rows": 85,
+      "stock_symbols": 77,
+      "monthly_rows": 68,
+      "coe_rule": "mean premium across rounds; sum bids / sum quota for each month/category",
+      "stock_rule": "equal-weight symbol monthly CLOSE returns, mean daily volatility and positive return share; no price fill",
+      "lag_months": 2
+    },
+    "regimes": [
+      "coe_available",
+      "market_available",
+      "market_frozen2"
+    ],
+    "features": "housing + COE/stock only; no amenities",
+    "blend_weights": [
+      0.25,
+      0.5,
+      1.0
+    ]
+  },
+  "test_data_read": false,
+  "submission_generated": false,
+  "limitations": [
+    "previously inspected and repeatedly reused validation windows",
+    "six-month OOF correction history; forecast-origin/horizon mismatch remains",
+    "no new 12-month backtest; old 12-month diagnostic remains applicable only to control",
+    "same-month macro is conditional-on-provided-covariates, not a real-time forecast",
+    "static HDB snapshot availability",
+    "bounded greedy search, not exhaustive"
+  ],
+  "run_id": "73e32bd1061a3a2afb28",
+  "complete": true,
+  "selected": "bias_town_flat_s500",
+  "cache": "/Users/ningyu/NUS/cs5228/project/models/segment_experiments_cache/73e32bd1061a3a2afb28"
+}

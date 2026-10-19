@@ -1,0 +1,8 @@
+{
+  "complete": false,
+  "reason": "Stopped during first raw CatBoost inner fit to correct public/competition street abbreviations before external-feature fitting.",
+  "completed_models": 0,
+  "superseded_by": "reports/experiments/data_rethink_v2",
+  "production_replaced": false,
+  "submission_generated": false
+}

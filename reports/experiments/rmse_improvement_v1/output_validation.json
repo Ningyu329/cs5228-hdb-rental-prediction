@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "score_rows_checked": 55,
+  "all_result_rows_checked": true,
+  "prediction_values_checked": 540810,
+  "primary_native_models_reloaded": 4,
+  "input_and_code_hashes_checked": true,
+  "validation_implementation_sha256": "d8cf0a9199e5bafeb46c71622994ab6bfbc650205a4b12280d398a844decf80b",
+  "historical_reference_sha256": "cdbb02f2dac9a15bf24720dc1d82bfcdce61de329de61935aa58cf5d48a982d8",
+  "control_primary_rmse": 450.47354274846384,
+  "historical_primary_rmse": 450.47354274846384,
+  "control_reproduction_difference": 0.0,
+  "stage_locks_checked": 4,
+  "labels_and_source_rows_aligned": true,
+  "primary_used_for_selection": false,
+  "test_data_read": false,
+  "note": "Long backtests overlap earlier tuning periods and are diagnostics, not untouched holdouts."
+}

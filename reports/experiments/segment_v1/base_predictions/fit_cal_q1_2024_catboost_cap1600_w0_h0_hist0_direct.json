@@ -1,0 +1,18 @@
+{
+  "iterations": 878,
+  "cap": 1600,
+  "train_rows": 105837,
+  "effective_train_start": "2021-01",
+  "inner_fit_end": "2023-09",
+  "inner_validation_start": "2023-10",
+  "inner_validation_end": "2023-12",
+  "seconds": 0.112349125003675,
+  "spec": {
+    "family": "catboost",
+    "cap": 1600,
+    "window": 0,
+    "half_life": 0,
+    "history": 0,
+    "trend": ""
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "ok": true,
+  "score_checks": 48,
+  "selection_checks": 22,
+  "native_model_checks": 18,
+  "source_hashes_verified": true,
+  "previous_submission_unchanged": true,
+  "selected": "incumbent",
+  "challenger": "unit_area_all_blend25",
+  "history_coverage": {
+    "q3_2024": {
+      "rows": 8786,
+      "exact_at_least_1": 0.9053038925563396,
+      "exact_at_least_5": 0.36239471887093105,
+      "block_at_least_1": 0.9053038925563396,
+      "block_at_least_5": 0.36239471887093105,
+      "median_16th_block_distance_km": 0.3588114298686872,
+      "median_64th_block_distance_km": 0.9481076573953178
+    },
+    "q4_2024": {
+      "rows": 8274,
+      "exact_at_least_1": 0.9053662073966643,
+      "exact_at_least_5": 0.36185641769398114,
+      "block_at_least_1": 0.9053662073966643,
+      "block_at_least_5": 0.36185641769398114,
+      "median_16th_block_distance_km": 0.3569001835501874,
+      "median_64th_block_distance_km": 0.941499486477988
+    },
+    "primary_2025": {
+      "rows": 8924,
+      "exact_at_least_1": 0.8988121918422233,
+      "exact_at_least_5": 0.35421335723890635,
+      "block_at_least_1": 0.8988121918422233,
+      "block_at_least_5": 0.35421335723890635,
+      "median_16th_block_distance_km": 0.3568298879758279,
+      "median_64th_block_distance_km": 0.9502830524095949
+    },
+    "long_6m": {
+      "rows": 17060,
+      "exact_at_least_1": 0.9086166471277843,
+      "exact_at_least_5": 0.3664712778429074,
+      "block_at_least_1": 0.9086166471277843,
+      "block_at_least_5": 0.3664712778429074,
+      "median_16th_block_distance_km": 0.35801098891583194,
+      "median_64th_block_distance_km": 0.9440662133865018
+    }
+  },
+  "auditor_sha256": "1a0e7ce849c8308aa85bb6c8da21f25f389f857533d73c44e4841420af07a32b",
+  "run_id": "93a81b016f56a8b14d76"
+}

@@ -1,0 +1,61 @@
+{
+  "source": "data/processed/train_location_features.csv",
+  "source_sha256": "1542050dcdad6937613b69f293ca07daaa209834195e4172dcb900c6921bf32b",
+  "implementation_sha256": {
+    "src/models/run_rmse_improvement.py": "8346b1fdf897e422d20df23e0c8435651dcf07fa453904f7def1d31d1c5a385d",
+    "src/features/build_temporal_features.py": "c26768291295e6b8f9b96701cfe621df05b0dfe5e4bbb67b872ef771737bba7d",
+    "src/models/run_stage5.py": "fa1782e146eedd8eea9694788607201180b01b85d720cfbef2357406e76e7e6a",
+    "src/models/run_tree_tuning.py": "4ac58e1a32ef53f9d2b2c5f45ac6f31642b2eed6089d2576fc50f63227cba3a5",
+    "src/features/build_stage5_features.py": "834a7c189a94cc9777414dc4610503653abe91a98099572e28633fccf38a3a29",
+    "src/models/train_baseline.py": "63fd08f617549563e01fe6bf65ff4ae0ef16187e717a1711a7384c2543fe5fb5"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1",
+    "sklearn": "1.9.1",
+    "catboost": "1.2.10",
+    "lightgbm": "4.7.0"
+  },
+  "threads": 3,
+  "seed": 42,
+  "splits": {
+    "q3_2024": [
+      "2024-07",
+      "2024-09"
+    ],
+    "q4_2024": [
+      "2024-10",
+      "2024-12"
+    ],
+    "primary_2025": [
+      "2025-01",
+      "2025-03"
+    ],
+    "long_6m": [
+      "2024-07",
+      "2024-12"
+    ],
+    "long_12m": [
+      "2024-01",
+      "2024-12"
+    ]
+  },
+  "primary_used_for_selection": false,
+  "primary_previously_inspected": true,
+  "test_data_read": false,
+  "submission_generated": false,
+  "selection_rule": "sequential tuning on pooled Jul-Sep/Oct-Dec 2024 RMSE; incumbent always eligible",
+  "cap_rule": "one shared inner 2400-cap trajectory; best prefix <=800/1600/2400; refit each distinct selected round count",
+  "recency_screen": "LightGBM screens all four recipes; confirm best new recipe with CatBoost",
+  "history_screen": "LightGBM screens 6/12-month histories; confirm best new recipe with CatBoost",
+  "trend_rule": "static LightGBM residual + flat3/damped12/damped24 monthly trend; blend weights 0/25/50/75/100%",
+  "long_backtests_use": "diagnostic only, not additional selection; earlier training origins and overlapping 2024 queries",
+  "limits": [
+    "static HDB snapshot availability",
+    "repeatedly inspected primary quarter",
+    "bounded screening and greedy selection",
+    "monthly trend is affected by housing composition"
+  ],
+  "run_id": "24cdf7b53bde332a047f"
+}

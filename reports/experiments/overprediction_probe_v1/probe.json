@@ -1,0 +1,217 @@
+{
+  "params": {
+    "n_estimators": 300,
+    "learning_rate": 0.04,
+    "num_leaves": 15,
+    "min_child_samples": 100,
+    "reg_lambda": 10.0,
+    "colsample_bytree": 0.9,
+    "random_state": 42,
+    "n_jobs": 3,
+    "verbosity": -1,
+    "deterministic": true,
+    "force_col_wise": true
+  },
+  "target": "OOF prediction - actual rent > 1000",
+  "features": {
+    "categorical": [
+      "TOWN",
+      "BLOCK",
+      "STREET",
+      "FLAT_TYPE",
+      "FLAT_MODEL",
+      "SUBZONE",
+      "PLANNING_AREA",
+      "REGION",
+      "BLOCK_ADDRESS",
+      "FLAT_AGE_BAND"
+    ],
+    "numeric": [
+      "FLOOR_AREA_SQM",
+      "LEASE_COMMENCE_DATE",
+      "RENT_YEAR",
+      "RENT_MONTH",
+      "RENT_MONTH_INDEX",
+      "FLAT_AGE",
+      "LATITUDE",
+      "LONGITUDE",
+      "YEAR_COMPLETED",
+      "MAX_FLOOR",
+      "BUILDING_AGE",
+      "YEAR_COMPLETED_MISSING",
+      "BUILDING_AGE_MISSING",
+      "ADDRESS_MATCHED",
+      "LOCATION_COORDINATES_VALID",
+      "LOG_FLOOR_AREA",
+      "RENT_MONTH_SIN",
+      "RENT_MONTH_COS",
+      "FLAT_TYPE_ROOMS",
+      "AREA_PER_ROOM"
+    ],
+    "extra": [
+      "CONTROL_PREDICTION",
+      "HISTORY_N",
+      "ALL_HISTORY_N",
+      "EXACT_HOUSE_N",
+      "HISTORY_MEAN",
+      "HISTORY_MEDIAN",
+      "HISTORY_STD",
+      "HISTORY_ADJUSTED_STD",
+      "HISTORY_Q10",
+      "HISTORY_Q90"
+    ]
+  },
+  "past_windows": {
+    "q3_2024": [
+      "cal_q1_2024",
+      "cal_q2_2024"
+    ],
+    "q4_2024": [
+      "cal_q2_2024",
+      "q3_2024"
+    ],
+    "primary_2025": [
+      "q3_2024",
+      "q4_2024"
+    ]
+  },
+  "no_model_selection": true,
+  "no_rent_model_changed": true,
+  "no_submission": true,
+  "no_test_data_read": true,
+  "provenance": [
+    {
+      "split": "q3_2024",
+      "fit_end": "2024-06",
+      "query_start": "2024-07",
+      "query_end": "2024-09",
+      "rows": 8786
+    },
+    {
+      "split": "q4_2024",
+      "fit_end": "2024-09",
+      "query_start": "2024-10",
+      "query_end": "2024-12",
+      "rows": 8274
+    },
+    {
+      "split": "primary_2025",
+      "fit_end": "2024-12",
+      "query_start": "2025-01",
+      "query_end": "2025-03",
+      "rows": 8924
+    },
+    {
+      "split": "cal_q1_2024",
+      "fit_end": "2023-12",
+      "query_start": "2024-01",
+      "query_end": "2024-03",
+      "rows": 9005
+    },
+    {
+      "split": "cal_q2_2024",
+      "fit_end": "2024-03",
+      "query_start": "2024-04",
+      "query_end": "2024-06",
+      "rows": 9174
+    }
+  ],
+  "results": [
+    {
+      "split": "q3_2024",
+      "variant": "housing",
+      "training_rows": 18179,
+      "rows": 8786,
+      "positive_rows": 315,
+      "prevalence": 0.035852492601866605,
+      "roc_auc": 0.5007937444839817,
+      "average_precision": 0.03743091827349254,
+      "alert_rows": 440,
+      "alert_precision": 0.04318181818181818,
+      "alert_recall": 0.06031746031746032,
+      "alert_lift": 1.2044300144300144
+    },
+    {
+      "split": "q3_2024",
+      "variant": "housing_history_control",
+      "training_rows": 18179,
+      "rows": 8786,
+      "positive_rows": 315,
+      "prevalence": 0.035852492601866605,
+      "roc_auc": 0.5096148765255128,
+      "average_precision": 0.03860307511072283,
+      "alert_rows": 440,
+      "alert_precision": 0.045454545454545456,
+      "alert_recall": 0.06349206349206349,
+      "alert_lift": 1.267821067821068
+    },
+    {
+      "split": "q4_2024",
+      "variant": "housing",
+      "training_rows": 17960,
+      "rows": 8274,
+      "positive_rows": 276,
+      "prevalence": 0.03335750543872371,
+      "roc_auc": 0.4912192722093567,
+      "average_precision": 0.03301263656558906,
+      "alert_rows": 414,
+      "alert_precision": 0.033816425120772944,
+      "alert_recall": 0.050724637681159424,
+      "alert_lift": 1.0137576139466498
+    },
+    {
+      "split": "q4_2024",
+      "variant": "housing_history_control",
+      "training_rows": 17960,
+      "rows": 8274,
+      "positive_rows": 276,
+      "prevalence": 0.03335750543872371,
+      "roc_auc": 0.49890167288198867,
+      "average_precision": 0.0333985213313189,
+      "alert_rows": 414,
+      "alert_precision": 0.033816425120772944,
+      "alert_recall": 0.050724637681159424,
+      "alert_lift": 1.0137576139466498
+    },
+    {
+      "split": "primary_2025",
+      "variant": "housing",
+      "training_rows": 17060,
+      "rows": 8924,
+      "positive_rows": 308,
+      "prevalence": 0.03451367099955177,
+      "roc_auc": 0.5213266016713092,
+      "average_precision": 0.0360089307126431,
+      "alert_rows": 447,
+      "alert_precision": 0.03355704697986577,
+      "alert_recall": 0.048701298701298704,
+      "alert_lift": 0.9722827508062407
+    },
+    {
+      "split": "primary_2025",
+      "variant": "housing_history_control",
+      "training_rows": 17060,
+      "rows": 8924,
+      "positive_rows": 308,
+      "prevalence": 0.03451367099955177,
+      "roc_auc": 0.5284859638968274,
+      "average_precision": 0.03612031953575743,
+      "alert_rows": 447,
+      "alert_precision": 0.02237136465324385,
+      "alert_recall": 0.032467532467532464,
+      "alert_lift": 0.6481885005374939
+    }
+  ],
+  "source_sha256": {
+    "data/processed/train_location_features.csv": "1542050dcdad6937613b69f293ca07daaa209834195e4172dcb900c6921bf32b",
+    "src/eda/probe_large_overprediction.py": "cc7c617ac22a1e30385775a592a2d31d110d8b3acaba8fcbcfcbda31b55ff481",
+    "src/eda/analyze_error_mechanisms.py": "6f6302873139219e1c767ed9a74c707f732f544c480d3560b7ad34cf273cf175",
+    "reports/experiments/rmse_improvement_v1/experiment_manifest.json": "0bab32d66e5d0070cbc1894f910077b0f16cfa76896ff9f958ce74be9ee5e4bc",
+    "reports/experiments/rmse_improvement_v1/selection_locked.json": "a667a17a991379c60c8ff057581af233d9bd1a580d402f61f03f20154d6888a5"
+  },
+  "limits": [
+    "fixed simple classifier failure does not establish absence of predictive information",
+    "all diagnostic windows have previously been inspected",
+    "top-5% alert quota is fixed without true query labels"
+  ]
+}

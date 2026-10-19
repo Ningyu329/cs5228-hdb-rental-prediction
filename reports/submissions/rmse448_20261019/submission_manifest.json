@@ -1,0 +1,79 @@
+{
+  "training_sha256": "1542050dcdad6937613b69f293ca07daaa209834195e4172dcb900c6921bf32b",
+  "test_sha256": "66446247a1699fd0de7f325c4fa6c5fd100e762c8d43ada5dcce559780b2de99",
+  "raw_test_sha256": "dfc407406d957bbf7c2f005e5d9852b1bfc6546cd4186f07e6824d8e03e64cfc",
+  "lock_sha256": "a667a17a991379c60c8ff057581af233d9bd1a580d402f61f03f20154d6888a5",
+  "implementation_sha256": {
+    "src/data/audit_cleaning.py": "559cb7f3f45ae7fa90f1bf2868966af868e3718d8f9ecb93963c85c8db3c22cb",
+    "src/data/clean_data.py": "601d7c33608fb8b2d2371b3248b32d3557a49cd1cdc441108d13de709618b2a2",
+    "src/eda/run_eda.py": "134b20e1d0ff8b579abf8588cb13970e218b5359d297ac04531fd839df25a567",
+    "src/features/build_location_features.py": "ec0bd4b09bab800c716f644f19b7c3e6b680cba627cd436215c52f8d0d409eb6",
+    "src/features/build_stage5_features.py": "834a7c189a94cc9777414dc4610503653abe91a98099572e28633fccf38a3a29",
+    "src/features/build_temporal_features.py": "c26768291295e6b8f9b96701cfe621df05b0dfe5e4bbb67b872ef771737bba7d",
+    "src/models/export_rmse_submission.py": "fb2fdd2b7c1d1765a1adc7038bfd149d3496156c470dc83fe225462cab6fb3ff",
+    "src/models/inspect_rmse_improvement.py": "d8cf0a9199e5bafeb46c71622994ab6bfbc650205a4b12280d398a844decf80b",
+    "src/models/inspect_stage5.py": "a1a14b75a56c8921ac1d183c1fa07fdbd7e3afef0b3823d2ad98988fbb2239ba",
+    "src/models/inspect_tree_tuning.py": "20e00ecdf2eb1272ddbb3640356b0a910cb70561a5383586e5f9be1957c1a558",
+    "src/models/run_location_ablation.py": "4ca9872b3ead4d84271802efc9f5a7b7cc92269b136696ca305a9afa9611c90b",
+    "src/models/run_rmse_improvement.py": "8346b1fdf897e422d20df23e0c8435651dcf07fa453904f7def1d31d1c5a385d",
+    "src/models/run_stage5.py": "fa1782e146eedd8eea9694788607201180b01b85d720cfbef2357406e76e7e6a",
+    "src/models/run_tree_tuning.py": "4ac58e1a32ef53f9d2b2c5f45ac6f31642b2eed6089d2576fc50f63227cba3a5",
+    "src/models/train_baseline.py": "63fd08f617549563e01fe6bf65ff4ae0ef16187e717a1711a7384c2543fe5fb5"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1",
+    "sklearn": "1.9.1",
+    "catboost": "1.2.10",
+    "lightgbm": "4.7.0"
+  },
+  "threads": 4,
+  "selected": "trend_damped24_weight25",
+  "weights": {
+    "catboost_cap1600_w0_h0_hist0_direct": 0.375,
+    "lightgbm_cap1000_w0_h0_hist0_direct": 0.375,
+    "lightgbm_cap1000_w0_h0_hist0_damped24": 0.25
+  },
+  "train_rows": 150000,
+  "test_rows": 50000,
+  "fit_end": "2025-03",
+  "test_start": "2025-03",
+  "test_end": "2026-07",
+  "test_order_verified_against_raw": true,
+  "no_test_labels": true,
+  "output": "/Users/ningyu/NUS/cs5228/project/submissions/submission_rmse448_trend25_20261019.csv",
+  "output_sha256": "e1f06bc525d0e048f04d7c86dcf069faf855fafdbd45d00438c69499ccbf5317",
+  "prediction_summary": {
+    "count": 50000.0,
+    "mean": 3160.4466879946826,
+    "std": 454.429167883502,
+    "min": 1631.8928498030934,
+    "25%": 2833.416991804313,
+    "50%": 3148.3544453130544,
+    "75%": 3422.111159067855,
+    "max": 5214.820280301357
+  },
+  "cache": "/Users/ningyu/NUS/cs5228/project/models/rmse_submission_cache/77d310cc678a65cc38bb",
+  "submission_generated": true,
+  "submitted_to_kaggle": true,
+  "kaggle_receipt": {
+    "competition": "cs-5228-2610-project",
+    "team": "CS5228 Avengers (31)",
+    "status": "scored",
+    "public_rmse": 437.44368,
+    "public_rank_at_submission": 20,
+    "teams_at_submission": 35,
+    "previous_best_public_rmse": 633.16539,
+    "total_team_entries_after_submission": 2,
+    "new_submissions_this_run": 1,
+    "result_url": "https://www.kaggle.com/competitions/cs-5228-2610-project/leaderboard",
+    "screenshot": "reports/submissions/rmse448_20261019/kaggle_result.jpg"
+  },
+  "independent_reload_audit": {
+    "passed": true,
+    "models_reloaded": 3,
+    "rows_checked": 50000,
+    "max_absolute_error": 4.547473508864641e-13
+  }
+}

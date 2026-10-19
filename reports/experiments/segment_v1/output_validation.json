@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "scores_checked": 58,
+  "partitions_checked": 96,
+  "native_models_reloaded": 14,
+  "control_reproduced": true,
+  "selection_excludes_primary": true,
+  "selected": "bias_town_flat_s500",
+  "tail_error_concentration": {
+    "q3_2024": {
+      "top_1pct_sse_share": 0.16530216808900114,
+      "top_5pct_sse_share": 0.4147274405567514,
+      "top_10pct_sse_share": 0.5752569610408355
+    },
+    "q4_2024": {
+      "top_1pct_sse_share": 0.1933275768726101,
+      "top_5pct_sse_share": 0.4529892026559098,
+      "top_10pct_sse_share": 0.6098761418745333
+    },
+    "primary_2025": {
+      "top_1pct_sse_share": 0.1692792133322377,
+      "top_5pct_sse_share": 0.43152577221524435,
+      "top_10pct_sse_share": 0.5912504039175004
+    },
+    "long_6m": {
+      "top_1pct_sse_share": 0.1756392059096524,
+      "top_5pct_sse_share": 0.42829166292134263,
+      "top_10pct_sse_share": 0.5872519907641895
+    }
+  }
+}

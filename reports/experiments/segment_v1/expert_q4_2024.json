@@ -1,0 +1,30 @@
+[
+  {
+    "group": "4-room",
+    "rows": 47811,
+    "inner_fit_rows": 44611,
+    "inner_rows": 3200,
+    "rounds": 505
+  },
+  {
+    "group": "3-room",
+    "rows": 43337,
+    "inner_fit_rows": 40462,
+    "inner_rows": 2875,
+    "rounds": 120
+  },
+  {
+    "group": "5-room",
+    "rows": 31615,
+    "inner_fit_rows": 29596,
+    "inner_rows": 2019,
+    "rounds": 687
+  },
+  {
+    "group": "executive",
+    "rows": 7382,
+    "inner_fit_rows": 6925,
+    "inner_rows": 457,
+    "rounds": 268
+  }
+]

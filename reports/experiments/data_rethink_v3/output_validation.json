@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "run_id": "21cb501c6b7b51b3dc55",
+  "scores_checked": 61,
+  "models_reloaded": 28,
+  "source_fingerprints_valid": true,
+  "selection_recomputed": true,
+  "long_selection_recomputed": true,
+  "monthly_totals_checked": true,
+  "query_target_and_id_invariance": true,
+  "previous_submission_unchanged": true,
+  "property_used_in_training": false,
+  "public_rental_labels_downloaded": false
+}

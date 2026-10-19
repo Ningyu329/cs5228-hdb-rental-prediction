@@ -1,0 +1,191 @@
+{
+  "selected": "trend_damped24_weight25",
+  "weights": {
+    "catboost_cap1600_w0_h0_hist0_direct": 0.375,
+    "lightgbm_cap1000_w0_h0_hist0_direct": 0.375,
+    "lightgbm_cap1000_w0_h0_hist0_damped24": 0.25
+  },
+  "baseline": "control_800_blend",
+  "specs": {
+    "catboost_cap800_w0_h0_hist0_direct": {
+      "family": "catboost",
+      "cap": 800,
+      "window": 0,
+      "half_life": 0,
+      "history": 0,
+      "trend": ""
+    },
+    "lightgbm_cap1000_w0_h0_hist0_direct": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "window": 0,
+      "half_life": 0,
+      "history": 0,
+      "trend": ""
+    },
+    "catboost_cap1600_w0_h0_hist0_direct": {
+      "family": "catboost",
+      "cap": 1600,
+      "window": 0,
+      "half_life": 0,
+      "history": 0,
+      "trend": ""
+    },
+    "catboost_cap2400_w0_h0_hist0_direct": {
+      "family": "catboost",
+      "cap": 2400,
+      "window": 0,
+      "half_life": 0,
+      "history": 0,
+      "trend": ""
+    },
+    "lightgbm_cap1000_w24_h0_hist0_direct": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "window": 24,
+      "half_life": 0,
+      "history": 0,
+      "trend": ""
+    },
+    "lightgbm_cap1000_w36_h0_hist0_direct": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "window": 36,
+      "half_life": 0,
+      "history": 0,
+      "trend": ""
+    },
+    "lightgbm_cap1000_w0_h12_hist0_direct": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "window": 0,
+      "half_life": 12,
+      "history": 0,
+      "trend": ""
+    },
+    "lightgbm_cap1000_w0_h24_hist0_direct": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "window": 0,
+      "half_life": 24,
+      "history": 0,
+      "trend": ""
+    },
+    "catboost_cap1600_w36_h0_hist0_direct": {
+      "family": "catboost",
+      "cap": 1600,
+      "window": 36,
+      "half_life": 0,
+      "history": 0,
+      "trend": ""
+    },
+    "lightgbm_cap1000_w0_h0_hist6_direct": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "window": 0,
+      "half_life": 0,
+      "history": 6,
+      "trend": ""
+    },
+    "lightgbm_cap1000_w0_h0_hist12_direct": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "window": 0,
+      "half_life": 0,
+      "history": 12,
+      "trend": ""
+    },
+    "catboost_cap1600_w0_h0_hist6_direct": {
+      "family": "catboost",
+      "cap": 1600,
+      "window": 0,
+      "half_life": 0,
+      "history": 6,
+      "trend": ""
+    },
+    "lightgbm_cap1000_w0_h0_hist0_flat3": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "window": 0,
+      "half_life": 0,
+      "history": 0,
+      "trend": "flat3"
+    },
+    "lightgbm_cap1000_w0_h0_hist0_damped12": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "window": 0,
+      "half_life": 0,
+      "history": 0,
+      "trend": "damped12"
+    },
+    "lightgbm_cap1000_w0_h0_hist0_damped24": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "window": 0,
+      "half_life": 0,
+      "history": 0,
+      "trend": "damped24"
+    }
+  },
+  "decisions": [
+    {
+      "stage": "01_caps",
+      "selected": "cap_1600_blend",
+      "pooled_rmse": 460.16918944452163,
+      "incumbent": "control_800_blend",
+      "candidates": [
+        "control_800_blend",
+        "cap_1600_blend",
+        "cap_2400_blend"
+      ],
+      "primary_used": false
+    },
+    {
+      "stage": "02_recency",
+      "selected": "cap_1600_blend",
+      "pooled_rmse": 460.16918944452163,
+      "incumbent": "cap_1600_blend",
+      "candidates": [
+        "cap_1600_blend",
+        "recency_confirmed_blend"
+      ],
+      "primary_used": false
+    },
+    {
+      "stage": "03_history",
+      "selected": "cap_1600_blend",
+      "pooled_rmse": 460.16918944452163,
+      "incumbent": "cap_1600_blend",
+      "candidates": [
+        "cap_1600_blend",
+        "history_confirmed_blend"
+      ],
+      "primary_used": false
+    },
+    {
+      "stage": "04_trend",
+      "selected": "trend_damped24_weight25",
+      "pooled_rmse": 459.17479596244954,
+      "incumbent": "cap_1600_blend",
+      "candidates": [
+        "cap_1600_blend",
+        "trend_flat3_weight25",
+        "trend_flat3_weight50",
+        "trend_flat3_weight75",
+        "trend_flat3_weight100",
+        "trend_damped12_weight25",
+        "trend_damped12_weight50",
+        "trend_damped12_weight75",
+        "trend_damped12_weight100",
+        "trend_damped24_weight25",
+        "trend_damped24_weight50",
+        "trend_damped24_weight75",
+        "trend_damped24_weight100"
+      ],
+      "primary_used": false
+    }
+  ],
+  "primary_used": false,
+  "primary_previously_inspected": true
+}

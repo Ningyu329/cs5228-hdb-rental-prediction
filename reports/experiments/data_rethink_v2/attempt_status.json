@@ -1,0 +1,6 @@
+{
+  "complete": false,
+  "reason": "Integer residual label in-place subtraction error; corrected before hierarchy residual model was fit",
+  "completed_models": 3,
+  "superseded_by": "reports/experiments/data_rethink_v3"
+}

@@ -1,0 +1,46 @@
+{
+  "splits": {
+    "q3_2024": [
+      "2024-07",
+      "2024-09"
+    ],
+    "q4_2024": [
+      "2024-10",
+      "2024-12"
+    ],
+    "primary_2025": [
+      "2025-01",
+      "2025-03"
+    ],
+    "long_12m": [
+      "2024-01",
+      "2024-12"
+    ],
+    "origin_202212_16m": [
+      "2023-01",
+      "2024-04"
+    ],
+    "origin_202306_16m": [
+      "2023-07",
+      "2024-10"
+    ],
+    "origin_202311_16m": [
+      "2023-12",
+      "2025-03"
+    ]
+  },
+  "selection_splits": [
+    "q3_2024",
+    "q4_2024"
+  ],
+  "diagnostic_only": [
+    "primary_2025",
+    "long_12m",
+    "origin_202212_16m",
+    "origin_202306_16m",
+    "origin_202311_16m"
+  ],
+  "test_horizon": "380 rows in existing March 2025; remaining 49,620 rows April 2025–July 2026 (1–16 months)",
+  "long_anchor": "Housing LightGBM; do not label as production model",
+  "future_labels_available_to_training": false
+}

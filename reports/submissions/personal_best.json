@@ -1,0 +1,22 @@
+{
+  "competition": "cs-5228-2610-project",
+  "team": "CS5228 Avengers (31)",
+  "metric": "public RMSE; lower is better",
+  "observed_date_singapore": "2026-10-19",
+  "personal_best": {
+    "score": 437.44368,
+    "file": "submissions/submission_rmse448_trend25_20261019.csv",
+    "sha256": "e1f06bc525d0e048f04d7c86dcf069faf855fafdbd45d00438c69499ccbf5317",
+    "receipt": "reports/submissions/rmse448_20261019/submission_manifest.json"
+  },
+  "latest_submission": {
+    "score": 437.4564,
+    "file": "submissions/submission_hierarchy25_20261019.csv",
+    "sha256": "8b9a8d1f486e94c1e396c0cc16b9b108d4575bc7cc482ceb96c2947f01764edd",
+    "receipt": "reports/submissions/hierarchy25_20261019/submission_manifest.json",
+    "status": "Complete",
+    "improved_personal_best": false
+  },
+  "final_selection": "Unchanged; Kaggle automatic selection remains enabled",
+  "source": "https://www.kaggle.com/competitions/cs-5228-2610-project/submissions"
+}

@@ -1,0 +1,23 @@
+{
+  "implementation_sha256": "514cae25ed45f0c957337b0a1dc39456613d10e39465699bde624c0f3ce1e1df",
+  "selection_origins": [
+    "origin_202212_16m",
+    "origin_202306_16m"
+  ],
+  "confirmation_origin": "origin_202311_16m",
+  "candidates": [
+    "housing_lgb",
+    "resale_lgb_only",
+    "resale_lgb_blend25",
+    "hierarchy_only",
+    "hierarchy_blend25",
+    "hierarchy_residual_lgb_only",
+    "hierarchy_residual_lgb_blend25"
+  ],
+  "min_pooled_gain": 5,
+  "max_origin_degradation": 10,
+  "anchor": "standalone housing LightGBM, NOT production blend",
+  "production_replacement": false,
+  "interpretation": "Repeated forecast tasks; overlapping contracts/origins are not independent samples",
+  "primary_and_latest_origin_used_for_selection": false
+}

@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "score_checks": 53,
+  "selection_checks": 22,
+  "native_model_checks": 17,
+  "run_id": "01e2be864702da1f62a7",
+  "best_pure": "native_unit_d6_blend100",
+  "best_new": "native_unit_d6_blend25",
+  "previous_submission_unchanged": true,
+  "auditor_sha256": "e9c0321d82a34acf7f6ebcfd39081fea6cc9ed9b358086eadb38299020947fbe"
+}

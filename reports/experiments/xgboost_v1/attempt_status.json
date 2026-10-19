@@ -1,0 +1,11 @@
+{
+  "completed": false,
+  "reason": "Interrupted onehot_d6 inner fit because of computation cost; no complete one-hot score obtained",
+  "completed_outer_components": ["q3_2024/native_d4", "q3_2024/native_d6", "q3_2024/native_d8", "q3_2024/native_d10"],
+  "onehot_d6": "interrupted_during_inner_fit",
+  "onehot_d8": "not_run",
+  "followup_output": "reports/experiments/xgboost_native_v1",
+  "followup_policy": "Fresh manifest and refitting all seven native-category settings; no one-hot performance conclusion",
+  "test_read": false,
+  "submission_generated": false
+}

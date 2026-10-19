@@ -1,0 +1,260 @@
+{
+  "selected": "bias_town_flat_s500",
+  "grid": {
+    "locked_448_control": {
+      "kind": "base"
+    },
+    "bias_global_s100": {
+      "kind": "correction",
+      "columns": [],
+      "shrink": 100,
+      "trend": false
+    },
+    "bias_global_s500": {
+      "kind": "correction",
+      "columns": [],
+      "shrink": 500,
+      "trend": false
+    },
+    "bias_flat_s100": {
+      "kind": "correction",
+      "columns": [
+        "FLAT_TYPE"
+      ],
+      "shrink": 100,
+      "trend": false
+    },
+    "bias_flat_s500": {
+      "kind": "correction",
+      "columns": [
+        "FLAT_TYPE"
+      ],
+      "shrink": 500,
+      "trend": false
+    },
+    "bias_town_s100": {
+      "kind": "correction",
+      "columns": [
+        "TOWN"
+      ],
+      "shrink": 100,
+      "trend": false
+    },
+    "bias_town_s500": {
+      "kind": "correction",
+      "columns": [
+        "TOWN"
+      ],
+      "shrink": 500,
+      "trend": false
+    },
+    "bias_town_flat_s100": {
+      "kind": "correction",
+      "columns": [
+        "TOWN",
+        "FLAT_TYPE"
+      ],
+      "shrink": 100,
+      "trend": false
+    },
+    "bias_town_flat_s500": {
+      "kind": "correction",
+      "columns": [
+        "TOWN",
+        "FLAT_TYPE"
+      ],
+      "shrink": 500,
+      "trend": false
+    },
+    "trend_global_s100": {
+      "kind": "correction",
+      "columns": [],
+      "shrink": 100,
+      "trend": true
+    },
+    "trend_global_s500": {
+      "kind": "correction",
+      "columns": [],
+      "shrink": 500,
+      "trend": true
+    },
+    "trend_flat_s100": {
+      "kind": "correction",
+      "columns": [
+        "FLAT_TYPE"
+      ],
+      "shrink": 100,
+      "trend": true
+    },
+    "trend_flat_s500": {
+      "kind": "correction",
+      "columns": [
+        "FLAT_TYPE"
+      ],
+      "shrink": 500,
+      "trend": true
+    },
+    "trend_town_flat_s100": {
+      "kind": "correction",
+      "columns": [
+        "TOWN",
+        "FLAT_TYPE"
+      ],
+      "shrink": 100,
+      "trend": true
+    },
+    "trend_town_flat_s500": {
+      "kind": "correction",
+      "columns": [
+        "TOWN",
+        "FLAT_TYPE"
+      ],
+      "shrink": 500,
+      "trend": true
+    },
+    "expert_weight25": {
+      "kind": "blend",
+      "source": "expert",
+      "weight": 0.25,
+      "incumbent": "bias_town_flat_s500"
+    },
+    "expert_weight50": {
+      "kind": "blend",
+      "source": "expert",
+      "weight": 0.5,
+      "incumbent": "bias_town_flat_s500"
+    },
+    "expert_weight100": {
+      "kind": "blend",
+      "source": "expert",
+      "weight": 1.0,
+      "incumbent": "bias_town_flat_s500"
+    },
+    "coe_available_weight25": {
+      "kind": "blend",
+      "source": "coe_available",
+      "weight": 0.25,
+      "incumbent": "bias_town_flat_s500"
+    },
+    "coe_available_weight50": {
+      "kind": "blend",
+      "source": "coe_available",
+      "weight": 0.5,
+      "incumbent": "bias_town_flat_s500"
+    },
+    "coe_available_weight100": {
+      "kind": "blend",
+      "source": "coe_available",
+      "weight": 1.0,
+      "incumbent": "bias_town_flat_s500"
+    },
+    "market_available_weight25": {
+      "kind": "blend",
+      "source": "market_available",
+      "weight": 0.25,
+      "incumbent": "bias_town_flat_s500"
+    },
+    "market_available_weight50": {
+      "kind": "blend",
+      "source": "market_available",
+      "weight": 0.5,
+      "incumbent": "bias_town_flat_s500"
+    },
+    "market_available_weight100": {
+      "kind": "blend",
+      "source": "market_available",
+      "weight": 1.0,
+      "incumbent": "bias_town_flat_s500"
+    },
+    "market_frozen2_weight25": {
+      "kind": "blend",
+      "source": "market_frozen2",
+      "weight": 0.25,
+      "incumbent": "bias_town_flat_s500"
+    },
+    "market_frozen2_weight50": {
+      "kind": "blend",
+      "source": "market_frozen2",
+      "weight": 0.5,
+      "incumbent": "bias_town_flat_s500"
+    },
+    "market_frozen2_weight100": {
+      "kind": "blend",
+      "source": "market_frozen2",
+      "weight": 1.0,
+      "incumbent": "bias_town_flat_s500"
+    }
+  },
+  "decisions": [
+    {
+      "stage": "01_bias",
+      "selected": "bias_town_flat_s500",
+      "incumbent": "locked_448_control",
+      "candidates": [
+        "locked_448_control",
+        "bias_global_s100",
+        "bias_global_s500",
+        "bias_flat_s100",
+        "bias_flat_s500",
+        "bias_town_s100",
+        "bias_town_s500",
+        "bias_town_flat_s100",
+        "bias_town_flat_s500"
+      ],
+      "pooled_rmse": 459.0770132411991
+    },
+    {
+      "stage": "02_trend",
+      "selected": "bias_town_flat_s500",
+      "incumbent": "bias_town_flat_s500",
+      "candidates": [
+        "bias_town_flat_s500",
+        "trend_global_s100",
+        "trend_global_s500",
+        "trend_flat_s100",
+        "trend_flat_s500",
+        "trend_town_flat_s100",
+        "trend_town_flat_s500"
+      ],
+      "pooled_rmse": 459.0770132411991
+    },
+    {
+      "stage": "03_experts",
+      "selected": "bias_town_flat_s500",
+      "incumbent": "bias_town_flat_s500",
+      "candidates": [
+        "bias_town_flat_s500",
+        "expert_weight25",
+        "expert_weight50",
+        "expert_weight100"
+      ],
+      "pooled_rmse": 459.0770132411991
+    },
+    {
+      "stage": "04_macro",
+      "selected": "bias_town_flat_s500",
+      "incumbent": "bias_town_flat_s500",
+      "candidates": [
+        "bias_town_flat_s500",
+        "coe_available_weight25",
+        "coe_available_weight50",
+        "coe_available_weight100",
+        "market_available_weight25",
+        "market_available_weight50",
+        "market_available_weight100",
+        "market_frozen2_weight25",
+        "market_frozen2_weight50",
+        "market_frozen2_weight100"
+      ],
+      "pooled_rmse": 459.0770132411991
+    }
+  ],
+  "checkpoints": [
+    "locked_448_control",
+    "bias_town_flat_s500",
+    "bias_town_flat_s500",
+    "bias_town_flat_s500",
+    "bias_town_flat_s500"
+  ],
+  "primary_used": false
+}

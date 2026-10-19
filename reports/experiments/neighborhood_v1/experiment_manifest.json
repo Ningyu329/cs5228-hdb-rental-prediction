@@ -1,0 +1,270 @@
+{
+  "source": "data/processed/train_location_features.csv",
+  "source_sha256": "1542050dcdad6937613b69f293ca07daaa209834195e4172dcb900c6921bf32b",
+  "implementation_sha256": {
+    "src/models/run_neighborhood_experiments.py": "14e16e6ad25fdf8b1278ed561bb33403e2c2bd4ca3a22492892ed5046f05fe7d",
+    "src/features/build_neighborhood_features.py": "6a6924cfc1971c83afd38228962f2e5be0106004dde45148b83a4b1f4005d8d8",
+    "src/models/run_stage5.py": "fa1782e146eedd8eea9694788607201180b01b85d720cfbef2357406e76e7e6a",
+    "src/models/run_rmse_improvement.py": "8346b1fdf897e422d20df23e0c8435651dcf07fa453904f7def1d31d1c5a385d",
+    "src/models/run_tree_tuning.py": "4ac58e1a32ef53f9d2b2c5f45ac6f31642b2eed6089d2576fc50f63227cba3a5",
+    "src/models/train_baseline.py": "63fd08f617549563e01fe6bf65ff4ae0ef16187e717a1711a7384c2543fe5fb5",
+    "src/models/run_location_ablation.py": "4ca9872b3ead4d84271802efc9f5a7b7cc92269b136696ca305a9afa9611c90b",
+    "src/features/build_stage5_features.py": "834a7c189a94cc9777414dc4610503653abe91a98099572e28633fccf38a3a29",
+    "src/features/build_temporal_features.py": "c26768291295e6b8f9b96701cfe621df05b0dfe5e4bbb67b872ef771737bba7d"
+  },
+  "reference_sha256": {
+    "reports/experiments/rmse_improvement_v1/selection_locked.json": "a667a17a991379c60c8ff057581af233d9bd1a580d402f61f03f20154d6888a5",
+    "reports/experiments/rmse_improvement_v1/predictions_q3_2024.csv": "e7adf97cab87980ff1bb0bafece51c48268eedfdcea0f957997af9fc33be5799",
+    "reports/experiments/rmse_improvement_v1/predictions_q4_2024.csv": "576c60bf0a9a850189ee1b9e8857ab91c4f7016b0c89ff33d8b60fe7a809ff87",
+    "reports/experiments/rmse_improvement_v1/predictions_primary_2025.csv": "b9c61f427bfc8ffb5e3c05cac6e7d7c389547bea296dfb80622f2232e9d5f324",
+    "reports/experiments/rmse_improvement_v1/predictions_long_6m.csv": "3bc43d4d50e000f00882d8048e2261d7d4365a948bcc375fa5e116e5747021c9"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1",
+    "sklearn": "1.9.1",
+    "catboost": "1.2.10",
+    "lightgbm": "4.7.0"
+  },
+  "grid": {
+    "housing_control": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "patience": 80,
+      "params": {
+        "num_leaves": 15,
+        "learning_rate": 0.04,
+        "min_child_samples": 80,
+        "reg_lambda": 10.0,
+        "colsample_bytree": 0.9
+      },
+      "features": [],
+      "unit": false
+    },
+    "unit_area": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "patience": 80,
+      "params": {
+        "num_leaves": 15,
+        "learning_rate": 0.04,
+        "min_child_samples": 80,
+        "reg_lambda": 10.0,
+        "colsample_bytree": 0.9
+      },
+      "features": [],
+      "unit": true
+    },
+    "distribution": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "patience": 80,
+      "params": {
+        "num_leaves": 15,
+        "learning_rate": 0.04,
+        "min_child_samples": 80,
+        "reg_lambda": 10.0,
+        "colsample_bytree": 0.9
+      },
+      "features": [
+        "PAST_EXACT_COUNT",
+        "PAST_EXACT_MEAN_RATE",
+        "PAST_EXACT_MEDIAN_RATE",
+        "PAST_EXACT_STD_RATE",
+        "PAST_EXACT_Q10_RATE",
+        "PAST_EXACT_Q90_RATE",
+        "PAST_BLOCK_COUNT",
+        "PAST_BLOCK_MEAN_RATE",
+        "PAST_BLOCK_MEDIAN_RATE",
+        "PAST_BLOCK_STD_RATE",
+        "PAST_BLOCK_Q10_RATE",
+        "PAST_BLOCK_Q90_RATE"
+      ],
+      "unit": false
+    },
+    "spatial": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "patience": 80,
+      "params": {
+        "num_leaves": 15,
+        "learning_rate": 0.04,
+        "min_child_samples": 80,
+        "reg_lambda": 10.0,
+        "colsample_bytree": 0.9
+      },
+      "features": [
+        "NEAR_16_BLOCKS",
+        "NEAR_16_MEAN_RATE",
+        "NEAR_16_STD_RATE",
+        "NEAR_16_MEDIAN_RATE",
+        "NEAR_16_MEAN_DISTANCE_KM",
+        "NEAR_16_FARTHEST_KM",
+        "NEAR_64_BLOCKS",
+        "NEAR_64_MEAN_RATE",
+        "NEAR_64_STD_RATE",
+        "NEAR_64_MEDIAN_RATE",
+        "NEAR_64_MEAN_DISTANCE_KM",
+        "NEAR_64_FARTHEST_KM"
+      ],
+      "unit": false
+    },
+    "distribution_spatial": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "patience": 80,
+      "params": {
+        "num_leaves": 15,
+        "learning_rate": 0.04,
+        "min_child_samples": 80,
+        "reg_lambda": 10.0,
+        "colsample_bytree": 0.9
+      },
+      "features": [
+        "PAST_EXACT_COUNT",
+        "PAST_EXACT_MEAN_RATE",
+        "PAST_EXACT_MEDIAN_RATE",
+        "PAST_EXACT_STD_RATE",
+        "PAST_EXACT_Q10_RATE",
+        "PAST_EXACT_Q90_RATE",
+        "PAST_BLOCK_COUNT",
+        "PAST_BLOCK_MEAN_RATE",
+        "PAST_BLOCK_MEDIAN_RATE",
+        "PAST_BLOCK_STD_RATE",
+        "PAST_BLOCK_Q10_RATE",
+        "PAST_BLOCK_Q90_RATE",
+        "NEAR_16_BLOCKS",
+        "NEAR_16_MEAN_RATE",
+        "NEAR_16_STD_RATE",
+        "NEAR_16_MEDIAN_RATE",
+        "NEAR_16_MEAN_DISTANCE_KM",
+        "NEAR_16_FARTHEST_KM",
+        "NEAR_64_BLOCKS",
+        "NEAR_64_MEAN_RATE",
+        "NEAR_64_STD_RATE",
+        "NEAR_64_MEDIAN_RATE",
+        "NEAR_64_MEAN_DISTANCE_KM",
+        "NEAR_64_FARTHEST_KM"
+      ],
+      "unit": false
+    },
+    "unit_area_all": {
+      "family": "lightgbm",
+      "cap": 1000,
+      "patience": 80,
+      "params": {
+        "num_leaves": 15,
+        "learning_rate": 0.04,
+        "min_child_samples": 80,
+        "reg_lambda": 10.0,
+        "colsample_bytree": 0.9
+      },
+      "features": [
+        "PAST_EXACT_COUNT",
+        "PAST_EXACT_MEAN_RATE",
+        "PAST_EXACT_MEDIAN_RATE",
+        "PAST_EXACT_STD_RATE",
+        "PAST_EXACT_Q10_RATE",
+        "PAST_EXACT_Q90_RATE",
+        "PAST_BLOCK_COUNT",
+        "PAST_BLOCK_MEAN_RATE",
+        "PAST_BLOCK_MEDIAN_RATE",
+        "PAST_BLOCK_STD_RATE",
+        "PAST_BLOCK_Q10_RATE",
+        "PAST_BLOCK_Q90_RATE",
+        "NEAR_16_BLOCKS",
+        "NEAR_16_MEAN_RATE",
+        "NEAR_16_STD_RATE",
+        "NEAR_16_MEDIAN_RATE",
+        "NEAR_16_MEAN_DISTANCE_KM",
+        "NEAR_16_FARTHEST_KM",
+        "NEAR_64_BLOCKS",
+        "NEAR_64_MEAN_RATE",
+        "NEAR_64_STD_RATE",
+        "NEAR_64_MEDIAN_RATE",
+        "NEAR_64_MEAN_DISTANCE_KM",
+        "NEAR_64_FARTHEST_KM"
+      ],
+      "unit": true
+    },
+    "flexible_all": {
+      "family": "lightgbm",
+      "cap": 1500,
+      "patience": 80,
+      "params": {
+        "num_leaves": 31,
+        "learning_rate": 0.04,
+        "min_child_samples": 40,
+        "reg_lambda": 5.0,
+        "colsample_bytree": 0.9
+      },
+      "features": [
+        "PAST_EXACT_COUNT",
+        "PAST_EXACT_MEAN_RATE",
+        "PAST_EXACT_MEDIAN_RATE",
+        "PAST_EXACT_STD_RATE",
+        "PAST_EXACT_Q10_RATE",
+        "PAST_EXACT_Q90_RATE",
+        "PAST_BLOCK_COUNT",
+        "PAST_BLOCK_MEAN_RATE",
+        "PAST_BLOCK_MEDIAN_RATE",
+        "PAST_BLOCK_STD_RATE",
+        "PAST_BLOCK_Q10_RATE",
+        "PAST_BLOCK_Q90_RATE",
+        "NEAR_16_BLOCKS",
+        "NEAR_16_MEAN_RATE",
+        "NEAR_16_STD_RATE",
+        "NEAR_16_MEDIAN_RATE",
+        "NEAR_16_MEAN_DISTANCE_KM",
+        "NEAR_16_FARTHEST_KM",
+        "NEAR_64_BLOCKS",
+        "NEAR_64_MEAN_RATE",
+        "NEAR_64_STD_RATE",
+        "NEAR_64_MEDIAN_RATE",
+        "NEAR_64_MEAN_DISTANCE_KM",
+        "NEAR_64_FARTHEST_KM"
+      ],
+      "unit": false
+    },
+    "cat_shallow": {
+      "family": "catboost",
+      "cap": 4000,
+      "patience": 100,
+      "params": {
+        "depth": 5,
+        "learning_rate": 0.05,
+        "l2_leaf_reg": 50.0
+      },
+      "features": [],
+      "unit": false
+    }
+  },
+  "threads": 3,
+  "seed": 42,
+  "history_months": 12,
+  "spatial_k": [
+    16,
+    64
+  ],
+  "spatial_reference": "one mean unit rent per block+flat_type; equal block weights",
+  "selection": "pooled earlier-quarter RMSE; >=1 improvement AND no quarter degradation >1",
+  "blend_weights": [
+    0.25,
+    0.5,
+    1.0
+  ],
+  "primary_used_for_selection": false,
+  "primary_previously_inspected": true,
+  "chronology": "exclude entire current training month; query snapshot frozen at training origin",
+  "unit_loss": "rate target; area squared weights normalized to mean 1, also for early stopping",
+  "test_data_read": false,
+  "submission_generated": false,
+  "limits": [
+    "reused historical quarters are not pristine holdouts",
+    "12-month history can be sparse",
+    "static housing coordinates",
+    "6-month diagnostic does not represent full test horizon"
+  ],
+  "run_id": "93a81b016f56a8b14d76"
+}

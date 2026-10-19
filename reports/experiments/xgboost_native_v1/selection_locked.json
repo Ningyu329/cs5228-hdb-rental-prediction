@@ -1,0 +1,11 @@
+{
+  "run_id": "01e2be864702da1f62a7",
+  "best_pure": "native_unit_d6_blend100",
+  "best_new": "native_unit_d6_blend25",
+  "selection_splits": [
+    "q3_2024",
+    "q4_2024"
+  ],
+  "primary_used": false,
+  "production_replaced": false
+}

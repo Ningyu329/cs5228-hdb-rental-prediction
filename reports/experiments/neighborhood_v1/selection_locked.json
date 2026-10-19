@@ -1,0 +1,12 @@
+{
+  "run_id": "93a81b016f56a8b14d76",
+  "selected": "incumbent",
+  "challenger": "unit_area_all_blend25",
+  "selection_splits": [
+    "q3_2024",
+    "q4_2024"
+  ],
+  "primary_used": false,
+  "minimum_gain": 1.0,
+  "max_quarter_loss": 1.0
+}

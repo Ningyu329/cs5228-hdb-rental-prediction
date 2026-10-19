@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "validation_rows_checked": 25984,
+  "partitions_checked": 36,
+  "probe_scores_reproduced": 6,
+  "probe_replication_directory": "tmp/overprediction_probe_reproduction_20261019",
+  "submitted_prediction_unchanged": true,
+  "rent_models_changed": false,
+  "inspector_sha256": "d1304dc8e6a777aad2c835ad11f9a8cee1f0bc334b7071fe7a6a77d806b0ef49",
+  "cleaner_sha256": "601d7c33608fb8b2d2371b3248b32d3557a49cd1cdc441108d13de709618b2a2"
+}

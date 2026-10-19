@@ -1,0 +1,77 @@
+{
+  "selected": "hierarchy_residual_lgb_only",
+  "ranking": [
+    {
+      "candidate": "hierarchy_residual_lgb_only",
+      "rmse": 577.4134517843462,
+      "worst_origin_delta": -9.429879679667465,
+      "gain": 26.970213898430416,
+      "eligible": true
+    },
+    {
+      "candidate": "hierarchy_blend25",
+      "rmse": 579.1638463059597,
+      "worst_origin_delta": -6.46970346816795,
+      "gain": 25.219819376816872,
+      "eligible": true
+    },
+    {
+      "candidate": "hierarchy_only",
+      "rmse": 579.5359936972337,
+      "worst_origin_delta": -7.582964493175496,
+      "gain": 24.84767198554289,
+      "eligible": true
+    },
+    {
+      "candidate": "hierarchy_residual_lgb_blend25",
+      "rmse": 579.5669317556573,
+      "worst_origin_delta": -5.796531310485534,
+      "gain": 24.816733927119344,
+      "eligible": true
+    },
+    {
+      "candidate": "resale_lgb_only",
+      "rmse": 596.4482527483156,
+      "worst_origin_delta": 0.5386437551301242,
+      "gain": 7.935412934461056,
+      "eligible": true
+    },
+    {
+      "candidate": "resale_lgb_blend25",
+      "rmse": 601.884076515568,
+      "worst_origin_delta": -0.3179314330041052,
+      "gain": 2.499589167208569,
+      "eligible": false
+    },
+    {
+      "candidate": "housing_lgb",
+      "rmse": 604.3836656827766,
+      "worst_origin_delta": 0.0,
+      "gain": 0.0,
+      "eligible": false
+    }
+  ],
+  "confirmation": [
+    {
+      "split": "origin_202311_16m",
+      "candidate": "housing_lgb",
+      "anchor": "housing_lgb",
+      "rows": 47171,
+      "rmse": 496.00077101053944,
+      "mae": 373.7704436284499,
+      "bias": -45.51475873726218
+    },
+    {
+      "split": "origin_202311_16m",
+      "candidate": "hierarchy_residual_lgb_only",
+      "anchor": "housing_lgb",
+      "rows": 47171,
+      "rmse": 500.1640048251657,
+      "mae": 385.72785364462936,
+      "bias": -96.56470074105704
+    }
+  ],
+  "primary_and_latest_origin_used_for_selection": false,
+  "production_replaced": false,
+  "plan_sha256": "8772fedf91b968a77238eb18702d4d0b565f8304b1948f41f9f4fb94f2e77f2b"
+}

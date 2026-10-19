@@ -1,0 +1,18 @@
+{
+  "iterations": 130,
+  "cap": 1000,
+  "train_rows": 69008,
+  "effective_train_start": "2022-07",
+  "inner_fit_end": "2024-03",
+  "inner_validation_start": "2024-04",
+  "inner_validation_end": "2024-06",
+  "seconds": 3.0129192089989374,
+  "spec": {
+    "family": "lightgbm",
+    "cap": 1000,
+    "window": 24,
+    "half_life": 0,
+    "history": 0,
+    "trend": ""
+  }
+}

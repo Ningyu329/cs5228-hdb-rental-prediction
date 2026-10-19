@@ -1,0 +1,20 @@
+{
+  "from_run": "81a1c9ce50c673e5fa6e",
+  "to_run": "21cb501c6b7b51b3dc55",
+  "exact_reverse_patch_sha256_verified": true,
+  "recipes": [
+    {
+      "split": "q3_2024",
+      "recipe": "raw_cat"
+    },
+    {
+      "split": "q3_2024",
+      "recipe": "resale_lgb"
+    },
+    {
+      "split": "q3_2024",
+      "recipe": "hierarchy"
+    }
+  ],
+  "reason": "Only residual-label float casting changed; these three recipes never enter that branch"
+}

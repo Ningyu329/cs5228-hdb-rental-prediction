@@ -1,0 +1,16 @@
+[
+  {
+    "split": "cal_q1_2024",
+    "fit_end": "2023-12",
+    "rows": 9005,
+    "query_start": "2024-01",
+    "query_end": "2024-03"
+  },
+  {
+    "split": "cal_q2_2024",
+    "fit_end": "2024-03",
+    "rows": 9174,
+    "query_start": "2024-04",
+    "query_end": "2024-06"
+  }
+]

@@ -1,0 +1,551 @@
+[
+  {
+    "split": "q3_2024",
+    "candidate": "incumbent",
+    "anchor": "locked_production",
+    "rows": 8786,
+    "rmse": 474.6845128617362,
+    "mae": 347.3841334643295,
+    "bias": -12.137883171926076
+  },
+  {
+    "split": "q3_2024",
+    "candidate": "raw_cat_only",
+    "anchor": "normalized_cat_only",
+    "rows": 8786,
+    "rmse": 475.7862851968824,
+    "mae": 352.5121710708672,
+    "bias": -39.11123092350256
+  },
+  {
+    "split": "q3_2024",
+    "candidate": "normalized_cat_only",
+    "anchor": "normalized_cat_only",
+    "rows": 8786,
+    "rmse": 476.96697105897243,
+    "mae": 354.2780398965907,
+    "bias": -43.991934753275544
+  },
+  {
+    "split": "q3_2024",
+    "candidate": "raw_cat_replacement",
+    "anchor": "locked_production",
+    "rows": 8786,
+    "rmse": 474.3154394366547,
+    "mae": 346.782603423972,
+    "bias": -10.307619235761207
+  },
+  {
+    "split": "q3_2024",
+    "candidate": "resale_lgb_only",
+    "anchor": "locked_production",
+    "rows": 8786,
+    "rmse": 480.7662495669023,
+    "mae": 355.7264503667604,
+    "bias": -36.880079828208565
+  },
+  {
+    "split": "q3_2024",
+    "candidate": "resale_lgb_blend25",
+    "anchor": "locked_production",
+    "rows": 8786,
+    "rmse": 475.29337561683917,
+    "mae": 348.67031796953773,
+    "bias": -18.323432335996696
+  },
+  {
+    "split": "q3_2024",
+    "candidate": "hierarchy_only",
+    "anchor": "locked_production",
+    "rows": 8786,
+    "rmse": 477.78541329783394,
+    "mae": 350.340606039016,
+    "bias": -15.329409612364238
+  },
+  {
+    "split": "q3_2024",
+    "candidate": "hierarchy_blend25",
+    "anchor": "locked_production",
+    "rows": 8786,
+    "rmse": 474.15321490644783,
+    "mae": 346.9257733615323,
+    "bias": -12.93576478203562
+  },
+  {
+    "split": "q3_2024",
+    "candidate": "hierarchy_residual_lgb_only",
+    "anchor": "locked_production",
+    "rows": 8786,
+    "rmse": 476.4764404123995,
+    "mae": 349.7966729271435,
+    "bias": -11.679670240677188
+  },
+  {
+    "split": "q3_2024",
+    "candidate": "hierarchy_residual_lgb_blend25",
+    "anchor": "locked_production",
+    "rows": 8786,
+    "rmse": 474.38304300109985,
+    "mae": 347.3403638421063,
+    "bias": -12.023329939113852
+  },
+  {
+    "split": "q4_2024",
+    "candidate": "incumbent",
+    "anchor": "locked_production",
+    "rows": 8274,
+    "rmse": 442.1100856923927,
+    "mae": 315.202063053576,
+    "bias": -2.0051421941318823
+  },
+  {
+    "split": "q4_2024",
+    "candidate": "raw_cat_only",
+    "anchor": "normalized_cat_only",
+    "rows": 8274,
+    "rmse": 444.74931019256263,
+    "mae": 322.5278326319641,
+    "bias": -21.65246753040897
+  },
+  {
+    "split": "q4_2024",
+    "candidate": "normalized_cat_only",
+    "anchor": "normalized_cat_only",
+    "rows": 8274,
+    "rmse": 444.8261791322091,
+    "mae": 321.0467810152324,
+    "bias": -15.317514601029123
+  },
+  {
+    "split": "q4_2024",
+    "candidate": "raw_cat_replacement",
+    "anchor": "locked_production",
+    "rows": 8274,
+    "rmse": 442.1178655166271,
+    "mae": 315.75989382687266,
+    "bias": -4.380749542649323
+  },
+  {
+    "split": "q4_2024",
+    "candidate": "resale_lgb_only",
+    "anchor": "locked_production",
+    "rows": 8274,
+    "rmse": 449.1528843799628,
+    "mae": 324.2564973367238,
+    "bias": -21.16321413655226
+  },
+  {
+    "split": "q4_2024",
+    "candidate": "resale_lgb_blend25",
+    "anchor": "locked_production",
+    "rows": 8274,
+    "rmse": 442.97612217101295,
+    "mae": 316.55729513538637,
+    "bias": -6.794660179736978
+  },
+  {
+    "split": "q4_2024",
+    "candidate": "hierarchy_only",
+    "anchor": "locked_production",
+    "rows": 8274,
+    "rmse": 450.1016673016728,
+    "mae": 317.0283561088394,
+    "bias": 43.459099117647405
+  },
+  {
+    "split": "q4_2024",
+    "candidate": "hierarchy_blend25",
+    "anchor": "locked_production",
+    "rows": 8274,
+    "rmse": 442.23303327395877,
+    "mae": 313.8269226158743,
+    "bias": 9.36091813381294
+  },
+  {
+    "split": "q4_2024",
+    "candidate": "hierarchy_residual_lgb_only",
+    "anchor": "locked_production",
+    "rows": 8274,
+    "rmse": 448.0521154650153,
+    "mae": 315.82950547648153,
+    "bias": 46.41982837829697
+  },
+  {
+    "split": "q4_2024",
+    "candidate": "hierarchy_residual_lgb_blend25",
+    "anchor": "locked_production",
+    "rows": 8274,
+    "rmse": 442.20380100323274,
+    "mae": 313.870393768596,
+    "bias": 10.101100448975325
+  },
+  {
+    "split": "primary_2025",
+    "candidate": "incumbent",
+    "anchor": "locked_production",
+    "rows": 8924,
+    "rmse": 448.334601957477,
+    "mae": 326.45573146195693,
+    "bias": -20.729955213800046
+  },
+  {
+    "split": "primary_2025",
+    "candidate": "raw_cat_only",
+    "anchor": "normalized_cat_only",
+    "rows": 8924,
+    "rmse": 454.3434672749185,
+    "mae": 336.2057636209017,
+    "bias": -48.506077395456145
+  },
+  {
+    "split": "primary_2025",
+    "candidate": "normalized_cat_only",
+    "anchor": "normalized_cat_only",
+    "rows": 8924,
+    "rmse": 452.67793732612984,
+    "mae": 334.6882236936397,
+    "bias": -48.02932786235073
+  },
+  {
+    "split": "primary_2025",
+    "candidate": "raw_cat_replacement",
+    "anchor": "locked_production",
+    "rows": 8924,
+    "rmse": 448.8125674337804,
+    "mae": 326.8067818556135,
+    "bias": -20.90873628871457
+  },
+  {
+    "split": "primary_2025",
+    "candidate": "resale_lgb_only",
+    "anchor": "locked_production",
+    "rows": 8924,
+    "rmse": 453.6384113537535,
+    "mae": 331.1307470079736,
+    "bias": -18.653943356985852
+  },
+  {
+    "split": "primary_2025",
+    "candidate": "resale_lgb_blend25",
+    "anchor": "locked_production",
+    "rows": 8924,
+    "rmse": 448.7619756970936,
+    "mae": 326.80910806548417,
+    "bias": -20.2109522495965
+  },
+  {
+    "split": "primary_2025",
+    "candidate": "hierarchy_only",
+    "anchor": "locked_production",
+    "rows": 8924,
+    "rmse": 457.8989676815023,
+    "mae": 320.1952389924833,
+    "bias": 56.25460813702993
+  },
+  {
+    "split": "primary_2025",
+    "candidate": "hierarchy_blend25",
+    "anchor": "locked_production",
+    "rows": 8924,
+    "rmse": 448.0981733593811,
+    "mae": 322.4912981645433,
+    "bias": -1.483814376092551
+  },
+  {
+    "split": "primary_2025",
+    "candidate": "hierarchy_residual_lgb_only",
+    "anchor": "locked_production",
+    "rows": 8924,
+    "rmse": 454.94874500587787,
+    "mae": 320.00652096169745,
+    "bias": 58.021124445469844
+  },
+  {
+    "split": "primary_2025",
+    "candidate": "hierarchy_residual_lgb_blend25",
+    "anchor": "locked_production",
+    "rows": 8924,
+    "rmse": 447.8825133353059,
+    "mae": 322.6748818719573,
+    "bias": -1.0421852989825786
+  },
+  {
+    "split": "long_12m",
+    "candidate": "incumbent",
+    "anchor": "locked_production",
+    "rows": 35239,
+    "rmse": 491.79159101266004,
+    "mae": 358.28467801999574,
+    "bias": 39.646174101115925
+  },
+  {
+    "split": "long_12m",
+    "candidate": "raw_cat_only",
+    "anchor": "normalized_cat_only",
+    "rows": 35239,
+    "rmse": 495.706281717278,
+    "mae": 376.68511895631724,
+    "bias": -59.81708991278679
+  },
+  {
+    "split": "long_12m",
+    "candidate": "normalized_cat_only",
+    "anchor": "normalized_cat_only",
+    "rows": 35239,
+    "rmse": 494.5785286188481,
+    "mae": 374.90987916028854,
+    "bias": -53.95649022460209
+  },
+  {
+    "split": "long_12m",
+    "candidate": "raw_cat_replacement",
+    "anchor": "locked_production",
+    "rows": 35239,
+    "rmse": 491.69492244893144,
+    "mae": 358.5257482093619,
+    "bias": 37.448449218046655
+  },
+  {
+    "split": "long_12m",
+    "candidate": "resale_lgb_only",
+    "anchor": "locked_production",
+    "rows": 35239,
+    "rmse": 498.0782994367617,
+    "mae": 373.1450475770886,
+    "bias": -31.952518138326134
+  },
+  {
+    "split": "long_12m",
+    "candidate": "resale_lgb_blend25",
+    "anchor": "locked_production",
+    "rows": 35239,
+    "rmse": 491.4727777971799,
+    "mae": 360.097225040839,
+    "bias": 21.746501041255407
+  },
+  {
+    "split": "long_12m",
+    "candidate": "hierarchy_only",
+    "anchor": "locked_production",
+    "rows": 35239,
+    "rmse": 501.1848997424701,
+    "mae": 383.9298354414081,
+    "bias": -80.89276138844035
+  },
+  {
+    "split": "long_12m",
+    "candidate": "hierarchy_blend25",
+    "anchor": "locked_production",
+    "rows": 35239,
+    "rmse": 489.81582753749336,
+    "mae": 360.55676850401954,
+    "bias": 9.511440228726853
+  },
+  {
+    "split": "long_12m",
+    "candidate": "hierarchy_residual_lgb_only",
+    "anchor": "locked_production",
+    "rows": 35239,
+    "rmse": 498.62040508105963,
+    "mae": 381.53842760091356,
+    "bias": -78.11937603762233
+  },
+  {
+    "split": "long_12m",
+    "candidate": "hierarchy_residual_lgb_blend25",
+    "anchor": "locked_production",
+    "rows": 35239,
+    "rmse": 489.80823495119944,
+    "mae": 360.62517113329596,
+    "bias": 10.204786566431356
+  },
+  {
+    "split": "origin_202212_16m",
+    "candidate": "housing_lgb",
+    "anchor": "housing_lgb",
+    "rows": 47805,
+    "rmse": 658.9785511706102,
+    "mae": 545.2860847852834,
+    "bias": -268.05122413563043
+  },
+  {
+    "split": "origin_202212_16m",
+    "candidate": "resale_lgb_only",
+    "anchor": "housing_lgb",
+    "rows": 47805,
+    "rmse": 643.946306507398,
+    "mae": 532.0184587728593,
+    "bias": -236.98079564777652
+  },
+  {
+    "split": "origin_202212_16m",
+    "candidate": "resale_lgb_blend25",
+    "anchor": "housing_lgb",
+    "rows": 47805,
+    "rmse": 654.662997780873,
+    "mae": 541.6235823982938,
+    "bias": -260.28361701366697
+  },
+  {
+    "split": "origin_202212_16m",
+    "candidate": "hierarchy_only",
+    "anchor": "housing_lgb",
+    "rows": 47805,
+    "rmse": 619.461660437407,
+    "mae": 474.85095960722435,
+    "bias": 161.21640392965386
+  },
+  {
+    "split": "origin_202212_16m",
+    "candidate": "hierarchy_blend25",
+    "anchor": "housing_lgb",
+    "rows": 47805,
+    "rmse": 617.805989848608,
+    "mae": 504.28072269161356,
+    "bias": -160.73431711930934
+  },
+  {
+    "split": "origin_202212_16m",
+    "candidate": "hierarchy_residual_lgb_only",
+    "anchor": "housing_lgb",
+    "rows": 47805,
+    "rmse": 617.0916343844227,
+    "mae": 473.14964499620953,
+    "bias": 162.90418195855779
+  },
+  {
+    "split": "origin_202212_16m",
+    "candidate": "hierarchy_residual_lgb_blend25",
+    "anchor": "housing_lgb",
+    "rows": 47805,
+    "rmse": 617.9771439935757,
+    "mae": 504.05810913309585,
+    "bias": -160.31237261208338
+  },
+  {
+    "split": "origin_202306_16m",
+    "candidate": "housing_lgb",
+    "anchor": "housing_lgb",
+    "rows": 47528,
+    "rmse": 543.9710604218383,
+    "mae": 421.5223852839315,
+    "bias": -64.26901816737512
+  },
+  {
+    "split": "origin_202306_16m",
+    "candidate": "resale_lgb_only",
+    "anchor": "housing_lgb",
+    "rows": 47528,
+    "rmse": 544.5097041769684,
+    "mae": 421.5166351642714,
+    "bias": -61.69144104843507
+  },
+  {
+    "split": "origin_202306_16m",
+    "candidate": "resale_lgb_blend25",
+    "anchor": "housing_lgb",
+    "rows": 47528,
+    "rmse": 543.6531289888342,
+    "mae": 421.12486545605276,
+    "bias": -63.62462388764009
+  },
+  {
+    "split": "origin_202306_16m",
+    "candidate": "hierarchy_only",
+    "anchor": "housing_lgb",
+    "rows": 47528,
+    "rmse": 536.3880959286628,
+    "mae": 405.324891141681,
+    "bias": 22.146570986583
+  },
+  {
+    "split": "origin_202306_16m",
+    "candidate": "hierarchy_blend25",
+    "anchor": "housing_lgb",
+    "rows": 47528,
+    "rmse": 537.5013569536703,
+    "mae": 413.7233575290249,
+    "bias": -42.66512087888559
+  },
+  {
+    "split": "origin_202306_16m",
+    "candidate": "hierarchy_residual_lgb_only",
+    "anchor": "housing_lgb",
+    "rows": 47528,
+    "rmse": 534.5411807421708,
+    "mae": 404.1603515434187,
+    "bias": 25.964755349420308
+  },
+  {
+    "split": "origin_202306_16m",
+    "candidate": "hierarchy_residual_lgb_blend25",
+    "anchor": "housing_lgb",
+    "rows": 47528,
+    "rmse": 538.1745291113527,
+    "mae": 414.1960984249787,
+    "bias": -41.71057478817626
+  },
+  {
+    "split": "origin_202311_16m",
+    "candidate": "housing_lgb",
+    "anchor": "housing_lgb",
+    "rows": 47171,
+    "rmse": 496.00077101053944,
+    "mae": 373.7704436284499,
+    "bias": -45.51475873726218
+  },
+  {
+    "split": "origin_202311_16m",
+    "candidate": "resale_lgb_only",
+    "anchor": "housing_lgb",
+    "rows": 47171,
+    "rmse": 497.13566970613505,
+    "mae": 373.95412997872086,
+    "bias": -42.44522331978545
+  },
+  {
+    "split": "origin_202311_16m",
+    "candidate": "resale_lgb_blend25",
+    "anchor": "housing_lgb",
+    "rows": 47171,
+    "rmse": 495.7775938481334,
+    "mae": 373.3706742512322,
+    "bias": -44.747374882893
+  },
+  {
+    "split": "origin_202311_16m",
+    "candidate": "hierarchy_only",
+    "anchor": "housing_lgb",
+    "rows": 47171,
+    "rmse": 502.8652318474723,
+    "mae": 388.37465211601665,
+    "bias": -99.55947379508964
+  },
+  {
+    "split": "origin_202311_16m",
+    "candidate": "hierarchy_blend25",
+    "anchor": "housing_lgb",
+    "rows": 47171,
+    "rmse": 494.7203562756608,
+    "mae": 374.8147451429614,
+    "bias": -59.02593750171904
+  },
+  {
+    "split": "origin_202311_16m",
+    "candidate": "hierarchy_residual_lgb_only",
+    "anchor": "housing_lgb",
+    "rows": 47171,
+    "rmse": 500.1640048251657,
+    "mae": 385.72785364462936,
+    "bias": -96.56470074105704
+  },
+  {
+    "split": "origin_202311_16m",
+    "candidate": "hierarchy_residual_lgb_blend25",
+    "anchor": "housing_lgb",
+    "rows": 47171,
+    "rmse": 494.92711562566467,
+    "mae": 374.93831149475193,
+    "bias": -58.2772442382109
+  }
+]

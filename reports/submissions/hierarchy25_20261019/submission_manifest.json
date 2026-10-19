@@ -1,0 +1,77 @@
+{
+  "train_sha256": "1542050dcdad6937613b69f293ca07daaa209834195e4172dcb900c6921bf32b",
+  "test_sha256": "66446247a1699fd0de7f325c4fa6c5fd100e762c8d43ada5dcce559780b2de99",
+  "raw_test_sha256": "dfc407406d957bbf7c2f005e5d9852b1bfc6546cd4186f07e6824d8e03e64cfc",
+  "base_sha256": "e1f06bc525d0e048f04d7c86dcf069faf855fafdbd45d00438c69499ccbf5317",
+  "selection_sha256": "3dee54699e18783bb81c3730666dba856f875273866128cced811fa35f58fff0",
+  "implementation_sha256": {
+    "src/models/export_hierarchy_submission.py": "ffce9baad4ceb921716d9d750c87abf6cdd8e8dca9ecaac381e0a3a37dabac8b",
+    "src/models/hierarchical_rent.py": "75d01a3ae4ce0e5ef7c641bae50732df2001e183013f667ca5016be5d3da1ab6",
+    "src/models/export_rmse_submission.py": "fb2fdd2b7c1d1765a1adc7038bfd149d3496156c470dc83fe225462cab6fb3ff",
+    "src/models/run_stage5.py": "fa1782e146eedd8eea9694788607201180b01b85d720cfbef2357406e76e7e6a",
+    "src/features/build_stage5_features.py": "834a7c189a94cc9777414dc4610503653abe91a98099572e28633fccf38a3a29",
+    "src/data/clean_data.py": "601d7c33608fb8b2d2371b3248b32d3557a49cd1cdc441108d13de709618b2a2"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1",
+    "sklearn": "1.9.1",
+    "scipy": "1.18.1"
+  },
+  "weights": {
+    "previous_submission": 0.75,
+    "hierarchy": 0.25
+  },
+  "hierarchy": {
+    "alpha": 30.0,
+    "damping_months": 6.0
+  },
+  "candidate": "hierarchy_blend25",
+  "train_rows": 150000,
+  "test_rows": 50000,
+  "fit_end": "2025-03-01",
+  "test_start": "2025-03-01",
+  "test_end": "2026-07-01",
+  "same_month_test_rows": 380,
+  "selection_basis": "Lowest pooled earlier-quarter RMSE among NEW candidates; no primary/public-score tuning",
+  "formal_promotion_gate_passed": false,
+  "submission_reason": "User explicitly requested one new best-candidate Kaggle trial on 2026-10-19",
+  "no_test_labels": true,
+  "external_resale_or_property_features_used": false,
+  "model_reload_verified": true,
+  "test_order_verified_against_raw": true,
+  "output": "/Users/ningyu/NUS/cs5228/project/submissions/submission_hierarchy25_20261019.csv",
+  "output_sha256": "8b9a8d1f486e94c1e396c0cc16b9b108d4575bc7cc482ceb96c2947f01764edd",
+  "model_sha256": "9a1c864bd9a58f61d80bfb42975a5fb08d3821e790f2f38d482702e2c946b767",
+  "model_path": "/Users/ningyu/NUS/cs5228/project/models/hierarchy_submission_cache/f1d0e3d451c31537f0a1/hierarchy.joblib",
+  "prediction_summary": {
+    "count": 50000.0,
+    "mean": 3162.7671319469773,
+    "std": 454.27907474812764,
+    "min": 1660.3364134449323,
+    "25%": 2830.171392162999,
+    "50%": 3156.0779371532885,
+    "75%": 3427.5346001700896,
+    "max": 5202.438965644947
+  },
+  "difference_from_previous": {
+    "mean": 2.3204439522942115,
+    "rms": 21.923715624798767,
+    "maximum_absolute": 281.9495535774122
+  },
+  "previous_submission_unchanged": true,
+  "submitted_to_kaggle": true,
+  "expected_pb_before": 437.44368,
+  "kaggle_status": "Complete",
+  "kaggle_public_score": 437.4564,
+  "personal_best_before": 437.44368,
+  "personal_best_after": 437.44368,
+  "personal_best_improved": false,
+  "public_rmse_delta": 0.01272,
+  "observed_utc": "2026-10-19T11:13:19Z",
+  "submissions_url": "https://www.kaggle.com/competitions/cs-5228-2610-project/submissions",
+  "proof_screenshot": "reports/submissions/hierarchy25_20261019/kaggle_result.jpg",
+  "final_submission_selection_changed": false,
+  "additional_submissions_this_request": 1
+}

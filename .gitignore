@@ -2,8 +2,19 @@
 data/raw/
 data/interim/
 data/processed/
-submissions/
+/submissions/
 /models/
+
+# Temporary, unrelated and interrupted-run artifacts; retained reports are separate.
+/tmp/
+/output/
+/reports/experiments/rmse_improvement_v1/progress.json
+/reports/experiments/data_rethink_v1/*
+!/reports/experiments/data_rethink_v1/attempt_status.json
+/reports/experiments/data_rethink_v2/*
+!/reports/experiments/data_rethink_v2/attempt_status.json
+/reports/experiments/xgboost_v1/*
+!/reports/experiments/xgboost_v1/attempt_status.json
 
 # Archives and tabular exports
 *.zip
@@ -23,6 +34,31 @@ submissions/
 !reports/experiments/tree_tuning_v1/results.csv
 !reports/experiments/tree_tuning_v1/screening.csv
 !reports/experiments/tree_tuning_v1/selection_backtests.csv
+!reports/experiments/rmse_improvement_v1/results.csv
+!reports/experiments/rmse_improvement_v1/selection_01_caps.csv
+!reports/experiments/rmse_improvement_v1/selection_02_recency.csv
+!reports/experiments/rmse_improvement_v1/selection_03_history.csv
+!reports/experiments/rmse_improvement_v1/selection_04_trend.csv
+!reports/experiments/rmse_improvement_v1/group_errors_primary_2025.csv
+!reports/experiments/rmse_improvement_v1/group_errors_long_6m.csv
+!reports/experiments/rmse_improvement_v1/group_errors_long_12m.csv
+!reports/experiments/segment_v1/results.csv
+!reports/experiments/segment_v1/selection_01_bias.csv
+!reports/experiments/segment_v1/selection_02_trend.csv
+!reports/experiments/segment_v1/selection_03_experts.csv
+!reports/experiments/segment_v1/selection_04_macro.csv
+!reports/experiments/segment_v1/segments_control_*.csv
+!reports/experiments/segment_v1/segments_selected_*.csv
+!reports/experiments/error_diagnosis_v1/error_mechanisms*.csv
+!reports/experiments/error_diagnosis_v1/raw_formatting.csv
+!reports/experiments/overprediction_probe_v1/probe_results.csv
+!reports/experiments/neighborhood_v1/results.csv
+!reports/experiments/neighborhood_v1/selection.csv
+!reports/experiments/neighborhood_v1/feature_importance.csv
+!reports/experiments/neighborhood_v1/diagnostic_groups.csv
+!reports/experiments/xgboost_native_v1/results.csv
+!reports/experiments/xgboost_native_v1/selection.csv
+!reports/experiments/xgboost_native_v1/monthly_errors.csv
 
 # Python and notebook artifacts
 __pycache__/
@@ -32,6 +68,8 @@ __pycache__/
 .matplotlib/
 .codex-build/
 .codex-finalizer/
+# Locally regenerated copy; historical location reports remain versioned.
+reports/location_features_local/
 
 # Credentials and local settings
 .env

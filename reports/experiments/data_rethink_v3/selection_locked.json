@@ -1,0 +1,63 @@
+{
+  "selected": "incumbent",
+  "ranking": [
+    {
+      "candidate": "hierarchy_blend25",
+      "pooled_rmse": 458.9494559921956,
+      "worst_quarter_delta": 0.12294758156605212,
+      "gain": 0.22533997025391272,
+      "eligible": false
+    },
+    {
+      "candidate": "raw_cat_replacement",
+      "pooled_rmse": 458.98196962886533,
+      "worst_quarter_delta": 0.007779824234376065,
+      "gain": 0.19282633358420753,
+      "eligible": false
+    },
+    {
+      "candidate": "hierarchy_residual_lgb_blend25",
+      "pooled_rmse": 459.0580959884428,
+      "worst_quarter_delta": 0.09371531084002527,
+      "gain": 0.11669997400673537,
+      "eligible": false
+    },
+    {
+      "candidate": "incumbent",
+      "pooled_rmse": 459.17479596244954,
+      "worst_quarter_delta": 0.0,
+      "gain": 0.0,
+      "eligible": false
+    },
+    {
+      "candidate": "resale_lgb_blend25",
+      "pooled_rmse": 459.9033942376273,
+      "worst_quarter_delta": 0.8660364786202308,
+      "gain": -0.7285982751777738,
+      "eligible": false
+    },
+    {
+      "candidate": "hierarchy_residual_lgb_only",
+      "pooled_rmse": 462.9088341791262,
+      "worst_quarter_delta": 5.942029772622561,
+      "gain": -3.7340382166766517,
+      "eligible": false
+    },
+    {
+      "candidate": "hierarchy_only",
+      "pooled_rmse": 464.56503038715624,
+      "worst_quarter_delta": 7.991581609280104,
+      "gain": -5.390234424706705,
+      "eligible": false
+    },
+    {
+      "candidate": "resale_lgb_only",
+      "pooled_rmse": 465.7020405289687,
+      "worst_quarter_delta": 7.042798687570098,
+      "gain": -6.527244566519187,
+      "eligible": false
+    }
+  ],
+  "primary_used_for_selection": false,
+  "production_replaced": false
+}

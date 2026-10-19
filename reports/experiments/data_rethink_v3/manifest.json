@@ -1,0 +1,101 @@
+{
+  "input_sha256": {
+    "data/processed/train_location_features.csv": "1542050dcdad6937613b69f293ca07daaa209834195e4172dcb900c6921bf32b",
+    "data/raw/external/hdb_20261019/resale.csv": "d401fc2e7d2a083576dd388b5ea3d170c2027d2503542de32a84656651ebe947",
+    "data/raw/train.csv": "6d7a417de72112361f8353659ba6fe44a442b07465b488aff1b03f7ec1ea3ba6"
+  },
+  "implementation_sha256": {
+    "src/models/run_data_rethink.py": "44b0646b3fbc980fa2d0d60dc5ce1c8883135455c3ad4c3fd3bbed05422ab10a",
+    "src/features/build_raw_views.py": "1da16e51afb45107ec46f95ae910b10d587b1352ce237493737cef2bbf2f2a04",
+    "src/features/build_resale_history.py": "f4e4b507c1b83349442a129fe90b33e5cf2630e02c2f10a3a08a1e50f144a535",
+    "src/models/hierarchical_rent.py": "75d01a3ae4ce0e5ef7c641bae50732df2001e183013f667ca5016be5d3da1ab6",
+    "src/models/run_stage5.py": "fa1782e146eedd8eea9694788607201180b01b85d720cfbef2357406e76e7e6a",
+    "src/models/run_rmse_improvement.py": "8346b1fdf897e422d20df23e0c8435651dcf07fa453904f7def1d31d1c5a385d",
+    "src/models/run_tree_tuning.py": "4ac58e1a32ef53f9d2b2c5f45ac6f31642b2eed6089d2576fc50f63227cba3a5",
+    "src/features/build_stage5_features.py": "834a7c189a94cc9777414dc4610503653abe91a98099572e28633fccf38a3a29",
+    "src/models/train_baseline.py": "63fd08f617549563e01fe6bf65ff4ae0ef16187e717a1711a7384c2543fe5fb5",
+    "src/data/clean_data.py": "601d7c33608fb8b2d2371b3248b32d3557a49cd1cdc441108d13de709618b2a2",
+    "src/features/build_temporal_features.py": "c26768291295e6b8f9b96701cfe621df05b0dfe5e4bbb67b872ef771737bba7d"
+  },
+  "reference_sha256": {
+    "reports/experiments/rmse_improvement_v1/selection_locked.json": "a667a17a991379c60c8ff057581af233d9bd1a580d402f61f03f20154d6888a5",
+    "reports/experiments/rmse_improvement_v1/predictions_q3_2024.csv": "e7adf97cab87980ff1bb0bafece51c48268eedfdcea0f957997af9fc33be5799",
+    "reports/experiments/rmse_improvement_v1/predictions_q4_2024.csv": "576c60bf0a9a850189ee1b9e8857ab91c4f7016b0c89ff33d8b60fe7a809ff87",
+    "reports/experiments/rmse_improvement_v1/predictions_primary_2025.csv": "b9c61f427bfc8ffb5e3c05cac6e7d7c389547bea296dfb80622f2232e9d5f324",
+    "reports/experiments/rmse_improvement_v1/predictions_long_12m.csv": "41dc6620612e7822bef8fa6e3a2a5a97cdd7ef07395ac2326b82fbc4c7a8887f",
+    "models/rmse_improvement_cache/24cdf7b53bde332a047f/pred_q3_2024_catboost_cap1600_w0_h0_hist0_direct.npz": "4ed4442a5257849dabb71c2b03e757cd07d2bdb28e0479d320cdd6e8532c7037",
+    "models/rmse_improvement_cache/24cdf7b53bde332a047f/pred_q4_2024_catboost_cap1600_w0_h0_hist0_direct.npz": "255254eaf9a26840639abe0f1c74e711c580aaee2bda2da97a862b9af1e46614",
+    "models/rmse_improvement_cache/24cdf7b53bde332a047f/pred_primary_2025_catboost_cap1600_w0_h0_hist0_direct.npz": "226c18c0023c9e906cfa19f8e8bce1be7922a0628ec804366de1f890304b5442",
+    "models/rmse_improvement_cache/24cdf7b53bde332a047f/pred_long_12m_catboost_cap1600_w0_h0_hist0_direct.npz": "0b6f54d83e71217556fd199fa9f68f71eabac4070630ae4fc37399401358f776"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1",
+    "catboost": "1.2.10",
+    "lightgbm": "4.7.0",
+    "sklearn": "1.9.1",
+    "scipy": "1.18.1"
+  },
+  "splits": {
+    "q3_2024": [
+      "2024-07",
+      "2024-09"
+    ],
+    "q4_2024": [
+      "2024-10",
+      "2024-12"
+    ],
+    "primary_2025": [
+      "2025-01",
+      "2025-03"
+    ],
+    "long_12m": [
+      "2024-01",
+      "2024-12"
+    ],
+    "origin_202212_16m": [
+      "2023-01",
+      "2024-04"
+    ],
+    "origin_202306_16m": [
+      "2023-07",
+      "2024-10"
+    ],
+    "origin_202311_16m": [
+      "2023-12",
+      "2025-03"
+    ]
+  },
+  "threads": 3,
+  "seed": 42,
+  "recipes": [
+    "raw_cat",
+    "resale_lgb",
+    "hierarchy",
+    "hierarchy_residual_lgb"
+  ],
+  "raw": "Normalized keys retained, plus raw street/type and 2 formatting indicators; same CatBoost 2400 trajectory, <=1600 best prefix",
+  "resale": "24-month snapshot; 2 calendar month lag; query frozen at fit end minus lag; latest-file historical revisions unverified",
+  "hierarchy": {
+    "ridge_alpha": 30,
+    "future_damping_months": 6,
+    "recent_group_slope_scale": 0.25
+  },
+  "blends": [
+    0.25,
+    1.0
+  ],
+  "selection": "Earlier two quarters only; >=3 pooled gain and no quarter loss >3; no automatic production replacement",
+  "long_window_anchor": "Matched housing LightGBM ONLY, not incumbent production blend",
+  "test_inputs": "Audit dates and alignment only; no test fields used by model fitting or selection",
+  "public_rental_data_downloaded": false,
+  "property_features_used": false,
+  "submission_generated": false,
+  "limitations": [
+    "Repeatedly inspected and overlapping historical windows, not pristine holdouts",
+    "Frozen event lag cannot establish publication vintage or undo historical revisions",
+    "Latest property snapshot excluded; no individual unit identifiers"
+  ],
+  "run_id": "21cb501c6b7b51b3dc55"
+}

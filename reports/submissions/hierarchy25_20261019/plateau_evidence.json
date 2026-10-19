@@ -1,0 +1,15 @@
+{
+  "validation_window": "2025-01 to 2025-03; repeatedly inspected historical diagnostic",
+  "rows": 8924,
+  "source_rows_and_actuals_aligned": true,
+  "cat_lgb_error_correlation": 0.9706738443192564,
+  "incumbent_unit_xgb_error_correlation": 0.9729918335152109,
+  "sse_reduction_required_for_rmse_200": 0.8009989012510619,
+  "sources_sha256": {
+    "reports/experiments/rmse_improvement_v1/predictions_primary_2025.csv": "b9c61f427bfc8ffb5e3c05cac6e7d7c389547bea296dfb80622f2232e9d5f324",
+    "reports/experiments/xgboost_native_v1/predictions_primary_2025.csv": "61ba57237644415d299ae6b060a19fa9530602ec5d055d20e1c1208e2db9fa0f",
+    "models/rmse_improvement_cache/24cdf7b53bde332a047f/pred_primary_2025_catboost_cap1600_w0_h0_hist0_direct.npz": "226c18c0023c9e906cfa19f8e8bce1be7922a0628ec804366de1f890304b5442",
+    "models/rmse_improvement_cache/24cdf7b53bde332a047f/pred_primary_2025_lightgbm_cap1000_w0_h0_hist0_direct.npz": "af49cab7d8f2b3e1cf364296f7314b81988b2b079d324234dca69cfbed0330ec"
+  },
+  "interpretation": "Shared residuals and missing within-group distinctions are supported concerns; not a proof of Bayes error or impossibility of RMSE 200."
+}

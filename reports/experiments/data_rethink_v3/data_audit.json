@@ -1,0 +1,261 @@
+{
+  "train": {
+    "rows": 150000,
+    "fields": [
+      {
+        "field": "RENT_APPROVAL_DATE",
+        "aligned": true,
+        "raw_distinct": 51,
+        "clean_distinct": 51,
+        "textual_changes": 0
+      },
+      {
+        "field": "TOWN",
+        "aligned": true,
+        "raw_distinct": 26,
+        "clean_distinct": 26,
+        "textual_changes": 0
+      },
+      {
+        "field": "BLOCK",
+        "aligned": true,
+        "raw_distinct": 2720,
+        "clean_distinct": 2720,
+        "textual_changes": 0
+      },
+      {
+        "field": "STREET",
+        "aligned": true,
+        "raw_distinct": 1146,
+        "clean_distinct": 576,
+        "textual_changes": 30781
+      },
+      {
+        "field": "FLAT_TYPE",
+        "aligned": true,
+        "raw_distinct": 11,
+        "clean_distinct": 6,
+        "textual_changes": 35331
+      },
+      {
+        "field": "FLAT_MODEL",
+        "aligned": true,
+        "raw_distinct": 20,
+        "clean_distinct": 20,
+        "textual_changes": 0
+      },
+      {
+        "field": "FLOOR_AREA_SQM",
+        "aligned": true,
+        "raw_distinct": 156,
+        "clean_distinct": 156,
+        "textual_changes": 149848
+      },
+      {
+        "field": "FURNISHED",
+        "aligned": true,
+        "raw_distinct": 1,
+        "clean_distinct": 1,
+        "textual_changes": 0
+      },
+      {
+        "field": "LEASE_COMMENCE_DATE",
+        "aligned": true,
+        "raw_distinct": 57,
+        "clean_distinct": 57,
+        "textual_changes": 0
+      },
+      {
+        "field": "FEE",
+        "aligned": true,
+        "raw_distinct": 1,
+        "clean_distinct": 1,
+        "textual_changes": 150000
+      },
+      {
+        "field": "RENT_YEAR",
+        "aligned": true,
+        "raw_distinct": null,
+        "clean_distinct": 5,
+        "textual_changes": 0
+      },
+      {
+        "field": "RENT_MONTH",
+        "aligned": true,
+        "raw_distinct": null,
+        "clean_distinct": 12,
+        "textual_changes": 0
+      },
+      {
+        "field": "RENT_MONTH_INDEX",
+        "aligned": true,
+        "raw_distinct": null,
+        "clean_distinct": 51,
+        "textual_changes": 0
+      },
+      {
+        "field": "FLAT_AGE",
+        "aligned": true,
+        "raw_distinct": null,
+        "clean_distinct": 61,
+        "textual_changes": 0
+      },
+      {
+        "field": "MONTHLY_RENT",
+        "aligned": true,
+        "raw_distinct": 608,
+        "clean_distinct": 608,
+        "textual_changes": 0
+      }
+    ]
+  },
+  "test": {
+    "rows": 50000,
+    "fields": [
+      {
+        "field": "RENT_APPROVAL_DATE",
+        "aligned": true,
+        "raw_distinct": 17,
+        "clean_distinct": 17,
+        "textual_changes": 0
+      },
+      {
+        "field": "TOWN",
+        "aligned": true,
+        "raw_distinct": 26,
+        "clean_distinct": 26,
+        "textual_changes": 0
+      },
+      {
+        "field": "BLOCK",
+        "aligned": true,
+        "raw_distinct": 2660,
+        "clean_distinct": 2660,
+        "textual_changes": 0
+      },
+      {
+        "field": "STREET",
+        "aligned": true,
+        "raw_distinct": 1129,
+        "clean_distinct": 573,
+        "textual_changes": 10482
+      },
+      {
+        "field": "FLAT_TYPE",
+        "aligned": true,
+        "raw_distinct": 6,
+        "clean_distinct": 6,
+        "textual_changes": 0
+      },
+      {
+        "field": "FLAT_MODEL",
+        "aligned": true,
+        "raw_distinct": 19,
+        "clean_distinct": 19,
+        "textual_changes": 0
+      },
+      {
+        "field": "FLOOR_AREA_SQM",
+        "aligned": true,
+        "raw_distinct": 148,
+        "clean_distinct": 148,
+        "textual_changes": 49963
+      },
+      {
+        "field": "FURNISHED",
+        "aligned": true,
+        "raw_distinct": 1,
+        "clean_distinct": 1,
+        "textual_changes": 0
+      },
+      {
+        "field": "LEASE_COMMENCE_DATE",
+        "aligned": true,
+        "raw_distinct": 57,
+        "clean_distinct": 57,
+        "textual_changes": 0
+      },
+      {
+        "field": "FEE",
+        "aligned": true,
+        "raw_distinct": 1,
+        "clean_distinct": 1,
+        "textual_changes": 50000
+      },
+      {
+        "field": "RENT_YEAR",
+        "aligned": true,
+        "raw_distinct": null,
+        "clean_distinct": 2,
+        "textual_changes": 0
+      },
+      {
+        "field": "RENT_MONTH",
+        "aligned": true,
+        "raw_distinct": null,
+        "clean_distinct": 12,
+        "textual_changes": 0
+      },
+      {
+        "field": "RENT_MONTH_INDEX",
+        "aligned": true,
+        "raw_distinct": null,
+        "clean_distinct": 17,
+        "textual_changes": 0
+      },
+      {
+        "field": "FLAT_AGE",
+        "aligned": true,
+        "raw_distinct": null,
+        "clean_distinct": 57,
+        "textual_changes": 0
+      }
+    ]
+  },
+  "granularity": {
+    "block_type_groups": 14828,
+    "groups_with_varying_attributes": {
+      "FLOOR_AREA_SQM": 0,
+      "FLAT_MODEL": 0,
+      "LEASE_COMMENCE_DATE": 0
+    },
+    "interpretation": "Static block+type attributes, not evidence of exact unit measurements; 2026 origin not verified"
+  },
+  "test_dates": {
+    "2025-03": 380,
+    "2025-04": 3112,
+    "2025-05": 3312,
+    "2025-06": 3296,
+    "2025-07": 3567,
+    "2025-08": 3096,
+    "2025-09": 3003,
+    "2025-10": 2983,
+    "2025-11": 2972,
+    "2025-12": 3044,
+    "2026-01": 3158,
+    "2026-02": 2555,
+    "2026-03": 3378,
+    "2026-04": 3033,
+    "2026-05": 3037,
+    "2026-06": 3040,
+    "2026-07": 3034
+  },
+  "resale": {
+    "rows": 242955,
+    "min_month": "2017-01-01",
+    "max_month": "2026-10-01",
+    "receipt": {
+      "dataset_id": "d_8b84c4ee58e3cfc0ece0d773c8ca6abc",
+      "source_page": "https://data.gov.sg/datasets/d_8b84c4ee58e3cfc0ece0d773c8ca6abc/view",
+      "retrieved_utc": "2026-10-19T10:40:53.582862+00:00",
+      "bytes": 24032414,
+      "sha256": "d401fc2e7d2a083576dd388b5ea3d170c2027d2503542de32a84656651ebe947",
+      "download_host": "s3.ap-southeast-1.amazonaws.com",
+      "licence": "Singapore Open Data Licence; see source page",
+      "user_confirmed_external_data_allowed": "2026-10-19",
+      "vintage": "Latest snapshot, NOT a historical release archive",
+      "use": "Only event months <= training/query origin minus 2 months. Historical revisions remain unverified."
+    }
+  },
+  "rule_confirmation": "User states course allows additional public data, 2026-10-19"
+}

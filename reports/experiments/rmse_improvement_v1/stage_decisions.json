@@ -1,0 +1,58 @@
+[
+  {
+    "stage": "01_caps",
+    "selected": "cap_1600_blend",
+    "pooled_rmse": 460.16918944452163,
+    "incumbent": "control_800_blend",
+    "candidates": [
+      "control_800_blend",
+      "cap_1600_blend",
+      "cap_2400_blend"
+    ],
+    "primary_used": false
+  },
+  {
+    "stage": "02_recency",
+    "selected": "cap_1600_blend",
+    "pooled_rmse": 460.16918944452163,
+    "incumbent": "cap_1600_blend",
+    "candidates": [
+      "cap_1600_blend",
+      "recency_confirmed_blend"
+    ],
+    "primary_used": false
+  },
+  {
+    "stage": "03_history",
+    "selected": "cap_1600_blend",
+    "pooled_rmse": 460.16918944452163,
+    "incumbent": "cap_1600_blend",
+    "candidates": [
+      "cap_1600_blend",
+      "history_confirmed_blend"
+    ],
+    "primary_used": false
+  },
+  {
+    "stage": "04_trend",
+    "selected": "trend_damped24_weight25",
+    "pooled_rmse": 459.17479596244954,
+    "incumbent": "cap_1600_blend",
+    "candidates": [
+      "cap_1600_blend",
+      "trend_flat3_weight25",
+      "trend_flat3_weight50",
+      "trend_flat3_weight75",
+      "trend_flat3_weight100",
+      "trend_damped12_weight25",
+      "trend_damped12_weight50",
+      "trend_damped12_weight75",
+      "trend_damped12_weight100",
+      "trend_damped24_weight25",
+      "trend_damped24_weight50",
+      "trend_damped24_weight75",
+      "trend_damped24_weight100"
+    ],
+    "primary_used": false
+  }
+]
