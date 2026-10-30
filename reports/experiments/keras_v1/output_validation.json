@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "run_id": "bda4769ad72f1d494db1",
+  "scores_checked": 30,
+  "seed_scores_checked": 30,
+  "models_reloaded": 30,
+  "seed_ensembles_checked": 10,
+  "preprocessing_fit_only": true,
+  "source_fingerprints_valid": true,
+  "query_target_and_id_invariance": true,
+  "selection_excludes_primary": true,
+  "original_submissions_unchanged": true,
+  "production_replaced": false,
+  "test_data_read": false,
+  "inspector_sha256": "2ed0b6417f1648a4bf5fd375093bc757bcf88ee70fef8cebd26f5909e6303b10"
+}

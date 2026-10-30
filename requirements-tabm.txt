@@ -1,0 +1,4 @@
+-r requirements-stage5.txt
+tabm==0.0.3
+torch==2.14.1
+rtdl-num-embeddings==0.0.12

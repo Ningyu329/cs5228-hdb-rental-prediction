@@ -1,0 +1,14 @@
+{
+  "date_singapore": "2026-10-23",
+  "run_id": "ae756d8539dced6f37ff",
+  "execution_changed_before_selection_lock": true,
+  "reason": "Full multi-seed evaluation is slower than the previous neural experiment; apply staged screening before spending compute on diagnostic windows.",
+  "original_model_grid_unchanged": true,
+  "original_promotion_gate_unchanged": true,
+  "stop_after_selection_if_selected_incumbent": true,
+  "continue_full_diagnostics_if_earlier_gate_passed": true,
+  "primary_or_long_metrics_used_for_this_policy": false,
+  "partial_model_fit_can_be_discarded_without_changing_completed_model_artifacts": true,
+  "readme_modified": false,
+  "kaggle_submission_authorized": false
+}

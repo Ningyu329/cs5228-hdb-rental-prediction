@@ -1,0 +1,12 @@
+{
+  "run_id": "bda4769ad72f1d494db1",
+  "best_pure": "direct_blend100",
+  "best_new": "trend_blend25",
+  "selected": "trend_blend25",
+  "selection_splits": [
+    "q3_2024",
+    "q4_2024"
+  ],
+  "primary_used": false,
+  "production_replaced": false
+}

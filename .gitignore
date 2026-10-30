@@ -7,6 +7,7 @@ data/processed/
 
 # Temporary, unrelated and interrupted-run artifacts; retained reports are separate.
 /tmp/
+/catboost_info/
 /output/
 /reports/experiments/rmse_improvement_v1/progress.json
 /reports/experiments/data_rethink_v1/*
@@ -59,6 +60,17 @@ data/processed/
 !reports/experiments/xgboost_native_v1/results.csv
 !reports/experiments/xgboost_native_v1/selection.csv
 !reports/experiments/xgboost_native_v1/monthly_errors.csv
+!reports/experiments/keras_v1/results.csv
+!reports/experiments/keras_v1/seed_results.csv
+!reports/experiments/keras_v1/seed_blends.csv
+!reports/experiments/keras_v1/selection.csv
+!reports/experiments/keras_v1/monthly_errors.csv
+!reports/experiments/tabm_v1/results.csv
+!reports/experiments/tabm_v1/seed_results.csv
+!reports/experiments/tabm_v1/seed_blends.csv
+!reports/experiments/tabm_v1/selection.csv
+!reports/experiments/tabm_v1/monthly_errors.csv
+!reports/experiments/tabm_v1/primary_diagnostic_groups.csv
 
 # Python and notebook artifacts
 __pycache__/
@@ -75,3 +87,5 @@ reports/location_features_local/
 .env
 kaggle.json
 .DS_Store
+!reports/experiments/te_v*/results.csv
+!reports/experiments/te_v*/importance_*.csv

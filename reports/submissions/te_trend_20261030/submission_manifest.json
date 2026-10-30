@@ -1,0 +1,64 @@
+{
+  "competition": "cs-5228-2610-project",
+  "dates_singapore": "2026-10-29/30",
+  "public_scores_reported_by_user": true,
+  "submissions": [
+    {
+      "file": "submissions/submission_te_resale_blend50_20261029.csv",
+      "sha256": "80610be24b18e20de8a172abdb360550bed57aeb46f6e8b434b80fccb774617c",
+      "description": "50% TE LightGBM (OOF target encoding + lagged resale) + 50% incumbent",
+      "public_rmse": null
+    },
+    {
+      "file": "submissions/submission_te_v2_property_blend75_20261029.csv",
+      "sha256": "6a85c29dbfb2799b984da72d4c2d336ee85b8a67b5f41270dcb5d69c76536902",
+      "description": "75% TE LightGBM (+ HDB property composition) + 25% incumbent",
+      "public_rmse": 435.91
+    },
+    {
+      "file": "submissions/submission_te_avg4_blend75_20261029.csv",
+      "sha256": "140589b428e3024224e4f4064b0050240c282d33d9b7ac08d01b57ff1b0f2c93",
+      "description": "75% average of 4 TE variants + 25% incumbent",
+      "public_rmse": 435.26895
+    },
+    {
+      "file": "submissions/submission_te_avg4_blend75_scale0.98_20261029.csv",
+      "sha256": "67349e8e3b259074fae746894c351bb4d62114c04a97ec52cd73f0ebba68cd97",
+      "description": "level probe x0.98",
+      "public_rmse": 447.6371
+    },
+    {
+      "file": "submissions/submission_te_avg4_blend75_scale1.02_20261029.csv",
+      "sha256": "fa447d6e2dfb8e1af711c0fe7377cb76a51ecf2593b98df2c8c48cc5795e28ca",
+      "description": "level probe x1.02",
+      "public_rmse": 431.98839
+    },
+    {
+      "file": "submissions/submission_te_avg4_blend75_scale1.017_20261029.csv",
+      "sha256": "d4c6eed622a5aeca7a82e971061b3d15503797957191d6e9a28f4384e8cc9645",
+      "description": "x1.017 (quadratic optimum of the three level probes)",
+      "public_rmse": 431.88651
+    },
+    {
+      "file": "submissions/submission_te_avg4_blend75_trendprobe_20261029.csv",
+      "sha256": "010f2c099900f6021cf190e4ece562c3a802baf91be151404dd2a652500d98c6",
+      "description": "x(1.017 + 0.002 * centred month)",
+      "public_rmse": 431.07006
+    }
+  ],
+  "notes": {
+    "first_submission_score": "~435 (user reported rounded value; exact score not recorded)",
+    "v2_property_score": "user reported 435.91 (rounded)",
+    "level_probe_fit": "public MSE is exactly quadratic in a global scale s; the 4 uniform-scale scores fit it with residual < 1e-5 and implied E[p^2] within 0.03% of the test-set value",
+    "level_trend_optimum": {
+      "level": 1.01704,
+      "trend_per_month": 0.00179,
+      "predicted_public_rmse": 431.059
+    },
+    "public_leaderboard_used_for": "two global parameters (level, trend) only; model and blend weights chosen on local time backtests",
+    "private_leaderboard_risk": "parameters fitted on the public subset; assumed public/private split is random over the same months",
+    "not_used": "data.gov.sg 'Renting Out of Flats' contains the test-period rents (label leakage); not downloaded or used"
+  },
+  "reproduce": "src/models/run_te_experiments.py --export (per variant) then src/models/export_te_submission.py",
+  "final_selection": "Kaggle automatic selection (best public = trendprobe file)"
+}

@@ -1,0 +1,10 @@
+{
+  "completed": false,
+  "screening_completed": true,
+  "full_diagnostics_completed": false,
+  "stop_reason": "No candidate passed the unchanged earlier-quarter gate; see screening_status.json",
+  "run_id": "ae756d8539dced6f37ff",
+  "test_data_read": false,
+  "submission_generated": false,
+  "production_replaced": false
+}

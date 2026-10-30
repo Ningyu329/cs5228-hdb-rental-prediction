@@ -1,0 +1,123 @@
+{
+  "source": "data/processed/train_location_features.csv",
+  "source_sha256": "1542050dcdad6937613b69f293ca07daaa209834195e4172dcb900c6921bf32b",
+  "implementation_sha256": {
+    "src/models/run_keras_experiments.py": "eeaff3ce2ecd0259aa3c0a4372af53577067163827de93cff74252c4ed1222e2",
+    "src/models/keras_rent.py": "e655d7931234dc07ec8ae6e7950bf0f26b517d2c8685c888b26a82d4b9bb65db",
+    "requirements-keras.txt": "e56009adaafbe2f61c544707a51b27795d8b2fb73acdb75a79fdc81cfccd4e47",
+    "src/features/build_temporal_features.py": "c26768291295e6b8f9b96701cfe621df05b0dfe5e4bbb67b872ef771737bba7d",
+    "src/features/build_stage5_features.py": "834a7c189a94cc9777414dc4610503653abe91a98099572e28633fccf38a3a29",
+    "src/models/run_stage5.py": "fa1782e146eedd8eea9694788607201180b01b85d720cfbef2357406e76e7e6a",
+    "src/models/run_rmse_improvement.py": "8346b1fdf897e422d20df23e0c8435651dcf07fa453904f7def1d31d1c5a385d",
+    "src/models/run_tree_tuning.py": "4ac58e1a32ef53f9d2b2c5f45ac6f31642b2eed6089d2576fc50f63227cba3a5",
+    "src/models/train_baseline.py": "63fd08f617549563e01fe6bf65ff4ae0ef16187e717a1711a7384c2543fe5fb5"
+  },
+  "reference_sha256": {
+    "reports/experiments/rmse_improvement_v1/selection_locked.json": "a667a17a991379c60c8ff057581af233d9bd1a580d402f61f03f20154d6888a5",
+    "reports/experiments/rmse_improvement_v1/predictions_q3_2024.csv": "e7adf97cab87980ff1bb0bafece51c48268eedfdcea0f957997af9fc33be5799",
+    "reports/experiments/rmse_improvement_v1/predictions_q4_2024.csv": "576c60bf0a9a850189ee1b9e8857ab91c4f7016b0c89ff33d8b60fe7a809ff87",
+    "reports/experiments/rmse_improvement_v1/predictions_primary_2025.csv": "b9c61f427bfc8ffb5e3c05cac6e7d7c389547bea296dfb80622f2232e9d5f324",
+    "reports/experiments/rmse_improvement_v1/predictions_long_6m.csv": "3bc43d4d50e000f00882d8048e2261d7d4365a948bcc375fa5e116e5747021c9",
+    "reports/experiments/rmse_improvement_v1/predictions_long_12m.csv": "41dc6620612e7822bef8fa6e3a2a5a97cdd7ef07395ac2326b82fbc4c7a8887f"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "machine": "arm64",
+    "keras": "3.15.1",
+    "jax": "0.12.0.1",
+    "jaxlib": "0.12.0.1",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1",
+    "scikit-learn": "1.9.1",
+    "h5py": "3.16.0",
+    "ml-dtypes": "0.6.0"
+  },
+  "backend": "jax",
+  "device": "cpu",
+  "grid": {
+    "direct": {
+      "widths": [
+        128,
+        64
+      ],
+      "dropout": 0.1,
+      "dense_l2": 1e-05,
+      "embedding_l2": 1e-06,
+      "learning_rate": 0.002,
+      "batch_size": 1024,
+      "max_epochs": 80,
+      "patience": 10
+    },
+    "trend": {
+      "widths": [
+        128,
+        64
+      ],
+      "dropout": 0.1,
+      "dense_l2": 1e-05,
+      "embedding_l2": 1e-06,
+      "learning_rate": 0.002,
+      "batch_size": 1024,
+      "max_epochs": 80,
+      "patience": 10
+    }
+  },
+  "seeds": [
+    42,
+    123,
+    2026
+  ],
+  "seed_ensemble": "equal mean of 3 predictions",
+  "selection_splits": [
+    "q3_2024",
+    "q4_2024"
+  ],
+  "splits": {
+    "q3_2024": [
+      "2024-07",
+      "2024-09"
+    ],
+    "q4_2024": [
+      "2024-10",
+      "2024-12"
+    ],
+    "primary_2025": [
+      "2025-01",
+      "2025-03"
+    ],
+    "long_6m": [
+      "2024-07",
+      "2024-12"
+    ],
+    "long_12m": [
+      "2024-01",
+      "2024-12"
+    ]
+  },
+  "weights_percent": [
+    10,
+    25,
+    50,
+    100
+  ],
+  "preprocessing": "fit-only rare-category vocabulary, median imputation, standardization and missing indicators",
+  "target": "fit-only centered/scaled original SGD rent or static residual plus damped24 trend; MSE",
+  "early_stopping": "fit-only last 3 months; scaled MSE excluding regularization; refit all prior rows at best epoch",
+  "promotion_gate": "at least 1 pooled RMSE improvement, no earlier-quarter loss exceeding 1; no automatic replacement",
+  "diagnostics": [
+    "primary_2025",
+    "long_6m",
+    "long_12m"
+  ],
+  "diagnostics_menu": "both three-seed pure networks and one locked best mixture, plus incumbent",
+  "primary_used_for_selection": false,
+  "previously_inspected_windows": true,
+  "test_data_read": false,
+  "submission_generated": false,
+  "production_replaced": false,
+  "official_sources": [
+    "https://keras.io/getting_started/",
+    "https://keras.io/api/callbacks/early_stopping/"
+  ],
+  "run_id": "bda4769ad72f1d494db1"
+}
