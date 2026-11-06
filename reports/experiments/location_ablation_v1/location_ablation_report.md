@@ -1,63 +1,63 @@
-# 位置特征 Ridge 消融实验
+# Location Feature Ridge Ablation
 
-## 实验设计
+## Design
 
-- temporal: 2021-01 至 2024-12 训练（141,076 行），2025-01 至 2025-03 验证（8,924 行）。
-- temporal_backtest_1: 2021-01 至 2024-09 训练（132,802 行），2024-10 至 2024-12 验证（8,274 行）。
-- temporal_backtest_2: 2021-01 至 2024-06 训练（124,016 行），2024-07 至 2024-09 验证（8,786 行）。
-- random: 2021-01 至 2025-03 训练（120,000 行），2021-01 至 2025-03 验证（30,000 行）。
+- temporal: train 2021-01 to 2024-12 (141,076 rows), validate 2025-01 to 2025-03 (8,924 rows).
+- temporal_backtest_1: train 2021-01 to 2024-09 (132,802 rows), validate 2024-10 to 2024-12 (8,274 rows).
+- temporal_backtest_2: train 2021-01 to 2024-06 (124,016 rows), validate 2024-07 to 2024-09 (8,786 rows).
+- random: train 2021-01 to 2025-03 (120,000 rows), validate 2021-01 to 2025-03 (30,000 rows).
 
-所有方案使用相同 Ridge 参数和固定划分，填补器、标准化和 One-hot 编码仅在各训练折拟合。
+All variants use the same Ridge parameters and fixed splits; imputer, scaler and one-hot encoder are fitted on each training fold only.
 
-## 主要时间验证结果
+## Main temporal validation
 
-| 特征方案 | 字段数 | RMSE | 相对本次主表基线改善 | 改善比例 |
+| Feature set | Fields | RMSE | Improvement over this run's main-table baseline | Improvement % |
 | --- | ---: | ---: | ---: | ---: |
-| 原主表 Ridge | 11 | 562.6666 | +0.0000 | +0.00% |
-| + HDB 坐标与楼栋属性 | 23 | 562.4358 | +0.2309 | +0.04% |
+| Main-table Ridge | 11 | 562.6666 | +0.0000 | +0.00% |
+| + HDB coordinates and block attributes | 23 | 562.4358 | +0.2309 | +0.04% |
 | + HDB + MRT | 26 | 562.0663 | +0.6004 | +0.11% |
-| + HDB + MRT + 学校 | 29 | 562.0281 | +0.6385 | +0.11% |
-| + HDB + MRT + 学校 + 商场 | 32 | 562.0597 | +0.6069 | +0.11% |
-| + HDB + 学校 + 商场（无 MRT） | 29 | 562.5459 | +0.1207 | +0.02% |
+| + HDB + MRT + schools | 29 | 562.0281 | +0.6385 | +0.11% |
+| + HDB + MRT + schools + malls | 32 | 562.0597 | +0.6069 | +0.11% |
+| + HDB + schools + malls (no MRT) | 29 | 562.5459 | +0.1207 | +0.02% |
 
-## 更早时间窗口与随机切分
+## Earlier windows and random split
 
-| 特征方案 | 验证划分 | RMSE | 相对同划分主表基线改善 |
+| Feature set | Split | RMSE | Improvement over same-split baseline |
 | --- | --- | ---: | ---: |
-| 原主表 Ridge | temporal_backtest_1 | 529.8556 | +0.0000 |
-| + HDB 坐标与楼栋属性 | temporal_backtest_1 | 529.4256 | +0.4300 |
+| Main-table Ridge | temporal_backtest_1 | 529.8556 | +0.0000 |
+| + HDB coordinates and block attributes | temporal_backtest_1 | 529.4256 | +0.4300 |
 | + HDB + MRT | temporal_backtest_1 | 529.0222 | +0.8334 |
-| + HDB + MRT + 学校 | temporal_backtest_1 | 528.9965 | +0.8590 |
-| + HDB + MRT + 学校 + 商场 | temporal_backtest_1 | 528.9253 | +0.9303 |
-| + HDB + 学校 + 商场（无 MRT） | temporal_backtest_1 | 528.9210 | +0.9346 |
-| 原主表 Ridge | temporal_backtest_2 | 546.6978 | +0.0000 |
-| + HDB 坐标与楼栋属性 | temporal_backtest_2 | 545.8737 | +0.8241 |
+| + HDB + MRT + schools | temporal_backtest_1 | 528.9965 | +0.8590 |
+| + HDB + MRT + schools + malls | temporal_backtest_1 | 528.9253 | +0.9303 |
+| + HDB + schools + malls (no MRT) | temporal_backtest_1 | 528.9210 | +0.9346 |
+| Main-table Ridge | temporal_backtest_2 | 546.6978 | +0.0000 |
+| + HDB coordinates and block attributes | temporal_backtest_2 | 545.8737 | +0.8241 |
 | + HDB + MRT | temporal_backtest_2 | 545.7541 | +0.9437 |
-| + HDB + MRT + 学校 | temporal_backtest_2 | 545.7136 | +0.9842 |
-| + HDB + MRT + 学校 + 商场 | temporal_backtest_2 | 545.9325 | +0.7653 |
-| + HDB + 学校 + 商场（无 MRT） | temporal_backtest_2 | 545.9508 | +0.7470 |
-| 原主表 Ridge | random | 505.1789 | +0.0000 |
-| + HDB 坐标与楼栋属性 | random | 504.8509 | +0.3280 |
+| + HDB + MRT + schools | temporal_backtest_2 | 545.7136 | +0.9842 |
+| + HDB + MRT + schools + malls | temporal_backtest_2 | 545.9325 | +0.7653 |
+| + HDB + schools + malls (no MRT) | temporal_backtest_2 | 545.9508 | +0.7470 |
+| Main-table Ridge | random | 505.1789 | +0.0000 |
+| + HDB coordinates and block attributes | random | 504.8509 | +0.3280 |
 | + HDB + MRT | random | 504.7496 | +0.4293 |
-| + HDB + MRT + 学校 | random | 504.7212 | +0.4578 |
-| + HDB + MRT + 学校 + 商场 | random | 504.6980 | +0.4809 |
-| + HDB + 学校 + 商场（无 MRT） | random | 504.7271 | +0.4518 |
+| + HDB + MRT + schools | random | 504.7212 | +0.4578 |
+| + HDB + MRT + schools + malls | random | 504.6980 | +0.4809 |
+| + HDB + schools + malls (no MRT) | random | 504.7271 | +0.4518 |
 
-## 结果解释与限制
+## Interpretation and limitations
 
-- 先前记录的 Ridge 时间 RMSE 为 562.5888；本次相同配置复跑为 562.6666。运行环境不同，所有改善均以本次同环境复跑为参照。
-- 本次主要时间验证得分最低的方案为 hdb_mrt_school；未使用 MRT 的方案中得分最低的是 hdb。
-- 主验证最佳方案相对本次基线降低 RMSE 0.6385（0.11%），提升有限。它在 2 个更早窗口中有 2 个窗口优于对应基线。
-- 主验证集平均预测减真实租金：主表基线 +316.44，最低 RMSE 方案 +316.85。正值表示整体高估，位置特征尚未解决这一偏差。
-- 上述最低分只用于确定后续实验候选，不能替代独立测试集表现或证明统计显著性。更早时间窗口用于检查表现稳定性，随机切分仅为辅助。
-- MRT 时间策略：snapshot。若为 snapshot 或 unknown，含 MRT 的结果仅为探索，当前 open 站点可能在早期租赁月份尚未开放。
-- 学校、商场及部分楼栋属性也来自静态快照，移除 MRT 不能证明其他辅助字段完全满足历史可用性。
-- 验证窗口为 3 个月（默认），测试集延伸至更远月份，长期外推误差可能更大。
-- 不使用 ADDRESS_KEY 或 POSTAL_CODE 做新模型输入。地址匹配标记等常量保留在预设方案内，Ridge 正则化和标准化处理与基线相同。
-- 未调节模型参数，未修改 baseline_config.json，未生成或上传 Kaggle 提交。
+- The previously recorded Ridge temporal RMSE is 562.5888; this rerun with the same configuration gives 562.6666. Environments differ, so all improvements use this same-environment rerun as reference.
+- Lowest main temporal validation score: hdb_mrt_school; lowest without MRT: hdb.
+- The best main-validation variant lowers RMSE by 0.6385 (0.11%) against this baseline, a limited gain. It beats the matching baseline in 2 of 2 earlier windows.
+- Mean prediction minus actual rent on the main validation: baseline +316.44, lowest-RMSE variant +316.85. Positive values mean overall overprediction, which location features do not fix.
+- The lowest score only selects candidates for later experiments; it does not replace independent test performance or show statistical significance. Earlier windows check stability; the random split is auxiliary.
+- MRT temporal mode: snapshot. With snapshot or unknown, MRT results are exploratory because currently open stations may not have been open in early rental months.
+- School, mall and some block attributes are also static snapshots, so removing MRT does not prove the other auxiliary fields are historically available.
+- Validation windows are 3 months by default while the test set extends further, so long-horizon extrapolation error may be larger.
+- ADDRESS_KEY and POSTAL_CODE are not used as model inputs. Constant flags such as address-match indicators stay in the preset variants; Ridge regularisation and scaling match the baseline.
+- No hyperparameters were tuned, baseline_config.json was not modified, and no Kaggle submission was generated.
 
-分组误差见 group_errors.csv，包含主表基线与主要候选按城镇、房型、月份及区域的 RMSE、MAE 和有方向偏差。
+Group errors are in group_errors.csv: RMSE, MAE and signed bias by town, flat type, month and region for the baseline and main candidates.
 
-## 下一步实验
+## Next experiments
 
-优先比较能够表达非线性时间变化的模型或时间特征方案，检查预测整体高估是否与长期线性趋势外推有关。这个原因目前仅为待验证假设，不能从平均偏差直接推断。继续使用同样的时间窗口，MRT 保留为带历史可用性限制的独立对照。
+First compare models or time features that capture nonlinear time changes, and check whether overall overprediction relates to long-term linear trend extrapolation. This is only a hypothesis and cannot be inferred from mean bias alone. Keep the same windows and keep MRT as a separate control with its availability caveat.

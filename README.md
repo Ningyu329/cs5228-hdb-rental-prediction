@@ -169,8 +169,8 @@ pre-translation commit `05e8ddf` for step 3.
 ## Experiment index
 
 Every experiment keeps its own directory with summary metrics; row-level outputs stay local.
-Except `te_report.md`, the per-experiment write-ups listed below are in Chinese; their tables and
-`results.csv` files are language-neutral.
+All write-ups are in English. Only `reports/location_features/location_features_manifest.json` keeps
+some original Chinese rule text, because later experiments read it as a fingerprinted input.
 
 | Experiment | Entry point | Results | Outcome |
 | --- | --- | --- | --- |

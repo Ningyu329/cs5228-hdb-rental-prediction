@@ -8,154 +8,154 @@
   "entries": [
     {
       "path": "output",
-      "reason": "与租金预测无关的课程讲义排版输出",
+      "reason": "Course lecture-note typesetting output unrelated to rent prediction",
       "file_count": 1,
       "bytes": 25304090,
       "content_manifest_sha256": "07af51b84997d7aabedbfafca71ea09a12a60660f2a6f1640754416dc37a23c6"
     },
     {
       "path": "tmp",
-      "reason": "失败诊断、重复核验输出及课程讲义临时图片和脚本",
+      "reason": "Failed diagnostics, duplicate verification output, and temporary lecture-note images and scripts",
       "file_count": 19,
       "bytes": 867314,
       "content_manifest_sha256": "fbed682c8603c01ae770d602f0a9dec887c4c5b4ee6e82e168f44acb3d4bd215"
     },
     {
       "path": ".codex-finalizer",
-      "reason": "旧幻灯片候选与临时验证文件；最终版保留在 reports/progress_report",
+      "reason": "Old slide drafts and temporary verification files; the final version is kept in reports/progress_report",
       "file_count": 9,
       "bytes": 2354307,
       "content_manifest_sha256": "dc81bc117f9314b080287eb1892867c7d8c7c908ead5e58a651c87da9f33d6e6"
     },
     {
       "path": "reports/location_features_local",
-      "reason": "重复生成的位置特征报告；正式历史报告保留",
+      "reason": "Duplicate location feature reports; the official historical report is kept",
       "file_count": 2,
       "bytes": 13884,
       "content_manifest_sha256": "5b53072a8a8053d6acb8fba7ec943b8b1006545f698dfac6f046fc60ff370120"
     },
     {
       "path": "src/models/reuse_data_rethink_unaffected.py",
-      "reason": "已执行完毕的一次性缓存迁移工具；迁移凭据保留",
+      "reason": "One-off cache migration tool that has finished; the migration receipt is kept",
       "file_count": 1,
       "bytes": 2775,
       "content_manifest_sha256": "c4b43db2a7191671348aabde66699f723716435a28fbbee2060380d9bd2a63d6"
     },
     {
       "path": "models/data_rethink_cache/5e669154f267b11fd9cb",
-      "reason": "数据重检第一轮中断缓存",
+      "reason": "Interrupted cache from the first data-review round",
       "file_count": 1,
       "bytes": 72574,
       "content_manifest_sha256": "cd3fb8436ea02001f4bfa1d8e5c0489781e3ca3be0db1c624bd26af683e0437d"
     },
     {
       "path": "models/data_rethink_cache/81a1c9ce50c673e5fa6e",
-      "reason": "第二轮中断缓存；已核验复用的模型已复制到第三轮",
+      "reason": "Interrupted second-round cache; verified reusable models were copied to round three",
       "file_count": 19,
       "bytes": 155983983,
       "content_manifest_sha256": "b5ce608b7eecf962aac0db001a77748fd8df424480f544b25eec10b92b2845ac"
     },
     {
       "path": "models/xgboost_cache/006dc65cbdce79eddcaf",
-      "reason": "未完成的原生类别与独热编码混合试验缓存",
+      "reason": "Cache of the unfinished native-category and one-hot encoding mixed trial",
       "file_count": 16,
       "bytes": 428156237,
       "content_manifest_sha256": "2d27c4a35d7cbd992954ad76ae758d99977eeb65fac0c077fdede63665e3eb6c"
     },
     {
       "path": "models/rmse_improvement_cache/58b185479ce660f288d2",
-      "reason": "空缓存目录",
+      "reason": "Empty cache directory",
       "file_count": 0,
       "bytes": 0,
       "content_manifest_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
       "path": "reports/experiments/rmse_improvement_v1/progress.json",
-      "reason": "训练期间的瞬时进度；正式结果及选择记录保留",
+      "reason": "Transient progress during training; official results and selection records are kept",
       "file_count": 1,
       "bytes": 4510,
       "content_manifest_sha256": "6c8839b07811d1e92946b009517ae6eed19f3fb2d511fefd5053045e7f1846ee"
     },
     {
       "path": "reports/experiments/data_rethink_v1/data_audit.json",
-      "reason": "中断试验的重复中间材料；原目录保留中断原因",
+      "reason": "Duplicate intermediate material from an interrupted trial; the original directory keeps the interruption reason",
       "file_count": 1,
       "bytes": 6393,
       "content_manifest_sha256": "29aa532043cfed9154c0abe1adc77c10c47e3cd343dcfb5259b1818a3fa15b66"
     },
     {
       "path": "reports/experiments/data_rethink_v1/validation_plan.json",
-      "reason": "中断试验的重复中间材料；原目录保留中断原因",
+      "reason": "Duplicate intermediate material from an interrupted trial; the original directory keeps the interruption reason",
       "file_count": 1,
       "bytes": 886,
       "content_manifest_sha256": "84576d53a474d43d2ffd57463571102356650c4feec57f3e57de398424663840"
     },
     {
       "path": "reports/experiments/data_rethink_v1/manifest.json",
-      "reason": "中断试验的重复中间材料；原目录保留中断原因",
+      "reason": "Duplicate intermediate material from an interrupted trial; the original directory keeps the interruption reason",
       "file_count": 1,
       "bytes": 4942,
       "content_manifest_sha256": "8a58a9f095c6475999ecac7d7a56f10bf77beeff2e50a5bc12a08b172587f8bd"
     },
     {
       "path": "reports/experiments/data_rethink_v1/property_audit.json",
-      "reason": "中断试验的重复中间材料；原目录保留中断原因",
+      "reason": "Duplicate intermediate material from an interrupted trial; the original directory keeps the interruption reason",
       "file_count": 1,
       "bytes": 1877,
       "content_manifest_sha256": "99e7e5ea1e1b08a18a4b855f96cb2b508c50ec98a6fde113f0aa32ffa90f7466"
     },
     {
       "path": "reports/experiments/data_rethink_v2/data_audit.json",
-      "reason": "中断试验的重复中间材料；原目录保留中断原因",
+      "reason": "Duplicate intermediate material from an interrupted trial; the original directory keeps the interruption reason",
       "file_count": 1,
       "bytes": 6393,
       "content_manifest_sha256": "29aa532043cfed9154c0abe1adc77c10c47e3cd343dcfb5259b1818a3fa15b66"
     },
     {
       "path": "reports/experiments/data_rethink_v2/validation_plan.json",
-      "reason": "中断试验的重复中间材料；原目录保留中断原因",
+      "reason": "Duplicate intermediate material from an interrupted trial; the original directory keeps the interruption reason",
       "file_count": 1,
       "bytes": 886,
       "content_manifest_sha256": "84576d53a474d43d2ffd57463571102356650c4feec57f3e57de398424663840"
     },
     {
       "path": "reports/experiments/data_rethink_v2/manifest.json",
-      "reason": "中断试验的重复中间材料；原目录保留中断原因",
+      "reason": "Duplicate intermediate material from an interrupted trial; the original directory keeps the interruption reason",
       "file_count": 1,
       "bytes": 4942,
       "content_manifest_sha256": "6828c8dba74f0451a0ec978fad42481cd517ca70133181d411744efa3175e865"
     },
     {
       "path": "reports/experiments/data_rethink_v2/property_audit.json",
-      "reason": "中断试验的重复中间材料；原目录保留中断原因",
+      "reason": "Duplicate intermediate material from an interrupted trial; the original directory keeps the interruption reason",
       "file_count": 1,
       "bytes": 2057,
       "content_manifest_sha256": "0f18d7df2be626d4f846ed07d8e4a7ee117f42288598f31091c37dbd1c32a3f5"
     },
     {
       "path": "reports/experiments/xgboost_v1/experiment_manifest.json",
-      "reason": "未完成试验的部分产物；原目录保留中断原因",
+      "reason": "Partial outputs of an unfinished trial; the original directory keeps the interruption reason",
       "file_count": 1,
       "bytes": 4731,
       "content_manifest_sha256": "5f1f426fe7883efba9a878c7af3b3743ce2dfe62229f26c432a16987ef344c74"
     },
     {
       "path": "reports/experiments/xgboost_v1/predictions_q3_2024.csv",
-      "reason": "未完成试验的部分产物；原目录保留中断原因",
+      "reason": "Partial outputs of an unfinished trial; the original directory keeps the interruption reason",
       "file_count": 1,
       "bytes": 2760444,
       "content_manifest_sha256": "d9dbb4477d3bbe3adb39770e5fc3cb68e26b0912cc632a81f56fdf36483a3b3e"
     },
     {
       "path": "reports/experiments/xgboost_v1/results.csv",
-      "reason": "未完成试验的部分产物；原目录保留中断原因",
+      "reason": "Partial outputs of an unfinished trial; the original directory keeps the interruption reason",
       "file_count": 1,
       "bytes": 1165,
       "content_manifest_sha256": "176aa36983587538efe1aff23e8076a1b5749689e658e30d58df47dc2e525ebe"
     },
     {
       "path": "reports/experiments/xgboost_v1/fit_details.json",
-      "reason": "未完成试验的部分产物；原目录保留中断原因",
+      "reason": "Partial outputs of an unfinished trial; the original directory keeps the interruption reason",
       "file_count": 1,
       "bytes": 2792,
       "content_manifest_sha256": "4b93d9d9b4d19d06d9063448051804ccd10dbc1cd3f2e202ff8c8b32335f0a38"
@@ -164,5 +164,5 @@
   "total_files": 81,
   "total_bytes": 615557182,
   "checksum_verification_passed": true,
-  "restore_instructions": "将归档目录中的所需相对路径移回项目同名位置；已有目标先备份，不要覆盖。"
+  "restore_instructions": "Move the needed relative paths from the archive directory back to the same location in the project; back up any existing target first and do not overwrite it."
 }

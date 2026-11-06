@@ -1,69 +1,69 @@
-# Keras 类别嵌入神经网络实验
+# Keras Categorical-Embedding Neural Network Experiment
 
-## 结论
+## Conclusion
 
-2026-10-23 完成两类小型网络、每类三个随机种子的时间回测。网络单独使用未优于现有方案。
-较早季度选出的“75% 原趋势融合＋25% 趋势残差网络”将主验证 RMSE 从 448.3346 降至 447.7987，
-但全年 2024 回测从 491.7916 升至 500.5986，未形成稳定改善。因此保留原模型与公榜最佳成绩，
-未读入竞赛测试集、未生成提交、未提交 Kaggle，也未推送 GitHub。
+On 2026-10-23, temporal backtests of two small networks with three random seeds each were completed. Neither network alone beats the existing approach.
+The option selected on the earlier quarters, "75% original trend blend + 25% trend-residual network", lowers the main validation RMSE from 448.3346 to 447.7987,
+but raises the full-year 2024 backtest from 491.7916 to 500.5986, so it is not a stable improvement. The original model and the public best score are therefore kept;
+the competition test set was not read, and no submission was generated, submitted to Kaggle or pushed to GitHub.
 
-## 实验设置
+## Setup
 
-- 数据：150,000 行清洗与位置特征训练表，与之前实验保持相同行序和标签；不删除难例。
-- 环境：Python 3.12.14、Keras 3.15.1、JAX/JAXlib 0.12.0.1，Apple arm64 CPU。
-- 输入：已有 `housing` 特征方案，包含城镇、街道、楼栋地址、房型、HDB 属性、时间与房屋衍生特征；不添加新的宏观或公开数据。
-- 预处理：只用当前训练部分构建类别词表、数值中位数和标准化参数；增加数值缺失标记。出现不足两次的类别与未知类别使用索引 0。未将标签、编号或原始行号作为特征。
-- 类别嵌入维度为 `min(16, max(2, ceil(sqrt(类别数))))`，拼接数值特征后进入 128、64 单元的两层 ReLU 网络；Dropout 为 0.1。
-- Dense 层 L2 为 0.00001，嵌入 L2 为 0.000001；Adam 学习率 0.002，批量 1024，上限 80 轮。
-- 目标在训练部分中心化、标准化，损失为 MSE。预测还原为原币值后计算指标，不使用对数租金损失。
-- 直接网络预测租金；趋势残差网络先在训练期拟合 `damped24` 月度市场水平，再预测静态房屋残差，并移除日期和确定性房龄输入。
-- 随机种子固定为 42、123、2026，不挑选表现最好的种子；三次预测等权平均。对负租金预测截断为零。
-- 每个外层训练集内部，最后三个月用于早停，监控不含 L2 项的标准化 MSE，耐心值 10。随后用内部最佳轮数在全部外层训练数据上从头重训；外层验证不参与轮数、词表或标准化参数的选择。
+- Data: the 150,000-row cleaned training table with location features, with the same row order and labels as earlier experiments; hard rows are not removed.
+- Environment: Python 3.12.14, Keras 3.15.1, JAX/JAXlib 0.12.0.1, Apple arm64 CPU.
+- Inputs: the existing `housing` feature set, including town, street, block address, flat type, HDB attributes, and time and housing-derived features; no new macro or public data are added.
+- Preprocessing: category vocabularies, numeric medians and scaling parameters are built from the current training part only, and numeric missing indicators are added. Categories seen fewer than twice and unknown categories map to index 0. Labels, ids and original row numbers are never features.
+- Categorical embedding size is `min(16, max(2, ceil(sqrt(number of categories))))`; embeddings are concatenated with numeric features and fed into two ReLU layers of 128 and 64 units, with dropout 0.1.
+- Dense-layer L2 is 0.00001 and embedding L2 0.000001; Adam with learning rate 0.002, batch size 1024, at most 80 epochs.
+- The target is centred and scaled on the training part, with MSE loss. Predictions are converted back to currency before computing metrics; no log-rent loss is used.
+- The direct network predicts rent; the trend-residual network first fits the `damped24` monthly market level on the training period, then predicts the static housing residual, with date and deterministic age inputs removed.
+- Random seeds are fixed at 42, 123 and 2026, with no picking of the best seed; the three predictions are averaged with equal weight. Negative rent predictions are clipped to zero.
+- Inside each outer training set, the last three months are used for early stopping on the standardised MSE without the L2 term, with patience 10. The network is then retrained from scratch on all outer training data with the inner best epoch count. The outer validation is never used to choose epochs, vocabularies or scaling parameters.
 
-## 验证与结果
+## Validation and results
 
-所有 RMSE 单位均为新加坡元/月，越低越好。直接网络、残差网络均为三个种子的预测均值，不是三个 RMSE 的平均值。
+All RMSE values are in SGD per month; lower is better. The direct and residual networks are means of three seeds' predictions, not means of three RMSEs.
 
-| 验证任务 | 原趋势融合 | 直接网络 | 趋势残差网络 | 锁定的 25% 残差网络融合 |
+| Validation task | Original trend blend | Direct network | Trend-residual network | Locked 25% residual-network blend |
 | --- | ---: | ---: | ---: | ---: |
-| 较早两个季度合并 | 459.1748 | 463.0439 | 470.9556 | 458.0168 |
-| 2025 年第一季度 | 448.3346 | 455.3848 | 453.9356 | 447.7987 |
-| 2024 年下半年，单起点预测 6 个月 | 460.0744 | 463.6368 | 477.8421 | 459.1214 |
-| 全年 2024，单起点预测 12 个月 | 491.7916 | 593.4904 | 580.5380 | 500.5986 |
+| Two earlier quarters pooled | 459.1748 | 463.0439 | 470.9556 | 458.0168 |
+| 2025 Q1 | 448.3346 | 455.3848 | 453.9356 | 447.7987 |
+| Second half of 2024, single 6-month forecast | 460.0744 | 463.6368 | 477.8421 | 459.1214 |
+| Full year 2024, single 12-month forecast | 491.7916 | 593.4904 | 580.5380 | 500.5986 |
 
-较早季度是分别以 2024 年第三、四季度为验证集，仅用各季度之前的数据训练，再合并平方误差计算 RMSE。
-候选权重预先限定为 10%、25%、50%、100%。替换资格要求合并 RMSE 至少改善 1 点，且任一季度不能变差超过 1 点；不会自动部署。
-`trend_blend25` 在较早季度改善 1.1580，两个季度分别改善 0.2598 和 2.1858，通过本轮早期资格门槛。
-候选及权重在查看主验证与长跨度指标之前锁定，后续没有根据这些结果改选权重。
+"Earlier quarters" means training only on data before 2024 Q3 and before 2024 Q4 respectively, validating on each quarter, and pooling squared errors.
+Candidate weights are restricted in advance to 10%, 25%, 50% and 100%. Replacement requires a pooled RMSE gain of at least 1 point with neither quarter worsening by more than 1 point; nothing is deployed automatically.
+`trend_blend25` improves the earlier quarters by 1.1580, by 0.2598 and 2.1858 in the two quarters respectively, passing this round's early eligibility threshold.
+The candidate and weight were locked before the main validation and long-horizon metrics were viewed, and were not changed afterwards.
 
-主验证 RMSE 改善 0.5359（约 0.12%），MAE 从 326.4557 降至 323.8454；
-6 个月 RMSE 改善 0.9531；12 个月 RMSE 恶化 8.8070，平均高估从 39.6462 升至 104.9742。
-这些窗口曾在历史实验中反复查看，且部分重叠，不是五个相互独立或完全未触碰的测试任务。
-第三季度和 6 个月任务具有相同训练起点，但查询跨度不同，分别重训；不能把它们当成两个独立起点的复现。
+Main validation RMSE improves by 0.5359 (about 0.12%), and MAE falls from 326.4557 to 323.8454;
+the 6-month RMSE improves by 0.9531; the 12-month RMSE worsens by 8.8070, with mean overprediction rising from 39.6462 to 104.9742.
+These windows have been viewed repeatedly in earlier experiments and partly overlap, so they are not five independent or untouched test tasks.
+Q3 and the 6-month task share a training origin but differ in query horizon and were retrained separately; they cannot be treated as two independent replications.
 
-## 稳定性与误差分析
+## Stability and error analysis
 
-- 主验证直接网络三个种子的 RMSE 为 462.4919、463.4965、455.1618，趋势残差网络为 456.6204、454.0740、455.5298。不能只报告最好的随机种子。
-- 全年回测直接网络三个种子的 RMSE 为 562.4965、603.2390、628.1100，远期表现对初始化敏感；趋势残差网络也均高于 578，问题不只出在某一次随机初始化。
-- 直接网络和趋势残差网络在主验证中的残差与原模型相关系数分别为 0.9846、0.9827。错误高度相关，因此低比例混合只能带来有限的抵消。
-- 内部最佳轮数为 1–13，均未达到 80 轮上限。更低训练损失没有稳定转化为更低的未来窗口误差，不能认为增加训练轮数就能解决问题。
-- 当前月度水平与静态残差设定没有解决跨年度市场外推，高估在全年回测中明显增大。但这只说明当前两种配方没有稳定胜出，不证明所有神经网络架构都无效，也不证明 RMSE 存在 448 的数学下限。
+- Main validation RMSE of the direct network's three seeds is 462.4919, 463.4965 and 455.1618, and of the trend-residual network 456.6204, 454.0740 and 455.5298. Reporting only the best seed would be misleading.
+- On the full-year backtest the direct network's three seeds give 562.4965, 603.2390 and 628.1100, so long-horizon performance is sensitive to initialisation; the trend-residual network is also above 578 for every seed, so the problem is not a single unlucky initialisation.
+- The direct and trend-residual networks' main-validation residuals correlate with the original model at 0.9846 and 0.9827. Errors are highly correlated, so low-weight blends can only cancel a little.
+- Inner best epochs are 1–13, never reaching the 80-epoch cap. Lower training loss does not consistently turn into lower future-window error, so more epochs would not solve the problem.
+- The current monthly-level plus static-residual design does not solve cross-year market extrapolation, and overprediction grows clearly on the full-year backtest. This only shows these two recipes do not win consistently; it does not prove all neural architectures are ineffective or that RMSE has a mathematical floor of 448.
 
-## 交付与核验
+## Delivery and verification
 
-共保存 30 条外层模型训练记录、30 条方案指标、30 条单种子指标；包括相同训练起点的重复重训。
-代码与依赖指纹、早停历史、选择锁、模型和预测的校验值均有记录。项目全部 94 项测试通过。
-独立检查重新加载全部 30 个模型，对齐原始行号和标签、重算全部指标和三种子均值、验证预处理仅用训练数据，
-并确认改变查询标签或编号不会改变预测；两份已有提交文件的校验值保持不变。
+30 outer training records, 30 option metrics and 30 single-seed metrics are saved, including repeated retraining from the same origin.
+Code and dependency fingerprints, early-stopping histories, the selection lock, and model and prediction checksums are recorded. All 94 project tests pass.
+An independent check reloads all 30 models, aligns original row numbers and labels, recomputes all metrics and three-seed means, verifies that preprocessing uses training data only,
+and confirms that changing query labels or ids does not change predictions; the checksums of the two existing submission files are unchanged.
 
-- [方案结果](results.csv)、[单种子结果](seed_results.csv)、[锁定方案按单种子混合的诊断](seed_blends.csv)。
-- [选择对比](selection.csv)、[选择锁](selection_locked.json)、[逐月误差](monthly_errors.csv)。
-- [独立核验](output_validation.json)、[训练细节](fit_details.json)、[配置与来源指纹](experiment_manifest.json)。
-- 私有逐行预测和 `.keras` 模型保存在本地，不纳入 Git。
+- [Option results](results.csv), [single-seed results](seed_results.csv), [diagnostic blends of the locked option by seed](seed_blends.csv).
+- [Selection comparison](selection.csv), [selection lock](selection_locked.json), [monthly errors](monthly_errors.csv).
+- [Independent check](output_validation.json), [training details](fit_details.json), [configuration and source fingerprints](experiment_manifest.json).
+- Private row-level predictions and `.keras` models are stored locally and not committed to Git.
 
-## 复现
+## Reproduction
 
-先按 README 重建位置特征和原趋势融合的逐行参考预测。依赖与源码字节不同应使用新输出目录，不能改写历史指纹以复用缓存。
+First rebuild the location features and the original trend blend's row-level reference predictions as described in the README. With different dependencies or source bytes, use a new output directory instead of rewriting historical fingerprints to reuse caches.
 
 ```bash
 uv pip install --python .venv/bin/python -r requirements-keras.txt
@@ -72,5 +72,5 @@ uv pip install --python .venv/bin/python -r requirements-keras.txt
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-该目录名虽可更换，仍需保持相同输入和来源依赖。模型缓存按实验指纹隔离，仅在指纹相同时续跑。
-方法实现参考 Keras 官方的[后端配置](https://keras.io/getting_started/)、[早停](https://keras.io/api/callbacks/early_stopping/)与[随机种子](https://keras.io/api/utils/python_utils/)说明。
+The directory name can change, but the inputs and source dependencies must stay the same. Model caches are isolated by experiment fingerprint and only resume when fingerprints match.
+The implementation follows the official Keras documentation on [backend configuration](https://keras.io/getting_started/), [early stopping](https://keras.io/api/callbacks/early_stopping/) and [random seeds](https://keras.io/api/utils/python_utils/).

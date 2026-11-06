@@ -1,105 +1,136 @@
-# 数据质量审计报告
+# Data Quality Audit Report
 
-审计日期：2026-09-24  
-审计范围：`data/raw/train.csv`、`data/raw/test.csv` 及 `data/raw/auxiliary/` 下的全部 CSV。  
-本次仅读取和诊断原始数据，未修改任何 CSV 文件。
+Audit date: 2026-09-24  
+Scope: `data/raw/train.csv`, `data/raw/test.csv` and every CSV under `data/raw/auxiliary/`.  
+This audit only reads and diagnoses the raw data; no CSV file was modified.
 
-## 1. 总结
+## 1. Summary
 
-主数据整体完整，所有字段均无缺失，日期和数值字段均可解析。最需要优先处理的问题是：
+The main data are complete: no field has missing values, and all date and numeric fields parse. The
+issues to handle first are:
 
-1. `FLAT_TYPE` 在训练集中同时存在 `4 room` 与 `4-room` 这类格式变体，需标准化；
-2. `FEE` 全部为 0，`FURNISHED` 全部为 `yes`，两列当前没有区分能力；
-3. 许多训练记录具有相同输入但不同的 `MONTHLY_RENT`，不能按特征直接去重；
-4. 股票数据有 85 行缺失全部行情数值；
-5. COE 数据同一年月和类别通常有两轮记录，合并前需定义月度聚合规则。
+1. `FLAT_TYPE` in the training set mixes format variants such as `4 room` and `4-room`, which need
+   standardising;
+2. `FEE` is always 0 and `FURNISHED` is always `yes`, so neither column currently discriminates;
+3. many training records share identical inputs but have different `MONTHLY_RENT`, so rows cannot be
+   deduplicated on features;
+4. 85 stock rows are missing all price values;
+5. COE data usually have two bidding rounds per month and category, so a monthly aggregation rule is
+   needed before merging.
 
-地址数据质量较好：主数据按 `TOWN + BLOCK + STREET` 与 HDB 楼栋表的匹配率为 100%，可作为后续地理特征工程的可靠基础。
+Address quality is good: matching the main data to the HDB block table on `TOWN + BLOCK + STREET`
+gives a 100% match rate, a reliable basis for later geographic features.
 
-## 2. 主数据概况
+## 2. Main data overview
 
-| 数据集 | 行数 | 字段数 | 日期范围 | 缺失值 | 完整重复行 |
+| Dataset | Rows | Fields | Date range | Missing values | Complete duplicate rows |
 |---|---:|---:|---|---:|---:|
-| `train.csv` | 150,000 | 11 | 2021-01 至 2025-03 | 0 | 425 |
-| `test.csv` | 50,000 | 10 | 2025-03 至 2026-07 | 0 | 5,508 |
+| `train.csv` | 150,000 | 11 | 2021-01 to 2025-03 | 0 | 425 |
+| `test.csv` | 50,000 | 10 | 2025-03 to 2026-07 | 0 | 5,508 |
 
-`train.csv` 比 `test.csv` 多出的唯一字段是目标变量 `MONTHLY_RENT`，两者输入字段一致。
+The only field in `train.csv` that is not in `test.csv` is the target `MONTHLY_RENT`; the input fields
+are identical.
 
-### 2.1 字段有效性
+### 2.1 Field validity
 
-| 字段 | 结果 | 说明 |
+| Field | Result | Notes |
 |---|---|---|
-| `RENT_APPROVAL_DATE` | 全部可解析 | 格式为 `YYYY-MM`。训练集与测试集均含 2025-03，时间验证需谨慎处理这一重叠月份。 |
-| `LEASE_COMMENCE_DATE` | 全部可解析 | 取值范围为 1966–2022，可用于构造房龄。 |
-| `FLOOR_AREA_SQM` | 全部可解析 | 取值范围为 31–215 平方米，未发现明显不合理的负值或零值。 |
-| `FEE` | 全部为 0 | 当前为常量特征，首版模型可移除；需要在报告中说明该列无有效变异。 |
-| `FURNISHED` | 全部为 `yes` | 当前为常量类别特征，首版模型可移除。 |
-| `MONTHLY_RENT` | 全部可解析 | 仅训练集具备，取值范围为 300–7,600。 |
+| `RENT_APPROVAL_DATE` | All parse | Format `YYYY-MM`. Both train and test contain 2025-03, so temporal validation must handle this overlapping month carefully. |
+| `LEASE_COMMENCE_DATE` | All parse | Range 1966–2022; usable for flat age. |
+| `FLOOR_AREA_SQM` | All parse | Range 31–215 sqm; no implausible negative or zero values. |
+| `FEE` | All 0 | Constant feature; can be removed from the first model, and the report should state it has no variation. |
+| `FURNISHED` | All `yes` | Constant categorical feature; can be removed from the first model. |
+| `MONTHLY_RENT` | All parse | Training set only; range 300–7,600. |
 
-所有文本字段均未发现首尾空格。
+No text field has leading or trailing spaces.
 
-### 2.2 类别格式与训练/测试一致性
+### 2.2 Category formats and train/test consistency
 
-- `TOWN`：训练集和测试集均有 26 个城镇，类别集合一致。
-- `STREET`：训练集 576 个、测试集 573 个；测试集不存在训练集未见街道，训练集有 3 个测试集中未出现的街道，属于正常时间切分差异。
-- `FLAT_TYPE`：训练集有 11 个原始值，测试集有 6 个。训练集中额外出现 `1 room`、`2 room`、`3 room`、`4 room`、`5 room`，而测试集使用连字符形式。应统一为 `1-room`、`2-room`、`3-room`、`4-room`、`5-room`。
-- `FLAT_MODEL`：训练集仅额外有一个 `improved maisonette` 类别，属于罕见但有效的类别，不应当作格式错误删除。
-- `BLOCK`：训练集和测试集均有少量对方未出现的楼号，属于正常的新旧样本差异。
+- `TOWN`: 26 towns in both train and test, with identical category sets.
+- `STREET`: 576 in train, 573 in test. Test has no street unseen in train; train has 3 streets absent
+  from test, a normal temporal-split difference.
+- `FLAT_TYPE`: 11 raw values in train, 6 in test. Train additionally contains `1 room`, `2 room`,
+  `3 room`, `4 room` and `5 room`, while test uses the hyphenated form. They should be unified as
+  `1-room`, `2-room`, `3-room`, `4-room` and `5-room`.
+- `FLAT_MODEL`: train only adds one `improved maisonette` category, which is rare but valid and should
+  not be removed as a format error.
+- `BLOCK`: each set has a few block numbers absent from the other, a normal difference between old and
+  new samples.
 
-### 2.3 重复记录的解释
+### 2.3 Interpreting duplicates
 
-训练集有 425 行完整重复记录；测试集有 5,508 行完整重复记录。更重要的是，训练集中有 13,434 组相同输入特征，共多出 15,547 行，其中 13,191 组对应多个不同的租金标签。
+The training set has 425 complete duplicate rows and the test set 5,508. More importantly, the
+training set has 13,434 groups of identical input features with 15,547 extra rows, and 13,191 of these
+groups have several different rent labels.
 
-因此，不能简单按输入字段去重。相同的城镇、楼号、街道、户型、面积和日期仍可能对应不同租金，说明数据未包含的因素也会影响租金。后续只应将 425 行完整重复记录标记为待确认项；在建立验证方案前，不建议删除任何记录。
+Rows therefore cannot simply be deduplicated on input fields. The same town, block, street, flat type,
+area and date can still have different rents, which shows that factors outside the data also affect
+rent. The 425 complete duplicates should only be flagged for review; no record should be deleted
+before a validation scheme exists.
 
-## 3. 辅助数据概况
+## 3. Auxiliary data overview
 
-| 文件 | 行数 | 字段数 | 缺失/重复情况 | 清洗重点 |
+| File | Rows | Fields | Missing / duplicates | Cleaning focus |
 |---|---:|---:|---|---|
-| `sg-hdb-block.csv` | 9,464 | 11 | 无缺失、无完整重复 | 11 行 `YEAR_COMPLETED=-1`，应转为缺失值。 |
-| `sg-mrt-stations.csv` | 243 | 8 | 无缺失、无重复站点代码 | 含 231 个已开放站和 12 个规划站；首版仅使用已开放站。 |
-| `sg-schools.csv` | 337 | 14 | 无缺失、无重复学校名 | 坐标均可解析，可用于距离或密度特征。 |
-| `sg-shopping-malls.csv` | 113 | 3 | 无缺失、无重复名称或坐标 | 坐标均可解析，可用于距离或密度特征。 |
-| `sg-coe-prices.csv` | 539 | 8 | 无缺失、无完整重复 | 货币和带逗号数值需转数值；同月同类常有两轮。 |
-| `sg-stock-prices.csv` | 91,642 | 9 | 85 行缺失全部行情数值；无重复证券日期 | 日期为 2021-01-04 至 2026-07-30，需按月聚合。 |
+| `sg-hdb-block.csv` | 9,464 | 11 | No missing values or complete duplicates | 11 rows with `YEAR_COMPLETED=-1` should become missing. |
+| `sg-mrt-stations.csv` | 243 | 8 | No missing values or duplicate station codes | 231 open and 12 planned stations; the first version uses open stations only. |
+| `sg-schools.csv` | 337 | 14 | No missing values or duplicate school names | All coordinates parse; usable for distance or density features. |
+| `sg-shopping-malls.csv` | 113 | 3 | No missing values, duplicate names or coordinates | All coordinates parse; usable for distance or density features. |
+| `sg-coe-prices.csv` | 539 | 8 | No missing values or complete duplicates | Currency and comma-formatted values need converting; the same month and category often has two rounds. |
+| `sg-stock-prices.csv` | 91,642 | 9 | 85 rows missing all price values; no duplicate security-date pairs | Dates 2021-01-04 to 2026-07-30; needs monthly aggregation. |
 
-### 3.1 HDB 楼栋数据
+### 3.1 HDB block data
 
-- 以小写、去空格后的 `TOWN + BLOCK + STREET` 匹配，训练集为 150,000/150,000（100%），测试集为 50,000/50,000（100%）。
-- 地址键无重复，坐标均可解析且在有效经纬度范围内。
-- `YEAR_COMPLETED=-1` 的 11 行不是有效竣工年份，应在清洗层转为缺失值，避免形成不合理房龄。
+- Matching on lowercased, trimmed `TOWN + BLOCK + STREET` gives 150,000/150,000 (100%) for train and
+  50,000/50,000 (100%) for test.
+- Address keys are unique, and all coordinates parse and lie within valid latitude/longitude ranges.
+- The 11 rows with `YEAR_COMPLETED=-1` are not valid completion years and should become missing in the
+  cleaning layer, to avoid implausible building ages.
 
-### 3.2 MRT、学校和商场数据
+### 3.2 MRT, school and mall data
 
-- MRT 数据中的 `STATUS` 为 `open`（231）和 `planned`（12）。
-- 规划 MRT 站缺少历史公开时间信息，直接用于早期租赁记录可能产生时间泄漏；首版距离特征仅使用 `open` 站点。
-- 学校和商场表均无缺失或重复坐标，可直接在清洗后作为地理距离计算的输入。
+- MRT `STATUS` is `open` (231) or `planned` (12).
+- Planned MRT stations lack historical opening dates, so using them for early rental records could leak
+  future information; the first distance features use `open` stations only.
+- The school and mall tables have no missing or duplicate coordinates and can be used for distance
+  calculations after cleaning.
 
-### 3.3 COE 数据
+### 3.3 COE data
 
-- 覆盖 2021-01 至 2026-08；类别为 a、b、c、e。
-- `QUOTA_PREMIUM` 与 `PREVAILING_QUOTA_PREMIUM` 含货币符号和逗号；`BIDS_RECEIVED` 也含逗号，均需转换为数值。
-- 所有金额、配额和投标数在格式清理后均可解析。
-- 有 268 个“年月—类别”组合包含多轮数据。将其接入主表前，需明确按最后一轮、均值或分别编码的规则。
-- 2026 年仅覆盖 1–8 月，与测试集截至 2026-07 的预测范围兼容，但构造特征时只能使用目标月份当时可获得的信息。
+- Covers 2021-01 to 2026-08; categories a, b, c and e.
+- `QUOTA_PREMIUM` and `PREVAILING_QUOTA_PREMIUM` contain currency symbols and commas; `BIDS_RECEIVED`
+  also contains commas. All need converting to numbers.
+- All amounts, quotas and bid counts parse after format cleaning.
+- 268 month-category combinations have several rounds. Before joining to the main table, a rule is
+  needed: last round, mean, or separate encoding.
+- 2026 only covers January–August, compatible with the test horizon to 2026-07, but features may only
+  use information available in the target month.
 
-### 3.4 股票数据
+### 3.4 Stock data
 
-- 包含 77 家公司、77 个证券代码，日期范围为 2021-01-04 至 2026-07-30。
-- `OPEN`、`HIGH`、`LOW`、`CLOSE`、`ADJUSTED_CLOSE` 与 `VOLUME` 各有 85 个缺失值；这些缺失集中在 2026-05-01 和 2026-06-01。
-- 已有数值全部可解析，且不存在重复的“证券代码—日期”组合。
-- 不建议直接将每日、每只股票的字段合并到主表；应先构造少量月度市场指标，例如月收益率或波动率。
+- 77 companies and 77 security codes, from 2021-01-04 to 2026-07-30.
+- `OPEN`, `HIGH`, `LOW`, `CLOSE`, `ADJUSTED_CLOSE` and `VOLUME` each have 85 missing values,
+  concentrated on 2026-05-01 and 2026-06-01.
+- All existing values parse and there are no duplicate security-date pairs.
+- Daily per-stock fields should not be merged directly into the main table; a few monthly market
+  indicators, such as monthly returns or volatility, should be built first.
 
-## 4. 建议的清洗优先级
+## 4. Recommended cleaning priorities
 
-1. 不修改 `data/raw/`，将清洗结果输出到 `data/interim/`。
-2. 标准化主表的 `FLAT_TYPE`，并统一所有参与地址匹配的文本字段。
-3. 将日期、数值和房龄等基础特征规范化；在首版模型中移除常量列 `FEE` 与 `FURNISHED`。
-4. 将 HDB 楼栋表的无效竣工年份转为缺失值，并建立可复用的地址匹配脚本。
-5. 清洗 COE 数值与月份；只在定义好月度聚合规则后再合并。
-6. 对股票缺失值制定按证券和时间的处理规则，并在后续阶段按月聚合。
-7. 先建立只使用清洗后主表的基线模型，再逐步比较地理、设施和宏观特征带来的 RMSE 改善。
+1. Keep `data/raw/` unchanged and write cleaned outputs to `data/interim/`.
+2. Standardise `FLAT_TYPE` in the main tables and unify all text fields used for address matching.
+3. Normalise dates, numbers and basic features such as flat age; drop the constant columns `FEE` and
+   `FURNISHED` from the first model.
+4. Convert invalid completion years in the HDB block table to missing and build a reusable
+   address-matching script.
+5. Clean COE values and months; merge only after defining a monthly aggregation rule.
+6. Define a per-security, per-date rule for missing stock values and aggregate monthly later.
+7. Build a baseline on the cleaned main table first, then compare the RMSE gains from geographic,
+   amenity and macro features step by step.
 
-## 5. 当前结论
+## 5. Conclusion
 
-数据无需进行大规模的缺失值填补，首个清洗版本应聚焦于类别格式统一、无效编码处理、日期和数值转换，以及避免时间泄漏。HDB 地址表质量高且完全匹配主表，应作为期中后扩展地理特征的优先数据源。
+The data need no large-scale imputation. The first cleaning version should focus on unifying category
+formats, handling invalid codes, converting dates and numbers, and avoiding temporal leakage. The HDB
+address table is of high quality and matches the main tables completely, so it is the first data
+source for extending geographic features after the mid-term.

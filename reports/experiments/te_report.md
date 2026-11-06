@@ -1,93 +1,116 @@
-# 折外目标编码、外部数据与市场水平校准（2026-10-29/30）
+# Out-of-Fold Target Encoding, External Data and Market-Level Calibration (2026-10-29/30)
 
-## 结论
+## Conclusion
 
-公榜 RMSE 从 437.44368 降至 **431.07006**（−6.37）。改进分两部分：
+The public RMSE fell from 437.44368 to **431.07006** (−6.37). The improvement has two parts:
 
-1. **模型改进（本地时间回测可验证）**：用 5 折折外（OOF）目标编码表达楼栋/街道级租金水平，
-   加入滞后转售单价与 HDB 楼栋构成两类外部数据，四个特征变体取平均后与原趋势融合按 75/25 混合。
-   四个回测窗口全部改善 2–4.8 分；公榜 437.44 → 435.27。
-2. **整体市场水平校准（依据公榜探测，本地无法验证）**：模型对测试期（2025-04 至 2026-07）的整体租金水平低估。
-   用 4 次全局缩放/趋势探测解出最优“整体水平 × 月度趋势”，公榜 435.27 → 431.07。
+1. **Model improvement (verifiable with local temporal backtests)**: five-fold out-of-fold (OOF) target
+   encoding represents block- and street-level rent levels, two external sources are added (lagged resale
+   prices and HDB block composition), and four feature variants are averaged and blended 75/25 with the
+   original trend blend. All four backtest windows improve by 2–4.8 points; public 437.44 → 435.27.
+2. **Overall market-level calibration (based on leaderboard probes, not verifiable locally)**: the model
+   underestimates the overall rent level of the test period (2025-04 to 2026-07). Four global scale/trend
+   probes identify the best "overall level × monthly trend"; public 435.27 → 431.07.
 
-## 1. 折外目标编码模型
+## 1. Out-of-fold target-encoding model
 
-脚本：[run_te_experiments.py](../../src/models/run_te_experiments.py)。
+Script: [run_te_experiments.py](../../src/models/run_te_experiments.py).
 
-- 目标：租金除以该月的组合调整市场水平（各行租金相对其城镇×房型均值之比的月度均值），去掉时间趋势后学习静态房屋差异。
-  预测时乘回水平；训练末月之后的月份使用最近 3 个月平均水平（flat3）。
-- 目标编码组：楼栋×房型、楼栋×房型×面积、楼栋、街道×房型、子区×房型、城镇×房型×房屋模型，平滑系数 5，同时输出样本数。
-  训练行使用 5 折折外值，查询行使用整个训练窗口；查询标签从不参与编码。
-- 与以前“只用更早月份的历史租金统计”的区别：训练行也能看到同期及之后月份的同楼栋样本，编码分布与查询行一致，
-  对样本稀疏的楼栋更稳定。
-- LightGBM：学习率 0.03、127 叶、每叶至少 40 行、特征/样本抽样 0.7/0.8、L2 5；轮数在训练内部最后 3 个月早停后按行数放大。
-  每个种子同时改变 K 折划分；回测 3 个种子，最终 5 个种子。
+- Target: rent divided by the month's mix-adjusted market level (the monthly mean of each row's rent
+  relative to its town × flat-type mean). With the time trend removed, the model learns static housing
+  differences. Predictions are multiplied back by the level; months after the last training month use the
+  average level of the last 3 months (flat3).
+- Target-encoding groups: block × flat type, block × flat type × floor area, block, street × flat type,
+  subzone × flat type, and town × flat type × flat model, with smoothing 5 and group counts.
+  Training rows get 5-fold out-of-fold values and query rows use the whole training window; query labels
+  never enter the encoding.
+- Difference from the earlier "history statistics from earlier months only": training rows also see
+  same-block rows from the same and later months, so their encoding distribution matches the query rows,
+  which is more stable for sparse blocks.
+- LightGBM: learning rate 0.03, 127 leaves, at least 40 rows per leaf, feature/row sampling 0.7/0.8, L2 5;
+  rounds are early-stopped on the last 3 training months and scaled up by row count.
+  Each seed also changes the K-fold split; backtests use 3 seeds and the final model 5.
 
-## 2. 外部数据
+## 2. External data
 
-| 数据 | 处理 | 作用 |
+| Data | Processing | Effect |
 | --- | --- | --- |
-| HDB 转售交易（data.gov.sg，已于 10-19 下载） | 复用 `build_resale_history.snapshot`；只用训练截止前 **2 个月及更早**、36 个月窗口的交易；楼栋/街道/城镇级每平方米中位价及样本数 | 单模型四个窗口均改善 0.4–1.2 |
-| HDB 楼栋属性（property.csv，最新快照） | 楼号 + 规范化街道名匹配，训练 99.87%、测试 99.97%；总户数、各房型及租赁单位占比、商铺/小贩中心/停车场等标记 | 较早季度持平，主验证与 12 个月窗口小幅改善 |
+| HDB resale transactions (data.gov.sg, downloaded 10-19) | Reuses `build_resale_history.snapshot`; only transactions **at least 2 months** before the training cut-off, in a 36-month window; block/street/town median price per sqm and counts | Single model improves by 0.4–1.2 in all four windows |
+| HDB property information (property.csv, latest snapshot) | Matched on block + normalised street name, 99.87% of training and 99.97% of test rows; total dwelling units, flat-type and rental-unit shares, shop/hawker/car-park flags | Flat on the earlier quarters, small gains on the main validation and the 12-month window |
 
-未使用 data.gov.sg “Renting Out of Flats”：它包含测试月份的真实租金，使用相当于直接读取标签。
+The data.gov.sg "Renting Out of Flats" dataset was not used: it contains the test months' true rents, so
+using it would amount to reading the labels.
 
-## 3. 回测结果
+## 3. Backtest results
 
-RMSE（新元/月）。较早季度（2024 Q3、Q4）用于选择，主验证与 12 个月窗口只作报告。
-“混合”指与原趋势融合（公榜 437.44 方案）的逐行预测按给定权重混合。
+RMSE in SGD per month. The earlier quarters (2024 Q3, Q4) are used for selection; the main validation and
+the 12-month window are reported only. "Blend" means mixing row-level predictions with the original trend
+blend (the public 437.44 model) at the given weight.
 
-| 方案 | 2024 Q3 | 2024 Q4 | 2025 Q1 主验证 | 2024 全年（12 个月） |
+| Option | 2024 Q3 | 2024 Q4 | 2025 Q1 main validation | 2024 full year (12 months) |
 | --- | ---: | ---: | ---: | ---: |
-| 原趋势融合（对照） | 474.68 | 442.11 | 448.33 | 491.79 |
-| TE 单模型 | 474.50 | 439.48 | 444.95 | 489.31 |
-| TE + 转售，50% 混合（公榜约 435） | 472.58 | 438.24 | 444.57 | 487.53 |
-| TE + 转售 + 楼栋属性，75% 混合（公榜 435.91） | 472.93 | 437.82 | 443.58 | 487.26 |
-| 四变体平均，75% 混合（公榜 435.27） | 472.54 | 437.75 | 443.65 | 486.95 |
+| Original trend blend (control) | 474.68 | 442.11 | 448.33 | 491.79 |
+| TE single model | 474.50 | 439.48 | 444.95 | 489.31 |
+| TE + resale, 50% blend (public about 435) | 472.58 | 438.24 | 444.57 | 487.53 |
+| TE + resale + block attributes, 75% blend (public 435.91) | 472.93 | 437.82 | 443.58 | 487.26 |
+| Four-variant average, 75% blend (public 435.27) | 472.54 | 437.75 | 443.65 | 486.95 |
 
-四个变体为：基础（转售 + 楼栋属性）、加组内中位数/标准差、加同房型近邻楼栋水平（最近 8 栋及 500 m 内）、
-加同月房源数量。各自单独加入时变化都在 ±0.7 以内，变体之间残差相关 0.9987；取平均只带来 0–0.4 的方差缩减。
+The four variants are: base (resale + block attributes), plus group median/standard deviation, plus
+same-flat-type nearest-block levels (nearest 8 blocks and within 500 m), and plus same-month listing
+counts. Each one alone changes results by less than ±0.7, residuals between variants correlate at 0.9987,
+and averaging only gives a 0–0.4 variance reduction.
 
-**没有采用的方向**（结果见各 `te_v*/results.csv`）：
+**Directions not adopted** (results in each `te_v*/results.csv`):
 
-- 仅用最近 12 个月的编码、学习率 0.015：±0.3 以内。
-- CatBoost（同特征 + 原生地址类别）：单模型更差，三方最优融合只给 5% 权重。
-- 阻尼趋势外推水平（φ=0.9、1.0）：季度窗口几乎不变，不阻尼时 12 个月窗口变差 4.7。
-- 更强正则或改叶数（`min_data_in_leaf` 150/400、`num_leaves` 63/255、L2 50）：较早季度合并 RMSE 均不优于基础参数。
-- 对数目标：较早季度合并 RMSE 变差 1.6。
+- Encodings from the last 12 months only, and learning rate 0.015: within ±0.3.
+- CatBoost (same features + native address categories): worse as a single model; the best three-way blend
+  gives it only 5% weight.
+- Damped-trend level extrapolation (φ=0.9, 1.0): quarterly windows barely change, and without damping the
+  12-month window worsens by 4.7.
+- Stronger regularisation or different leaf counts (`min_data_in_leaf` 150/400, `num_leaves` 63/255,
+  L2 50): none beats the base parameters on the pooled earlier quarters.
+- Log target: pooled earlier-quarter RMSE worsens by 1.6.
 
-混合权重：较早季度合并平方误差在 50% 与 75% 之间选择，含楼栋属性后 75% 更优。
+Blend weight: chosen between 50% and 75% on the pooled earlier-quarter squared error; with block
+attributes included, 75% is better.
 
-## 4. 公榜水平探测
+## 4. Public leaderboard level probes
 
-全局缩放 s 下公榜 MSE 是 s 的精确二次函数。以四个特征变体平均的 75% 混合为基准：
+Under a global scale s, the public MSE is an exact quadratic function of s. The base is the 75% blend of
+the four-variant average:
 
-| 文件 | 调整 | 公榜 RMSE |
+| File | Adjustment | Public RMSE |
 | --- | --- | ---: |
 | `submission_te_avg4_blend75_20261029.csv` | ×1.00 | 435.26895 |
 | `..._scale0.98_...` | ×0.98 | 447.63710 |
 | `..._scale1.02_...` | ×1.02 | 431.98839 |
-| `..._scale1.017_...` | ×1.017（三点二次拟合最优） | 431.88651 |
-| `..._trendprobe_...` | ×(1.017 + 0.002 × 距测试期中心月份数) | **431.07006** |
+| `..._scale1.017_...` | ×1.017 (quadratic optimum of three points) | 431.88651 |
+| `..._trendprobe_...` | ×(1.017 + 0.002 × months from the test-period centre) | **431.07006** |
 
-- 四个缩放点与二次曲线残差 < 1e-5，二次项系数与测试预测平方均值相差 0.03%，说明拟合可靠。
-- 加入趋势后的联合最优为水平 1.0170、每月 +0.18%，预测 431.059，与已提交的趋势探测仅差 0.01，因此不再提交。
-- 含义：测试期整体租金比 flat3 外推高约 1.7%，且越远的月份越高（2025-03 约 ×1.000，2026-07 约 ×1.032）。
-  这与本地回测中 flat3 平均低估 30–40 一致。
-- 风险：两个参数在公榜子集上拟合。若公私榜按同一批月份随机划分，私榜应有相近改善，但无法保证。
+- The four scale points fit the quadratic with residuals below 1e-5, and the quadratic coefficient is
+  within 0.03% of the mean squared test prediction, so the fit is reliable.
+- The joint optimum with the trend is level 1.0170 and +0.18% per month, predicting 431.059, only 0.01
+  away from the submitted trend probe, so no further submission was made.
+- Meaning: the test period's overall rent is about 1.7% above the flat3 extrapolation, and the gap grows
+  for later months (about ×1.000 in 2025-03 and ×1.032 in 2026-07). This matches the 30–40 average
+  underprediction of flat3 in the local backtests.
+- Risk: the two parameters were fitted on the public subset. If the public and private splits are drawn
+  at random from the same months, the private score should improve similarly, but this is not
+  guaranteed.
 
-提交记录与校验值见 [submission_manifest.json](../submissions/te_trend_20261030/submission_manifest.json)。
+Submission records and checksums are in [submission_manifest.json](../submissions/te_trend_20261030/submission_manifest.json).
 
-## 5. 复现
+## 5. Reproduction
 
 ```bash
 for f in "" "--stats" "--knn" "--volume"; do
   .venv/bin/python src/models/run_te_experiments.py --export --seeds 5 --resale --property $f \
-    --out reports/experiments/<对应目录>
+    --out reports/experiments/<matching directory>
 done
 .venv/bin/python src/models/export_te_submission.py
 ```
 
-对应目录依次为 `te_v2_property`、`te_v3_stats`、`te_v3_knn`、`te_v5_volume`。回测去掉 `--export`、使用 `--seeds 3` 即可。
-需要先按 README 生成位置特征，并保留原趋势融合提交文件与 `data/raw/external/hdb_20261019/`。
-逐行预测含真实租金，不纳入 Git。
+The matching directories are `te_v2_property`, `te_v3_stats`, `te_v3_knn` and `te_v5_volume`. For
+backtests, drop `--export` and use `--seeds 3`. Location features must first be built as described in the
+README, and the original trend-blend submission file and `data/raw/external/hdb_20261019/` must be
+present. Row-level predictions contain true rents and are not committed to Git.

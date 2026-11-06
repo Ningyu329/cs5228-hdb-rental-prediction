@@ -1,59 +1,59 @@
-# 清洗后数据质量对比报告
+# Data Quality After Cleaning
 
-本报告比较 data/raw/ 原始数据与 data/interim/ 清洗结果。清洗过程未删除任何记录，也未改写原始文件。
+This report compares the raw data in data/raw/ with the cleaned output in data/interim/. Cleaning removed no records and did not modify the raw files.
 
-| 数据集 | 原始行数 | 清洗后行数 | 原始缺失单元格 | 清洗后缺失单元格 | 原始完整重复行 | 清洗后完整重复行 |
+| Dataset | Raw rows | Clean rows | Raw missing cells | Clean missing cells | Raw duplicate rows | Clean duplicate rows |
 | --- | --- | --- | --- | --- | --- | --- |
-| 训练主表 | 150,000 | 150,000 | 0 | 1 | 425 | 641 |
-| 测试主表 | 50,000 | 50,000 | 0 | 0 | 5,508 | 7,764 |
-| HDB 楼栋表 | 9,464 | 9,464 | 0 | 11 | 0 | 0 |
-| MRT 站点表 | 243 | 243 | 0 | 0 | 0 | 0 |
-| 学校表 | 337 | 337 | 0 | 0 | 0 | 0 |
-| 商场表 | 113 | 113 | 0 | 0 | 0 | 0 |
-| COE 表 | 539 | 539 | 0 | 0 | 0 | 0 |
-| 股票表 | 91,642 | 91,642 | 510 | 510 | 0 | 0 |
+| Training table | 150,000 | 150,000 | 0 | 1 | 425 | 641 |
+| Test table | 50,000 | 50,000 | 0 | 0 | 5,508 | 7,764 |
+| HDB blocks | 9,464 | 9,464 | 0 | 11 | 0 | 0 |
+| MRT stations | 243 | 243 | 0 | 0 | 0 | 0 |
+| Schools | 337 | 337 | 0 | 0 | 0 | 0 |
+| Shopping malls | 113 | 113 | 0 | 0 | 0 | 0 |
+| COE prices | 539 | 539 | 0 | 0 | 0 | 0 |
+| Stock prices | 91,642 | 91,642 | 510 | 510 | 0 | 0 |
 
-## 1. 已完成的处理
+## 1. Processing completed
 
-- 主表新增 RENT_YEAR、RENT_MONTH、RENT_MONTH_INDEX 与 FLAT_AGE，以支持后续基线模型和时间验证。
-- FLAT_TYPE 已标准化：训练集类别数由 11 个降至 6 个；测试集由 6 个保持为 6 个。3 room 与 3-room 等变体已统一。
-- 主表中的城镇、楼号、街道、房屋模型和装修状态已统一为小写、去首尾空格并压缩连续空格。
-- 主表完整重复行数量在清洗后上升，是因为原本仅格式不同但语义相同的记录被标准化为相同值；清洗过程没有删除或合并任何记录。
-- 训练集中有 1 条记录的租赁年份早于租约起始年份；其 FLAT_AGE 已保留为空，避免产生不合理的负房龄。
-- HDB 楼栋表中 11 个 YEAR_COMPLETED=-1 已转换为缺失值；清洗后该字段有 11 个缺失值。
-- COE 的 539 个带货币符号或逗号的溢价字段已转换为数值；539/539 行已补充 MONTH_NUM 与 YEAR_MONTH。
-- MRT、学校、商场和股票数据已统一文本、日期与数值格式，但没有进行聚合或删除。
+- Added RENT_YEAR, RENT_MONTH, RENT_MONTH_INDEX and FLAT_AGE to the main tables for baseline models and temporal validation.
+- Standardised FLAT_TYPE: training categories reduced from 11 to 6; test categories from 6 to 6. Variants such as 3 room and 3-room were unified.
+- Town, block, street, flat model and furnishing fields were lowercased, trimmed and had repeated spaces collapsed.
+- Complete duplicate rows increased after cleaning because records that differed only in formatting became identical; no record was removed or merged.
+- 1 training records have a rental year before the lease commencement year; their FLAT_AGE is left missing to avoid negative ages.
+- 11 HDB YEAR_COMPLETED values of -1 were converted to missing; the cleaned field has 11 missing values.
+- 539 COE premium values with currency symbols or commas were converted to numbers; 539/539 rows received MONTH_NUM and YEAR_MONTH.
+- MRT, school, mall and stock data had text, date and numeric formats standardised, without aggregation or deletion.
 
-## 2. 一致性与可用性检查
+## 2. Consistency and usability checks
 
-- 清洗后训练集地址匹配：150,000/150,000（100.0%）。
-- 清洗后测试集地址匹配：50,000/50,000（100.0%）。
-- 清洗后 MRT 状态：已开放 231 个，规划中 12 个。首版位置特征仅应使用已开放站点。
-- 股票表仍保留 85 行缺失收盘价；这是原始缺失，尚未填补，后续按证券和月份聚合时再定义处理规则。
+- Cleaned training address matches: 150,000/150,000 (100.0%).
+- Cleaned test address matches: 50,000/50,000 (100.0%).
+- Cleaned MRT status: 231 open, 12 planned. The first location features should use open stations only.
+- The stock table still has 85 rows with missing closing prices; these are missing in the raw data and are handled when aggregating by security and month.
 
-## 3. 保留的限制与下一步
+## 3. Remaining limitations and next steps
 
-- FEE 全为 0，FURNISHED 全为 yes；两列保留在清洗表中以维持数据谱系，但首版模型应排除。
-- 清洗未删除重复记录。训练集中相同输入特征可对应不同租金标签，按特征去重会丢失有效观测。
-- COE 同年月同类别可能有多轮记录；本阶段只规范格式，后续特征工程需明确选择最后一轮、均值或其他聚合规则。
-- 股票表在本阶段只完成日期与数值字段清洗；月度收益率、波动率等聚合指标将在阶段 5 根据验证结果决定是否构造和接入模型。
-- 规划 MRT 站点可能带来时间泄漏；在有明确历史开放时间前，不应纳入早期租赁记录的距离特征。
-- 下一步应使用 data/interim/train_clean.csv 和 data/interim/test_clean.csv 建立仅含主表特征的时间切分基线模型。
+- FEE is always 0 and FURNISHED is always yes; both are kept for lineage but should be excluded from the first model.
+- Duplicates are not removed. Identical inputs can have different rents, so deduplicating on features would discard valid observations.
+- COE can have several rounds for the same month and category; feature engineering must choose the last round, the mean or another aggregation.
+- Stock data are only cleaned here; monthly returns and volatility are built in stage 5 if validation supports them.
+- Planned MRT stations may leak future information; they should not be used for early rental records without reliable opening dates.
+- Next step: build a time-split baseline on data/interim/train_clean.csv and data/interim/test_clean.csv using main-table features only.
 
-## 4. 输入与输出路径
+## 4. Input and output paths
 
-- 输入：data/raw/，只读保存 Kaggle 原始文件。
-- 本阶段输出：data/interim/，保存清洗后的主表和辅助表。
-- 后续特征工程输出：data/processed/，保存按实验方案合并后的建模特征表。
-- 本报告：reports/data_quality_after_cleaning.md。
+- Input: data/raw/, read-only Kaggle files.
+- This stage: data/interim/, cleaned main and auxiliary tables.
+- Later feature engineering: data/processed/, merged modelling tables.
+- This report: reports/data_quality_after_cleaning.md.
 
-## 5. 训练集与测试集分布对比
+## 5. Train/test distribution comparison
 
-下表用于识别测试集与训练集的结构性差异。此处只做数据审计，不分析目标租金；租金分布、时间趋势及其与特征的关系将在阶段 2 的 EDA 中分析。
+These tables identify structural differences between training and test data. This is an audit only and does not analyse rent; rent distributions and trends are covered by the stage 2 EDA.
 
-### 租赁年份
+### Rental year
 
-| RENT_YEAR | 训练集数量 | 训练集占比 | 测试集数量 | 测试集占比 | 占比差异（测试-训练） |
+| RENT_YEAR | Train count | Train share | Test count | Test share | Share difference (test - train) |
 | --- | --- | --- | --- | --- | --- |
 | 2021 | 37,619 | 25.1% | 0 | 0.0% | -25.1% |
 | 2022 | 32,564 | 21.7% | 0 | 0.0% | -21.7% |
@@ -62,9 +62,9 @@
 | 2025 | 8,924 | 5.9% | 28,765 | 57.5% | +51.6% |
 | 2026 | 0 | 0.0% | 21,235 | 42.5% | +42.5% |
 
-### 房型
+### Flat type
 
-| FLAT_TYPE | 训练集数量 | 训练集占比 | 测试集数量 | 测试集占比 | 占比差异（测试-训练） |
+| FLAT_TYPE | Train count | Train share | Test count | Test share | Share difference (test - train) |
 | --- | --- | --- | --- | --- | --- |
 | 1-room | 42 | 0.0% | 12 | 0.0% | -0.0% |
 | 2-room | 3,098 | 2.1% | 1,436 | 2.9% | +0.8% |
@@ -73,9 +73,9 @@
 | 5-room | 35,523 | 23.7% | 11,530 | 23.1% | -0.6% |
 | executive | 8,234 | 5.5% | 2,552 | 5.1% | -0.4% |
 
-### 城镇
+### Town
 
-| TOWN | 训练集数量 | 训练集占比 | 测试集数量 | 测试集占比 | 占比差异（测试-训练） |
+| TOWN | Train count | Train share | Test count | Test share | Share difference (test - train) |
 | --- | --- | --- | --- | --- | --- |
 | ang mo kio | 8,283 | 5.5% | 2,664 | 5.3% | -0.2% |
 | bedok | 8,907 | 5.9% | 2,803 | 5.6% | -0.3% |
@@ -104,11 +104,11 @@
 | woodlands | 7,577 | 5.1% | 2,385 | 4.8% | -0.3% |
 | yishun | 7,913 | 5.3% | 2,662 | 5.3% | +0.0% |
 
-### 面积与房龄
+### Floor area and flat age
 
-| 数值字段 | 训练集最小值 | 训练集中位数 | 训练集最大值 | 测试集最小值 | 测试集中位数 | 测试集最大值 |
+| Numerical field | Train min | Train median | Train max | Test min | Test median | Test max |
 | --- | --- | --- | --- | --- | --- | --- |
 | FLOOR_AREA_SQM | 31.0 | 92.0 | 215.0 | 31.0 | 92.0 | 215.0 |
 | FLAT_AGE | 0.0 | 34.0 | 59.0 | 3.0 | 37.0 | 59.0 |
 
-测试集覆盖更晚的租赁年份，因此后续基线必须采用时间切分，而不应仅依赖随机切分。城镇、房型、面积和房龄均需在 EDA 中进一步检查其与租金的关系。
+The test set covers later rental years, so baselines must use a temporal split rather than only a random split. Town, flat type, floor area and age are examined against rent in the EDA.

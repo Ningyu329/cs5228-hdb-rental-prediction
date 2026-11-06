@@ -1,39 +1,39 @@
-# 地址匹配与位置特征运行报告
+# Address Matching and Location Features Run Report
 
-本报告仅依据本次运行的输入生成，不使用历史审计匹配率代替本次结果。
+This report is generated from the inputs of this run only; historical audit match rates are not substituted.
 
-| 数据集 | 行数 | 匹配行数 | 地址匹配率 | 有效坐标行数 | 缺失建筑年龄行数 |
+| Dataset | Rows | Matched rows | Address match rate | Valid coordinate rows | Missing building age rows |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | train | 150,000 | 150,000 | 100.00% | 150,000 | 159 |
 | test | 50,000 | 50,000 | 100.00% | 50,000 | 0 |
 
-## 特征与处理规则
+## Features and processing rules
 
-- 地址按 TOWN + BLOCK + STREET 标准化后精确匹配，缺失地址不匹配，不做模糊猜测。
-- HDB 地址键必须唯一。保留主表行数、行序、重复观测和训练标签，不使用租金计算位置特征。
-- 保留坐标、规划区、区域、竣工年份、最高楼层及邮编。ADDRESS_MATCHED 与 LOCATION_COORDINATES_VALID 分开标记。
-- BUILDING_AGE = 租赁批准年份 - YEAR_COMPLETED，与租约起始年计算的 FLAT_AGE 含义不同。无效、缺失或负建筑年龄保留为空并添加缺失标记。
-- 距离使用 Haversine 大圆距离，单位 km。半径内设施数量作为密度代理，包含半径边界，不代表步行距离或真实服务质量。
-- MRT 相同坐标仅计一次，避免换乘站多个线路代码重复计数；学校、商场按名称和坐标去重。
-- 无效或未匹配坐标的距离与计数保留为空。无可用设施时最近距离为空，有效坐标的设施计数为 0。
+- Addresses are matched exactly on standardised TOWN + BLOCK + STREET; missing addresses are not matched and no fuzzy guessing is used.
+- HDB address keys must be unique. Main-table row count, order, duplicates and labels are preserved; rent is never used to build location features.
+- Coordinates, planning area, region, completion year, maximum floor and postal code are kept. ADDRESS_MATCHED and LOCATION_COORDINATES_VALID are flagged separately.
+- BUILDING_AGE = rental approval year - YEAR_COMPLETED, which differs from FLAT_AGE based on lease commencement. Invalid, missing or negative building ages are left empty with a missing indicator.
+- Distances use the Haversine great-circle distance in km. Facility counts within a radius (inclusive) are density proxies, not walking distance or service quality.
+- MRT stations at the same coordinates count once, so interchanges with several line codes are not double counted; schools and malls are deduplicated by name and coordinates.
+- Distances and counts are empty for invalid or unmatched coordinates. With no usable facility the nearest distance is empty and counts are 0 for valid coordinates.
 
-## 时间可用性与限制
+## Temporal availability and limitations
 
-- MRT snapshot 模式仅筛选当前 STATUS=open，不能证明站点在历史租赁月份已开放，仍有时间泄漏风险。正式时间验证应提供开放日期并使用 historical 模式。
-- 学校、商场和 HDB 区域属性来自静态辅助表，没有完整历史版本。不能宣称整套位置特征已完全消除时间泄漏。
-- 特征生成不拟合填补器、编码器或聚类。后续建模必须仅在训练折拟合这些转换。
+- MRT snapshot mode only keeps stations with current STATUS=open, which does not prove they were open in historical rental months, so temporal leakage remains possible. Formal temporal validation should supply opening dates and use historical mode.
+- School, mall and HDB area attributes come from static auxiliary tables without full historical versions. The location features cannot be claimed to remove temporal leakage entirely.
+- Feature generation fits no imputer, encoder or clustering. Later modelling must fit such transforms on the training fold only.
 
-## 辅助数据检查
+## Auxiliary data checks
 
-| 来源 | 输入行数 | 有效唯一位置数 | 无效坐标行数 |
+| Source | Input rows | Valid unique locations | Invalid coordinate rows |
 | --- | ---: | ---: | ---: |
 | mrt | 243 | 192 | 0 |
 | school | 337 | 337 | 0 |
 | mall | 113 | 113 | 0 |
 
-## 按城镇的地址匹配
+## Address matching by town
 
-| 数据集 | 城镇 | 行数 | 匹配行数 |
+| Dataset | Town | Rows | Matched rows |
 | --- | --- | ---: | ---: |
 | train | ang mo kio | 8283 | 8283 |
 | train | bedok | 8907 | 8907 |
@@ -88,6 +88,6 @@
 | test | woodlands | 2385 | 2385 |
 | test | yishun | 2662 | 2662 |
 
-## 后续验证
+## Next validation step
 
-使用相同时间切分对比原主表特征与本次位置特征的验证 RMSE。此脚本只生成特征，不训练模型，也不声明已改善 RMSE。
+Compare validation RMSE of main-table features and these location features on the same temporal split. This script only builds features; it trains no model and makes no RMSE claim.

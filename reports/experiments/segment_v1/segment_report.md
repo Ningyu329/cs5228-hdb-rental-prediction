@@ -1,35 +1,35 @@
-# 分组诊断与针对性优化实验
+# Group Diagnostics and Targeted Optimisation
 
-## 结论与模型选择
+## Conclusion and model selection
 
-锁定方案：`bias_town_flat_s500`。未生成新提交，也未读取竞赛测试集。
+Locked option: `bias_town_flat_s500`. No new submission was generated and the competition test set was not read.
 
-本轮没有发现有实际意义的稳定降分：较早季度合并 RMSE 仅从 459.1748 降到 459.0770（约 0.10），
-2025 年第一季度从 448.3346 变为 448.3390，六个月窗口从 460.0744 变为 459.9859。
-不据此声称本轮优于已提交的模型，也不自动替换原提交。原模型的 Kaggle 公榜为 437.44368，
-本轮分组修正方案没有 Kaggle 分数。锁定记录保留按较早窗口选出的方案，不根据后看的主验证重选。
+This round found no meaningful stable gain: the pooled earlier-quarter RMSE only fell from 459.1748 to 459.0770 (about 0.10),
+2025 Q1 moved from 448.3346 to 448.3390, and the six-month window from 460.0744 to 459.9859.
+This round is therefore not claimed to beat the submitted model, and the submission is not replaced. The original model's Kaggle public score is 437.44368;
+the group-correction option has no Kaggle score. The lock keeps the option selected on earlier windows and is not reselected on the later main validation.
 
-| 阶段 | 锁定方案 | 较早季度合并 RMSE |
+| Stage | Locked option | Earlier-quarter pooled RMSE |
 | --- | --- | ---: |
 | 01_bias | bias_town_flat_s500 | 459.0770 |
 | 02_trend | bias_town_flat_s500 | 459.0770 |
 | 03_experts | bias_town_flat_s500 | 459.0770 |
 | 04_macro | bias_town_flat_s500 | 459.0770 |
 
-各阶段新增方案中的最佳较早季度合并 RMSE：
+Best pooled earlier-quarter RMSE among the new options of each stage:
 
-| 方向 | 新增方案中最佳 | 合并 RMSE | 解释 |
+| Direction | Best new option | Pooled RMSE | Interpretation |
 | --- | --- | ---: | --- |
-| 当前全局对照 | locked_448_control | 459.1748 | 上一轮锁定模型 |
-| 城镇与房型偏差修正 | bias_town_flat_s500 | 459.0770 | 改善极小，两个季度一好一坏 |
-| 分组残差趋势 | trend_town_flat_s500 | 459.5463 | 未优于对照或修正器 |
-| 房型专属模型融合 | expert_weight25 | 459.6935 | 与偏差修正器融合 25%；未改善 |
-| 宏观模型融合 | market_frozen2_weight25 | 460.1288 | 同期信息版本也未改善 |
+| Current global control | locked_448_control | 459.1748 | Model locked in the previous round |
+| Town and flat-type bias correction | bias_town_flat_s500 | 459.0770 | Tiny gain; one quarter better, one worse |
+| Group residual trend | trend_town_flat_s500 | 459.5463 | Not better than the control or the corrector |
+| Flat-type expert blend | expert_weight25 | 459.6935 | 25% blend with the bias corrector; no gain |
+| Macro model blend | market_frozen2_weight25 | 460.1288 | The same-period information version did not help either |
 
-同期 COE+股票模型的最佳融合为 460.1760，仅 COE 为 460.1978。
-这只能说明本次聚合特征、LightGBM 配置和融合比例未改善，不能推广为所有宏观特征均无效。
+The best blend with the same-period COE+stock model is 460.1760, and COE only 460.1978.
+This only shows that these aggregated features, this LightGBM configuration and these blend ratios did not help; it does not show that all macro features are useless.
 
-| 窗口 | 方案 | RMSE | MAE | 平均偏差 |
+| Window | Option | RMSE | MAE | Mean bias |
 | --- | --- | ---: | ---: | ---: |
 | q3_2024 | locked_448_control | 474.6845 | 347.3841 | -12.14 |
 | q3_2024 | bias_town_flat_s500 | 474.2784 | 349.1387 | -27.31 |
@@ -40,12 +40,12 @@
 | long_6m | locked_448_control | 460.0744 | 333.7802 | -12.01 |
 | long_6m | bias_town_flat_s500 | 459.9859 | 336.0331 | -27.41 |
 
-## 优先分组：仅使用较早回测
+## Priority groups: earlier backtests only
 
-平方误差贡献率分母为该窗口全部样本 SSE。同一分组方案内贡献率和为 100%，不同分组方案互相重叠，不可相加。
-偏差取预测减真实值；正值为高估。组内均值偏差的平方贡献仅为描述性分解，不是可实现的降分保证。
+The denominator of the squared-error share is the SSE of all rows in the window. Shares sum to 100% within one grouping; different groupings overlap and cannot be added.
+Bias is prediction minus actual; positive means overprediction. The squared contribution of group mean bias is a descriptive decomposition, not an achievable gain.
 
-| 窗口 | 分组 | 样本数 | RMSE | 偏差 | 总 SSE 占比 |
+| Window | Group | Rows | RMSE | Bias | Share of total SSE |
 | --- | --- | ---: | ---: | ---: | ---: |
 | q3_2024 | jurong west / 5-room | 235 | 663.30 | -223.52 | 5.2% |
 | q3_2024 | jurong west / 4-room | 216 | 621.11 | -93.49 | 4.2% |
@@ -60,28 +60,28 @@
 | q4_2024 | yishun / 4-room | 171 | 500.09 | -9.07 | 2.6% |
 | q4_2024 | jurong west / 4-room | 210 | 448.12 | -38.57 | 2.6% |
 
-## 误差集中在哪里
+## Where the errors concentrate
 
-- 合并 2024 年两个较早回测，4 房型贡献 37.45% 总平方误差，3 房型 29.22%，5 房型 23.18%，三者合计 89.85%。这同时受样本数与单条误差影响，不表示这些房型本身一定最难预测。
-- 城镇与房型分组中，组均值偏差平方只占 Q3/Q4 总 SSE 的 4.25%/2.80%。即使事后完美去掉各组平均偏差，大部分组内差异仍在；这不是不可约噪声下界，也不排除更好的细粒度特征能解释这些差异。
-- Q3 最差 5% 样本贡献 41.47% SSE，Q4 为 45.30%；2025 年 Q1 为 43.15%。该分组依据已知验证误差，只能用于诊断，不能在测试集凭未知真实租金路由或过滤。
-- Jurong West 的 5 房型 Q3 低估 223.52，Q4 只低估 16.93。偏差随时间变化，直接按一个季度的观察加减固定租金并不可靠。
-- 下一步如继续追求降分，应检查大误差样本对应的可观测特征、区位细分与训练覆盖，尝试可迁移的近邻租金分布、空间聚类或目标变换，而不是删除验证集难例。新尝试仍需独立记录并先在较早窗口比较。
+- Pooling the two 2024 backtests, 4-room flats contribute 37.45% of total squared error, 3-room 29.22% and 5-room 23.18%, together 89.85%. This reflects both sample size and per-row error, so it does not mean these flat types are inherently hardest to predict.
+- In the town by flat-type grouping, squared group mean bias is only 4.25%/2.80% of Q3/Q4 total SSE. Even removing every group's mean bias after the fact leaves most within-group variation; this is not an irreducible-noise bound and does not rule out finer features explaining it.
+- The worst 5% of rows contribute 41.47% of SSE in Q3, 45.30% in Q4 and 43.15% in 2025 Q1. This grouping uses known validation errors, so it is diagnostic only and cannot route or filter test rows by unknown true rent.
+- Jurong West 5-room flats are underpredicted by 223.52 in Q3 but only 16.93 in Q4. Bias changes over time, so adding or subtracting a fixed rent based on one quarter is unreliable.
+- To keep lowering the score, next check the observable features, location detail and training coverage of large-error rows, and try transferable neighbour rent distributions, spatial clustering or target transforms rather than removing hard validation rows. New attempts must be recorded separately and compared on earlier windows first.
 
-## 独立复核
+## Independent review
 
-59 项测试通过。`inspect_segment_experiments.py` 独立核对 58 条分数、96 个分组方案的行数与 SSE 守恒，
-重新加载 14 个新增原生模型检查逐行预测，并核对四个窗口的原模型对照与上一轮导出结果一致。
-验证记录为 `output_validation.json`。主验证没有参与本轮方案选择；所有复用窗口仍存在反复查看的限制。
+59 tests pass. `inspect_segment_experiments.py` independently checks 58 scores and row counts and SSE conservation for 96 groupings,
+reloads the 14 new native models to check row-level predictions, and confirms that the original-model control in all four windows matches the previous export.
+The record is `output_validation.json`. The main validation was not used for selection in this round; all reused windows still carry the repeated-viewing caveat.
 
-## 方法与防泄漏约定
+## Method and leakage rules
 
-- 按城镇、房型、区域、面积、房龄、月份、历史地址样本数及交叉组统计 RMSE、MAE、偏差、P90 绝对误差、SSE 贡献率和大误差数量。
-- 修正器只使用预测窗口之前六个月的扩展时间 OOF 残差。每条校准预测的基础模型仅使用该季度之前的标签；不使用训练内拟合误差。
-- 常数修正向零收缩；趋势修正拟合组内月度 OOF 残差，斜率限制为每月 ±25，新窗口增长以六个月时间常数衰减，最终修正限制为 ±200。
-- 小样本组不修正，未见组回退原全局模型。分段模型按历史 OOF 的 SSE 选最多四种房型；每组至少 3000 条外层训练样本，内部验证至少 100 条，迭代轮数只用内部时间切分选择。
-- 分段及宏观 LightGBM 均使用同一 15 叶正则化配置，与当前方案以 25%/50%/100% 权重比较。
-- 对比对应月份已提供的 COE、COE+股票，以及滞后两个月并冻结截止时点的 COE+股票。同期辅助信息条件下的回测不是严格实时预测；不涉及验证租金标签。
-- 各阶段按 2024 年 Q3/Q4 合并 SSE 贪心选择，始终保留上一方案。锁定后才计算 2025 年 Q1 和六个月窗口；所有这些时期先前已被查看，不能称为全新独立测试。
-- 本轮不重跑十二个月窗口；不能将旧方案的十二个月结果移用于本轮新方案，也不能据本地改进推断 Kaggle 一定改善。
-- 原始数据、原实验目录、已提交文件均不覆盖；逐行标签/预测及模型只保存在本地。
+- RMSE, MAE, bias, P90 absolute error, SSE share and large-error counts are computed by town, flat type, region, floor area, flat age, month, historical address sample count and their crosses.
+- Correctors use only expanding-time OOF residuals from the six months before the prediction window. Each calibration prediction's base model uses only labels before that quarter; in-sample training errors are never used.
+- Constant corrections are shrunk towards zero; trend corrections fit monthly within-group OOF residuals with slopes capped at +/-25 per month, new-window growth decays with a six-month time constant, and the final correction is capped at +/-200.
+- Small groups are not corrected and unseen groups fall back to the global model. Segment models are chosen for at most four flat types by historical OOF SSE; each needs at least 3000 outer training rows and 100 inner validation rows, and rounds are chosen on an inner time split only.
+- Segment and macro LightGBM models share one regularised 15-leaf configuration and are compared with the current option at 25%/50%/100% weights.
+- Compares same-month COE, COE plus stocks, and COE plus stocks lagged two months and frozen at the cut-off. Backtests with same-period auxiliary data are not strict real-time forecasts; validation rent labels are never used.
+- Each stage greedily selects on pooled 2024 Q3/Q4 SSE and always keeps the previous option. 2025 Q1 and six-month windows are computed only after locking; all periods have been viewed before and are not fresh independent tests.
+- The twelve-month window is not rerun here; old twelve-month results cannot be transferred to new options, and local gains do not guarantee a Kaggle gain.
+- Raw data, earlier experiment directories and submitted files are not overwritten; row-level labels, predictions and models stay local.

@@ -1,19 +1,19 @@
-# 第 5 阶段：特征扩展与模型优化
+# Stage 5: Feature Expansion and Model Optimisation
 
-## 验证与选择规则
+## Validation and selection rules
 
-- 使用 2024-07 至 2024-09、2024-10 至 2024-12 两个较早窗口的合并 RMSE 选择候选。
-- 2025-01 至 2025-03 为主验证窗口，不用于选择模型、早停轮数、融合权重或特征。先前实验已查看过该窗口，因此它不是完全未触碰的最终测试集。
-- CatBoost、LightGBM 仅在各外层训练集内部保留最后 3 个月用于早停，再按选定轮数重训全部外层训练数据。
-- 融合固定为相同特征 CatBoost/LightGBM 各 50%，不根据主验证调权重。
-- 所有宏观特征滞后两个月，外层和内层验证均按各自训练截止时间冻结可用源月份。未来验证月份的 COE 和股票值不参与预测。
+- Candidates are selected on the pooled RMSE of two earlier windows, 2024-07 to 2024-09 and 2024-10 to 2024-12.
+- 2025-01 to 2025-03 is the main validation window and is not used to select models, early-stopping rounds, blend weights or features. Earlier experiments have viewed it, so it is not an untouched final test set.
+- CatBoost and LightGBM hold out the last 3 months inside each outer training set for early stopping, then refit on the whole outer training set with the selected rounds.
+- The blend is fixed at 50% CatBoost / 50% LightGBM on the same features; weights are not tuned on the main validation.
+- All macro features are lagged by two months, and outer and inner validations freeze available source months at their own training cut-off. COE and stock values of future validation months are never used.
 
-## 主时间验证结果
+## Main temporal validation
 
-| 候选 | RMSE | MAE | 平均预测偏差 | 较早窗口选中 |
+| Candidate | RMSE | MAE | Mean prediction bias | Selected on earlier windows |
 | --- | ---: | ---: | ---: | --- |
 | blend_main | 451.6188 | 329.2781 | -23.72 |  |
-| blend_housing | 452.1702 | 331.1601 | -30.59 | 是 |
+| blend_housing | 452.1702 | 331.1601 | -30.59 | yes |
 | blend_amenities | 452.5783 | 330.8470 | -28.19 |  |
 | lightgbm_housing | 455.1987 | 332.9281 | -26.55 |  |
 | lightgbm_main | 455.5022 | 331.9834 | -19.66 |  |
@@ -27,53 +27,53 @@
 | ridge_spline_main | 465.2389 | 335.5900 | +4.65 |  |
 | ridge_main | 562.6666 | 406.7216 | +316.44 |  |
 
-## 结果解读
+## Interpretation
 
-- 较早窗口选出的候选是 blend_housing。主验证 RMSE 为 452.1702，同环境 Ridge 为 562.6666，改善 19.64%。
-- 平均预测偏差从 Ridge 的 +316.44 变为候选的 -30.59。正值表示高估月租。
-- 模型/特征选择详见 selection_backtests.csv。主验证最低分不一定是按较早窗口选出的候选，保留这一差异，避免事后换选。
+- The candidate selected on earlier windows is blend_housing. Its main validation RMSE is 452.1702 against 562.6666 for same-environment Ridge, an improvement of 19.64%.
+- Mean prediction bias changes from +316.44 for Ridge to -30.59 for the candidate. Positive values mean overpredicted rent.
+- Model and feature selection details are in selection_backtests.csv. The lowest main-validation score need not be the candidate selected on earlier windows; the difference is kept to avoid post-hoc reselection.
 
-## 主要特征组
+## Main feature groups
 
-| 特征组 | 打乱后样本 RMSE 增加 |
+| Feature group | RMSE increase after permutation |
 | --- | ---: |
 | housing | 243.8911 |
 | hdb | 69.1611 |
 | address | 31.4140 |
 | time | 0.4464 |
 
-重要性来自主验证固定样本的成组置换，重复 2 次。只用于解释，不再用其选择特征。相关特征可能互相替代，不能解释为因果效应。
+Importance comes from grouped permutation on a fixed main-validation sample, repeated twice. It is for interpretation only and not used for feature selection. Correlated features can substitute for each other, so it is not a causal effect.
 
-## 时间、宏观与数据限制
+## Temporal, macro and data limitations
 
-- mrt_snapshot 方案只作探索，不能参与推荐选择，因为缺少历史开放日期。学校、商场、部分楼栋属性也来自静态快照。
-- 月度 COE 使用各轮溢价均值及总投标/总配额比。股票使用未复权 CLOSE 的等权月收益率、平均日波动率、上涨证券占比和证券覆盖数，不填补未来价格。
-- 宏观表没有真实发布时间。两个月滞后是保守可用性假设，不构成无泄漏保证。未复权价格的拆股等公司行动也可能造成跳变。
-- 冻结后的宏观值在一个验证窗口内可能恒定，树模型的未来时间字段也可能落在相同叶子。局部置换重要性接近 0 不代表这些变量在历史训练中没有作用。
-- FEE/FURNISHED 在当前数据中没有变异，因此不增加费用或装修标记。
-- 季度验证不能保证延伸到 2026-07 的长预测跨度表现。需要在阶段 6 做更长窗口评估及最终提交。
-- 本轮只在预设参数下优化训练轮数。若早停轮数达到搜索上限，需另做更高上限的稳健性检查，不能宣称参数已达到全局最优。
-- 尚未读取测试标签，也未生成/上传新的竞赛提交。保存的模型是主验证训练截止时的诊断模型，不是全量训练最终模型。
+- The mrt_snapshot variant is exploratory only and excluded from recommended selection because historical opening dates are missing. Schools, malls and some block attributes are also static snapshots.
+- Monthly COE uses the mean premium across rounds and total bids / total quota. Stocks use equal-weight monthly returns of unadjusted CLOSE, mean daily volatility, share of rising securities and security coverage, without filling future prices.
+- The macro tables have no true publication dates. The two-month lag is a conservative availability assumption, not a no-leakage guarantee. Corporate actions such as splits may cause jumps in unadjusted prices.
+- Frozen macro values can be constant within a validation window, and future time fields can fall into the same tree leaves. Near-zero local permutation importance does not mean these variables had no role in training.
+- FEE and FURNISHED have no variation in the current data, so no fee or furnishing flags are added.
+- Quarterly validation does not guarantee performance over the long horizon to 2026-07; stage 6 needs longer-window evaluation and the final submission.
+- This round only tunes boosting rounds under preset parameters. If early stopping reaches the search cap, a higher-cap robustness check is needed; the parameters cannot be claimed globally optimal.
+- No test labels were read and no new competition submission was generated or uploaded. Saved models are diagnostic models at the main-validation cut-off, not final full-data models.
 
-## 输出
+## Outputs
 
-results.csv 保存全部外层实验；group_errors.csv 保存按城镇、房型、模型、面积、房龄、月份、区域和地址匹配状态的误差。
-group_permutation_importance.csv 为候选特征组重要性。native_feature_importance.csv 为树模型训练重要性，CatBoost 为 PredictionValuesChange，LightGBM 为 gain，不能直接跨算法比较原始数值。
+results.csv stores all outer experiments; group_errors.csv stores errors by town, flat type, flat model, floor area, flat age, month, region and address-match status.
+group_permutation_importance.csv holds candidate feature-group importance. native_feature_importance.csv holds tree training importance (CatBoost PredictionValuesChange, LightGBM gain); raw values are not comparable across algorithms.
 
-模型 API 依据 [CatBoost 官方文档](https://catboost.ai/docs/en/concepts/python-reference_catboostregressor) 与 [LightGBM 官方文档](https://lightgbm.readthedocs.io/en/stable/pythonapi/lightgbm.LGBMRegressor.html)。
+Model APIs follow the [CatBoost documentation](https://catboost.ai/docs/en/concepts/python-reference_catboostregressor) and the [LightGBM documentation](https://lightgbm.readthedocs.io/en/stable/pythonapi/lightgbm.LGBMRegressor.html).
 
-## 候选模型的分组误差诊断
+## Group error diagnostics for the selected candidate
 
-下表仅为主验证描述，不据此重新挑选模型。城镇按至少 100 条记录筛选后列出误差最高的 4 组，避免按极小样本排序。
+These tables describe the main validation only and are not used to reselect models. Towns with at least 100 records are filtered and the 4 with the highest error are listed, to avoid ranking tiny samples.
 
-| 城镇 | 验证记录数 | RMSE | 平均预测偏差 |
+| Town | Validation rows | RMSE | Mean prediction bias |
 | --- | ---: | ---: | ---: |
 | jurong west | 620 | 548.76 | +22.40 |
 | kallang/whampoa | 342 | 541.49 | -3.83 |
 | bukit merah | 530 | 508.53 | -62.77 |
 | toa payoh | 341 | 498.81 | -55.47 |
 
-| 房型 | 验证记录数 | RMSE | 平均预测偏差 |
+| Flat type | Validation rows | RMSE | Mean prediction bias |
 | --- | ---: | ---: | ---: |
 | 1-room | 4 | 204.14 | -39.69 |
 | 2-room | 242 | 408.90 | -15.64 |
@@ -82,11 +82,11 @@ group_permutation_importance.csv 为候选特征组重要性。native_feature_im
 | 5-room | 2100 | 471.28 | -23.72 |
 | executive | 462 | 542.77 | -80.90 |
 
-后续应检查高误差城镇与大户型的残差分布，并在较早时间窗口验证任何修正方案。稀有房型样本少，不宜仅按主验证分数判断模型优劣。
+Residual distributions of high-error towns and large flat types should be checked next, and any correction validated on earlier windows. Rare flat types have few samples and should not be judged on the main validation score alone.
 
-## 选定组件的训练重要性
+## Training importance of the selected components
 
-| 组件 | 特征 | 重要性数值 | 方法 |
+| Component | Feature | Importance | Method |
 | --- | --- | ---: | --- |
 | catboost_housing | RENT_MONTH_INDEX | 40.31 | PredictionValuesChange |
 | catboost_housing | FLAT_TYPE | 25.57 | PredictionValuesChange |
@@ -99,9 +99,9 @@ group_permutation_importance.csv 为候选特征组重要性。native_feature_im
 | lightgbm_housing | RENT_YEAR | 3.677e+10 | gain |
 | lightgbm_housing | STREET | 3.609e+10 | gain |
 
-训练期的时间字段重要性较高，而主验证局部置换时间组的作用较小，两者衡量范围不同，不能将局部重要性解释为时间趋势不重要。
+Time fields have high training importance, while permuting the time group on the main validation matters little. The two measure different scopes, so the local importance does not mean the time trend is unimportant.
 
-## 结果图片
+## Figures
 
 ![01_model_comparison](figures/01_model_comparison.png)
 

@@ -1,80 +1,80 @@
-# 单位面积租金与历史空间特征实验
+# Unit-Area Rent and Historical Spatial Features
 
-## 结论
+## Conclusion
 
-本轮比较 7 个新配方及其与当前模型的混合，未发现达到采用门槛的改善。两个历史季度中最好的新组合，将合并 RMSE 从 459.1748 降到 458.8237，仅改善 0.3511；在 2025 年初验证集上反而从 448.3346 升到 448.8767。因此保留当前模型，不生成或上传新的 Kaggle 提交。已有公榜分数仍为 437.44368。
+This round compares 7 new recipes and their blends with the current model and finds no improvement that meets the adoption threshold. The best new combination lowers the pooled RMSE over the two historical quarters from 459.1748 to 458.8237, only 0.3511, and on the early-2025 validation it rises from 448.3346 to 448.8767. The current model is therefore kept and no new Kaggle submission is generated or uploaded. The existing public score remains 437.44368.
 
-这里的“当前模型”是已提交的 CatBoost、LightGBM 和阻尼趋势组合，不是最初的 Ridge 基线。
+"Current model" here means the submitted CatBoost, LightGBM and damped-trend blend, not the original Ridge baseline.
 
-## 方法与时间边界
+## Method and time boundaries
 
-新配方使用相同的主数据和住房位置字段，分别测试以下变化。
+The new recipes use the same main data and housing/location fields and test the following changes.
 
-1. **单位面积租金。** 将目标改为月租金除以面积，预测后再乘面积。训练及提前停止均使用面积平方权重，归一化到平均权重为 1。给定验证样本，单位面积误差的加权平方和与原币值误差平方和仅差固定比例，避免换目标后偏离原币值 RMSE。树结构和正则化仍可能产生不同结果。
-2. **历史租金分布。** 对相同房屋属性组、同楼栋同房型组，计算过去 12 个月单位面积租金的数量、均值、中位数、标准差和第 10、90 百分位数。“相同属性”不等于同一套房屋。
-3. **空间近邻。** 先将历史交易聚合成同楼栋同房型的平均单位面积租金，再查找同房型的最近 16、64 个楼栋。提取楼栋数、租金均值、标准差、中位数及距离。按楼栋等权，避免某栋重复交易挤占邻居位置。
-4. **组合与容量。** 合并上述两组特征，分别预测原租金和单位面积租金；另试一个叶子更多的 LightGBM，以及深度 5、正则化较强的 CatBoost。
+1. **Unit-area rent.** The target becomes monthly rent divided by floor area, and predictions are multiplied back by area. Training and early stopping use area-squared weights normalised to a mean weight of 1. For given validation rows, the weighted squared error in unit-area terms differs from the currency squared error only by a constant factor, so the change of target does not drift away from currency RMSE. Tree structure and regularisation can still give different results.
+2. **Historical rent distributions.** For groups with the same flat attributes, and for same-block same-flat-type groups, the count, mean, median, standard deviation and 10th/90th percentiles of unit-area rent over the past 12 months are computed. "Same attributes" does not mean the same flat.
+3. **Spatial neighbours.** Historical rentals are first aggregated into the mean unit-area rent of each block and flat type, then the nearest 16 and 64 blocks with the same flat type are found. Block count, mean, standard deviation, median rent and distance are extracted. Blocks are weighted equally so that one block's repeated rentals do not crowd out its neighbours.
+4. **Combination and capacity.** The two feature groups are combined to predict either rent or unit-area rent; a LightGBM with more leaves and a strongly regularised depth-5 CatBoost are also tried.
 
-训练样本的历史统计排除整个当前月；验证窗口只使用训练截止时的历史快照，不根据验证期真实租金滚动更新。类别取值范围仅从训练数据建立。
+Historical statistics for training rows exclude the whole current month; the validation window only uses the history snapshot at the training cut-off and is never rolled forward with validation-period rents. Category vocabularies are built from training data only.
 
-每个外层窗口均用训练数据最后 3 个月选择训练轮数，再用外层全部训练数据重训。外层验证目标不参与特征计算、编码或提前停止。原 LightGBM 在两个季度重新训练后，与旧预测逐行一致。
+Each outer window chooses boosting rounds on the last 3 training months and then refits on all outer training data. Outer validation targets are never used for feature construction, encoding or early stopping. Retraining the original LightGBM on both quarters reproduces the old predictions row for row.
 
-方法灵感可参考往届的[空间近邻与分布特征](https://github.com/Concyclics/NUS-CS5228-project/blob/main/detail.md)和[浅层 CatBoost 案例](https://github.com/cs5228-group-1/cs5228-final-project)。不同年份的数据、验证方式和排行榜不直接比较。本轮采用独立的过去信息实现。加权验证参数见 [LightGBM 官方接口](https://lightgbm.readthedocs.io/en/stable/pythonapi/lightgbm.LGBMRegressor.html)。
+The ideas draw on earlier cohorts' [spatial neighbour and distribution features](https://github.com/Concyclics/NUS-CS5228-project/blob/main/detail.md) and [shallow CatBoost case](https://github.com/cs5228-group-1/cs5228-final-project). Data, validation and leaderboards from other years are not directly comparable. This round uses its own past-information implementation. Weighted validation parameters follow the [LightGBM API](https://lightgbm.readthedocs.io/en/stable/pythonapi/lightgbm.LGBMRegressor.html).
 
-## 选型规则
+## Selection rule
 
-完整配方在读取新验证结果前写入 `experiment_manifest.json`。每个新模型分别以 25%、50%、100% 权重与当前模型混合，加上当前模型，共比较 22 个方案。
+The full recipes were written to `experiment_manifest.json` before any new validation result was read. Each new model is blended with the current model at 25%, 50% and 100% weight; with the current model itself, 22 options are compared.
 
-只使用 2024 年第三、第四季度的 17,060 条验证记录选型。采用新方案需同时满足：合并 RMSE 至少降低 1.0，且任一季度恶化不超过 1.0。该门槛是本轮的实际采用规则，不是统计显著性检验。
+Selection uses only the 17,060 validation records of 2024 Q3 and Q4. A new option is adopted only if the pooled RMSE falls by at least 1.0 and neither quarter worsens by more than 1.0. This threshold is the practical adoption rule for this round, not a significance test.
 
-选择写入 `selection_locked.json` 后，才检查最好的新挑战者在 2025 年初和 6 个月窗口的表现。这些历史窗口已在前几轮查看过，不能称为全新独立留出集；6 个月窗口也与季度验证记录重叠，但训练截止时间不同。
+Only after the choice was written to `selection_locked.json` were the best new challenger's early-2025 and 6-month-window results checked. These windows were viewed in earlier rounds and are not fresh hold-out sets; the 6-month window also overlaps the quarterly records, with a different training cut-off.
 
-## 实验结果
+## Results
 
-每行展示该配方三个预设混合权重中的最低合并 RMSE。差值为新方案减当前模型，负数才是改善。
+Each row shows the lowest pooled RMSE among the three preset blend weights for that recipe. The difference is new option minus current model; only negative values are improvements.
 
-| 配方 | 新模型权重 | 两季度合并 RMSE | 与当前模型差值 |
+| Recipe | New model weight | Two-quarter pooled RMSE | Difference from current model |
 | --- | ---: | ---: | ---: |
-| 当前模型 | — | 459.1748 | 0.0000 |
-| 仅单位面积目标 | 25% | 459.3719 | +0.1971 |
-| 历史分布 | 25% | 460.1229 | +0.9481 |
-| 空间近邻 | 25% | 460.0638 | +0.8890 |
-| 历史分布加空间近邻 | 25% | 460.2104 | +1.0356 |
-| 单位面积目标加两组特征 | 25% | 458.8237 | −0.3511 |
-| 两组特征加更灵活 LightGBM | 25% | 460.5094 | +1.3346 |
-| 浅层 CatBoost | 25% | 458.8458 | −0.3290 |
+| Current model | — | 459.1748 | 0.0000 |
+| Unit-area target only | 25% | 459.3719 | +0.1971 |
+| Historical distributions | 25% | 460.1229 | +0.9481 |
+| Spatial neighbours | 25% | 460.0638 | +0.8890 |
+| Historical distributions plus spatial neighbours | 25% | 460.2104 | +1.0356 |
+| Unit-area target plus both feature groups | 25% | 458.8237 | −0.3511 |
+| Both feature groups plus more flexible LightGBM | 25% | 460.5094 | +1.3346 |
+| Shallow CatBoost | 25% | 458.8458 | −0.3290 |
 
-最佳新挑战者是“75% 当前模型＋25% 单位面积目标及两组新特征模型”。其各窗口表现如下。
+The best new challenger is "75% current model + 25% unit-area target model with both new feature groups". Its results by window:
 
-| 验证窗口 | 样本数 | 当前模型 RMSE | 新挑战者 RMSE | 差值 |
+| Validation window | Rows | Current model RMSE | New challenger RMSE | Difference |
 | --- | ---: | ---: | ---: | ---: |
-| 2024 年第三季度 | 8,786 | 474.6845 | 473.6973 | −0.9872 |
-| 2024 年第四季度 | 8,274 | 442.1101 | 442.4826 | +0.3725 |
-| 两季度合并 | 17,060 | 459.1748 | 458.8237 | −0.3511 |
-| 2025 年第一季度 | 8,924 | 448.3346 | 448.8767 | +0.5421 |
-| 2024 年下半年整体预测 | 17,060 | 460.0744 | 459.5564 | −0.5181 |
+| 2024 Q3 | 8,786 | 474.6845 | 473.6973 | −0.9872 |
+| 2024 Q4 | 8,274 | 442.1101 | 442.4826 | +0.3725 |
+| Two quarters pooled | 17,060 | 459.1748 | 458.8237 | −0.3511 |
+| 2025 Q1 | 8,924 | 448.3346 | 448.8767 | +0.5421 |
+| Second half of 2024, single forecast | 17,060 | 460.0744 | 459.5564 | −0.5181 |
 
-2025 年初验证集的 MAE 同样由 326.4557 升到 327.5352。新挑战者未达到历史选型门槛，也未在后续诊断中显示一致优势。
+On the early-2025 validation the MAE also rises, from 326.4557 to 327.5352. The new challenger does not meet the historical selection threshold and shows no consistent advantage in later diagnostics.
 
-## 对误差原因的新认识
+## New understanding of the error
 
-过去 12 个月中，约 90% 的验证记录有同楼栋同房型历史，但只有约 35% 至 37% 有至少 5 条，分位数和波动估计仍可能不稳定。最近第 16、64 个楼栋的距离中位数约为 0.36、0.95 公里，空间查询确实覆盖了局部区域，并非远距离全城平均。
+Over the past 12 months about 90% of validation records have same-block same-flat-type history, but only about 35–37% have at least 5 such records, so quantile and volatility estimates can still be unstable. The median distances to the 16th and 64th nearest blocks are about 0.36 and 0.95 km, so the spatial queries do cover local areas rather than city-wide averages.
 
-新特征被模型使用，不代表验证效果会更好。单位面积组合模型中，空间特征约占训练分裂增益的 73% 至 74%，但其单模型和混合结果均未形成足够稳定的优势。这不能证明空间信息无用，只说明本轮表达没有带来足够稳定的额外收益。
+That the model uses new features does not mean validation improves. In the unit-area combined model, spatial features account for about 73–74% of training split gain, yet neither the single model nor the blends show a stable enough advantage. This does not prove spatial information is useless; it only shows this round's representation adds no stable extra gain.
 
-2025 年初实际租金不超过 2,000 的样本，其 RMSE 从 1,131.74 小幅降到 1,127.43；其余样本则从 371.30 升到 372.75。低价样本仍普遍被高估，新配方没有解决此前发现的大误差问题。该分组仅用于事后分析，不能按未知的真实租金选择预测模型或删除验证样本。
+For early-2025 rows with actual rent at most 2,000, RMSE falls slightly from 1,131.74 to 1,127.43, while for the rest it rises from 371.30 to 372.75. Cheap rentals are still widely overpredicted, so the new recipes do not solve the large-error problem found earlier. This grouping is post-hoc analysis only; models cannot be chosen, nor validation rows removed, based on unknown true rent.
 
-## 后续优先方向
+## Next priorities
 
-1. **按测试跨度设计多起点验证。** 当前选型主要比较季度预测，测试集却延伸到 2026 年 7 月。下一轮应预先固定若干较早训练截止点，比较 6 至 12 个月甚至更长的预测，逐月检查偏差，再选择趋势和训练窗口。此前 6、12 个月结果主要用于诊断，并未用于本轮选型。
-2. **测试不同于邻居租金的区位表达。** 可低成本比较最近地铁站和商场的身份、地理聚类标签、区域与房型交互；先确认历史可用性，不能把未来开放站点当成当时已开放设施。这些是待验证方向，不承诺显著降分。
-3. **核查租赁口径及可关联信息。** 若大幅改善是目标，应优先查明同属性房屋中低价与普通租金的差异是否有可观测信息。只能使用竞赛允许、可合法关联的数据，不能用测试租金回填。现有结果既不支持承诺降至 200，也不构成不可达到 200 的证明。
+1. **Multi-origin validation matched to the test horizon.** Selection so far mainly compares quarterly forecasts, while the test set extends to July 2026. The next round should fix several earlier training cut-offs in advance, compare 6–12-month or longer forecasts, check bias month by month, and then choose the trend and training window. Earlier 6- and 12-month results were mainly diagnostic and were not used for selection in this round.
+2. **Location representations other than neighbour rents.** Cheap comparisons include the identity of the nearest MRT station and mall, geographic cluster labels, and region by flat-type interactions. Historical availability must be confirmed first; stations opening in the future cannot be treated as open at the time. These are directions to test, with no promised gain.
+3. **Check the rental definition and linkable information.** If a large improvement is the goal, first find out whether observable information explains why some flats with the same attributes rent cheaply. Only data allowed by the competition and legitimately linkable may be used; test rents must never be backfilled. Current results neither support a promise of reaching 200 nor prove that 200 is unreachable.
 
-本轮不支持继续扩大同类调参网格来追逐零点几的改善；更灵活模型也未改善这组验证，但这不等于所有模型都已达到上限。
+This round does not support expanding similar tuning grids to chase gains of a few tenths; more flexible models did not improve these validations either, but that does not mean every model has reached its limit.
 
-## 路径与复现
+## Paths and reproduction
 
-输入为 `data/processed/train_location_features.csv`，不读取测试集。模型和特征缓存分别保存在 `models/neighborhood_cache/`、`models/neighborhood_features/`，不覆盖已有模型。逐行预测仅本地保存；允许纳入 Git 的 CSV 只有经过检查的汇总结果、选型、特征重要性和分组诊断。
+The input is `data/processed/train_location_features.csv`; the test set is not read. Model and feature caches are stored in `models/neighborhood_cache/` and `models/neighborhood_features/` without overwriting existing models. Row-level predictions are kept locally only; the CSVs allowed into Git are reviewed summaries, selections, feature importance and group diagnostics.
 
 ```bash
 .venv/bin/python src/models/run_neighborhood_experiments.py --threads 3 --output-dir reports/experiments/neighborhood_reproduction
@@ -82,4 +82,4 @@
 .venv/bin/python -m unittest discover -s tests
 ```
 
-改动源码、依赖或参数后应使用新的输出目录。72 项测试通过；独立核验重算 48 条指标、22 个选型方案并重新加载 18 个模型核对预测，直接重建验证特征，不依赖特征缓存。原提交文件的 SHA256 保持不变。
+Use a new output directory after changing source, dependencies or parameters. 72 tests pass; the independent check recomputes 48 metrics and 22 selection options, reloads 18 models to verify predictions, and rebuilds validation features directly without the feature cache. The SHA256 of the original submission file is unchanged.
