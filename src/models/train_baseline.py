@@ -63,7 +63,7 @@ def load_tables() -> tuple[pd.DataFrame, pd.DataFrame]:
 def temporal_split(train: pd.DataFrame, n_validation_months: int = 3) -> tuple[pd.DataFrame, pd.DataFrame]:
     months = sorted(train["RENT_APPROVAL_DATE"].dt.to_period("M").unique())
     if len(months) <= n_validation_months:
-        raise ValueError("训练月份数量不足以建立时间验证集。")
+        raise ValueError("Not enough training months to build a temporal validation set.")
     validation_months = set(months[-n_validation_months:])
     mask = train["RENT_APPROVAL_DATE"].dt.to_period("M").isin(validation_months)
     return train.loc[~mask].copy(), train.loc[mask].copy()

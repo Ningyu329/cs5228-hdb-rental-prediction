@@ -153,22 +153,22 @@ def inspect_outputs(output: Path, render_figures: bool = True) -> dict:
     assert (ROOT / "models/stage5_cache" / manifest["cache_signature"]).is_dir()
     text = render_report(results, manifest, importance)
     selected_groups = groups.loc[groups.candidate.eq(selection)]
-    text += "\n## 候选模型的分组误差诊断\n\n下表仅为主验证描述，不据此重新挑选模型。城镇按至少 100 条记录筛选后列出误差最高的 4 组，避免按极小样本排序。\n\n"
-    text += "| 城镇 | 验证记录数 | RMSE | 平均预测偏差 |\n| --- | ---: | ---: | ---: |\n"
+    text += "\n## Group error diagnostics for the selected candidate\n\nThese tables describe the main validation only and are not used to reselect models. Towns with at least 100 records are filtered and the 4 with the highest error are listed, to avoid ranking tiny samples.\n\n"
+    text += "| Town | Validation rows | RMSE | Mean prediction bias |\n| --- | ---: | ---: | ---: |\n"
     towns = selected_groups.loc[selected_groups.field.eq("TOWN") & selected_groups.rows.ge(100)].nlargest(4, "rmse")
     for row in towns.itertuples():
         text += f"| {row.value} | {row.rows} | {row.rmse:.2f} | {row.bias:+.2f} |\n"
-    text += "\n| 房型 | 验证记录数 | RMSE | 平均预测偏差 |\n| --- | ---: | ---: | ---: |\n"
+    text += "\n| Flat type | Validation rows | RMSE | Mean prediction bias |\n| --- | ---: | ---: | ---: |\n"
     for row in selected_groups.loc[selected_groups.field.eq("FLAT_TYPE")].itertuples():
         text += f"| {row.value} | {row.rows} | {row.rmse:.2f} | {row.bias:+.2f} |\n"
-    text += "\n后续应检查高误差城镇与大户型的残差分布，并在较早时间窗口验证任何修正方案。稀有房型样本少，不宜仅按主验证分数判断模型优劣。\n"
+    text += "\nResidual distributions of high-error towns and large flat types should be checked next, and any correction validated on earlier windows. Rare flat types have few samples and should not be judged on the main validation score alone.\n"
     native = pd.read_csv(output / "native_feature_importance.csv")
-    text += "\n## 选定组件的训练重要性\n\n| 组件 | 特征 | 重要性数值 | 方法 |\n| --- | --- | ---: | --- |\n"
+    text += "\n## Training importance of the selected components\n\n| Component | Feature | Importance | Method |\n| --- | --- | ---: | --- |\n"
     for component in manifest["selected_components"]:
         for row in native.loc[native.candidate.eq(component)].nlargest(5, "importance").itertuples():
             text += f"| {component} | {row.feature} | {row.importance:.4g} | {row.method} |\n"
-    text += "\n训练期的时间字段重要性较高，而主验证局部置换时间组的作用较小，两者衡量范围不同，不能将局部重要性解释为时间趋势不重要。\n"
-    text += "\n## 结果图片\n\n" + "\n\n".join(f"![{Path(figure).stem}]({figure})" for figure in figures) + "\n"
+    text += "\nTime fields have high training importance, while permuting the time group on the main validation matters little. The two measure different scopes, so the local importance does not mean the time trend is unimportant.\n"
+    text += "\n## Figures\n\n" + "\n\n".join(f"![{Path(figure).stem}]({figure})" for figure in figures) + "\n"
     (output / "stage5_report.md").write_text(text, encoding="utf-8")
     check = {"experiment_rows": len(results), "verified_prediction_values": checked_predictions, "source_hashes_match": True, "selected_candidate": selection, "selection_uses_only_earlier_windows": True, "diagnostic_model_reload_matches": True, "figures": figures}
     (output / "output_validation.json").write_text(json.dumps(check, indent=2) + "\n", encoding="utf-8")

@@ -1,853 +1,208 @@
-# CS5228 HDB 组屋月租预测
+# CS5228 HDB Monthly Rent Prediction
 
-本仓库用于 CS5228-2610 Kaggle 私有竞赛的小组协作。
+Team project for the CS5228-2610 Kaggle competition (**CS5228 Avengers, Team 31**):
+Wang Ningyu, Xie Lin, Zhang Baowen, Zhu Tianyi.
 
-## 项目目标
+The task is to predict the monthly rent (`MONTHLY_RENT`) of Singapore HDB flats from flat attributes,
+location and time. Submissions are scored by root mean squared error (RMSE) in SGD per month.
 
-预测新加坡 HDB 组屋的月租金 `MONTHLY_RENT`，并以均方根误差（RMSE）评估模型表现。
+## Final result
 
-项目以监督学习回归为主线：
-
-`房屋属性 + 地理位置 + 时间 + 辅助信息 → 月租金`
-
-聚类和其他数据挖掘方法可用于探索或构造特征，但不是主要预测方法。
-
-## 当前进度与结果
-
-第 4、5 阶段的地址匹配、特征工程、模型比较、时间回测和参数调优已完成并整合到 `main`。
-目前进入第 6 阶段的最终评估与交付准备。2026-10-30 公榜最佳成绩（PB）更新为 **431.07006**（原 437.44368）。
-
-### 2026-10-29/30 更新：折外目标编码、外部数据与市场水平校准
-
-详见 [实验报告](reports/experiments/te_report.md)。两部分改进：
-
-1. **楼栋级折外目标编码 + 外部数据**（本地时间回测验证）：对楼栋×房型、街道×房型等细分组做 5 折折外均值编码，
-   加入滞后 2 个月的转售单价和 HDB 楼栋构成（户数、房型及租赁单位占比、商铺等）。四个特征变体平均后与原趋势融合按 75/25 混合，
-   2024 Q3 / Q4 / 2025 Q1 / 2024 全年回测分别从 474.68 / 442.11 / 448.33 / 491.79 降至 472.54 / 437.75 / 443.65 / 486.95。
-   这是项目中第一个在全部窗口（含 12 个月长跨度）都改善超过 1 分的方案；公榜 437.44 → 435.27。
-2. **测试期整体水平校准**（依据公榜探测）：全局缩放下公榜 MSE 是二次函数，用 4 次探测解出测试期整体租金比外推水平高约 1.7%、
-   每月再高约 0.18%；按此调整后公榜 435.27 → 431.07。这两个参数来自公榜而非本地验证，存在私榜偏差风险。
-
-CatBoost 成员、阻尼趋势、正则化调参、对数目标、近邻/离散度/房源量特征单独均无稳定收益。
-未使用 data.gov.sg 的 “Renting Out of Flats” 原始租赁数据，因为它包含测试月份的真实租金。
-
-| 阶段 | 已完成内容 | 当前状态 |
-| --- | --- | --- |
-| 1. 数据审计与清洗 | 主表及辅助数据清洗、处理前后质量报告、统一输入输出路径 | 已完成 |
-| 2. 探索性分析与基线 | 数据探索图表、时间与随机切分、主表 Ridge 基线及首版预测 | 已完成 |
-| 3. 中期进展汇报幻灯片 | 已有数据清洗、探索分析、验证设计与基线结果的汇报材料 | 已形成中期版本；本轮更新项目文档 |
-| 4. 地址匹配与位置特征 | HDB 地址匹配、楼栋属性、MRT/学校/商场距离与密度、覆盖率报告及消融实验 | 核心任务已完成；地理聚类为可选项，尚未实现 |
-| 5. 特征扩展与模型优化 | 时间与房屋衍生特征、月度 COE/股票指标、CatBoost/LightGBM/XGBoost 比较与调优、融合、重要性与分组误差分析 | 核心任务已完成；继续检验额外公开数据与结构化模型 |
-| 6. 最终评估与交付 | 已有消融、分组误差及 6/12/16 个月跨度诊断；完成两次强化模型全量训练与对应提交 | 待完成最终特征取舍、最终报告及后续方案验证 |
-
-### 与基线的 RMSE 对比
-
-下表均使用同一主时间验证划分：2021-01 至 2024-12 训练（141,076 行），
-2025-01 至 2025-03 验证（8,924 行）。RMSE 单位为新加坡元/月，越低越好。
-改善比例以本轮同环境复跑的 Ridge 为参照。
-
-| 方法与特征 | 主时间验证 RMSE | 相对 Ridge 降低 | 说明 |
-| --- | ---: | ---: | --- |
-| Ridge：仅主表 | 562.6666 | — | 同环境基线 |
-| Ridge：主表 + HDB + MRT + 学校 | 562.0281 | 0.11% | 位置消融中主验证最低分；MRT 静态快照，仅作探索 |
-| CatBoost：仅主表 | 458.3400 | 18.54% | 模型比较对照 |
-| LightGBM：仅主表 | 455.5022 | 19.05% | 模型比较对照 |
-| CatBoost + LightGBM：房屋扩展特征，原参数各占 50% | 452.1702 | 19.64% | 第 5 阶段由较早季度选定的方案 |
-| CatBoost + LightGBM：相同房屋扩展特征，首轮调参后各占 50% | 450.4735 | 19.94% | 首轮调优锁定候选，较原融合改善约 0.38% |
-| 后续顺序实验：提高 CatBoost 上限并加入趋势分解融合 | **448.3346** | **20.32%** | 按较早季度预先锁定，较 450.4735 再降低 2.1389（0.47%） |
-
-原阶段 2 的 Ridge 历史 RMSE 为 562.5888（约 562.59）；运行环境不同，本轮复跑为
-562.6666，保留两次记录，避免混用参照。位置特征单独加入 Ridge 的收益有限，
-仅主表的树模型已带来较大改善。首轮锁定候选使用主表、时间/房屋衍生特征及 HDB 属性，
-不含 MRT、学校、商场、COE 或股票特征；已尝试的辅助特征并非全部进入最终候选。
-后续顺序实验保留上述主表与 HDB 方案，加入一个单独学习月度租金水平与静态房屋残差的模型；
-近期训练窗口、时间衰减权重和历史租金统计未进入本轮最终候选。
-
-候选及融合权重依据 2024 年第三、四季度的回测结果选择，2025 年第一季度用于报告主验证表现。
-该主验证窗口已在多轮实验中被查看，**上述分数均为本地验证结果，不是 Kaggle 排行榜分数**。
-静态辅助信息的历史可用性和远期月份预测仍需在最终评估中说明。
-数据来源见[位置消融报告](reports/experiments/location_ablation_v1/location_ablation_report.md)、
-[阶段 5 报告](reports/experiments/stage5_v1/stage5_report.md)和
-[调优对比结果](reports/experiments/tree_tuning_v1/comparison.csv)及
-[后续顺序实验](reports/experiments/rmse_improvement_v1/improvement_report.md)。
-
-## 实验总结与当前误差瓶颈
-
-### 历轮实验结果总表
-
-下表按实验推进顺序整理代表性结果，RMSE 单位均为新加坡元/月，越低越好。
-“较早季度”指分别以 2024 年第三、四季度为验证集、用各季度以前的数据训练，再按验证行数合并平方误差计算的 RMSE，
-**不是两个季度 RMSE 的算术平均**；“主验证”指 2025 年第一季度。
-6 个月回测指训练至 2024-06、验证 2024-07 至 2024-12，12 个月回测指训练至 2023-12、验证全年 2024。
-各列任务不同，不能横向直接比较分数大小；“—”表示该轮未运行或没有对应汇总，不代表零误差。
-
-| 实验方案 | 较早季度 RMSE | 主验证 RMSE | 6 个月 RMSE | 12 个月 RMSE | 结论 |
-| --- | ---: | ---: | ---: | ---: | --- |
-| 同环境主表 Ridge 基线 | — | 562.6666 | — | — | 基础参照；历史环境为 562.5888 |
-| Ridge 加入 HDB、MRT、学校 | — | 562.0281 | — | — | 位置消融探索结果，不作为正式选型依据 |
-| 仅主表 CatBoost | — | 458.3400 | — | — | 非线性模型明显优于 Ridge |
-| 仅主表 LightGBM | — | 455.5022 | — | — | 主表模型对照 |
-| 房屋扩展特征，原参数双模型等权融合 | 461.8684 | 452.1702 | — | — | 阶段 5 锁定方案 |
-| 首轮调参后的双模型等权融合 | 460.4831 | 450.4735 | 462.3438 | 492.2118 | 首轮优化有效 |
-| CatBoost 上限提高至 1600，双模型等权融合 | 460.1692 | 449.3854 | — | — | 保留；2400 上限没有额外收益 |
-| 原趋势分解融合 | 459.1748 | 448.3346 | 460.0744 | 491.7916 | 当前正式对照及公榜最佳方案 |
-| 按城镇与房型进行历史折外偏差修正 | 459.0770 | 448.3390 | 459.9859 | — | 改善极小，未替换正式方案 |
-| 25% 单位面积目标、历史分布与空间近邻模型融合 | 458.8237 | 448.8767 | 459.5564 | — | 未达预设提升门槛，保留对照 |
-| 单位面积目标 XGBoost，深度 6，单模型 | 471.3936 | 460.0835 | 473.5076 | 508.5778 | 不优于现有融合 |
-| 25% 上述 XGBoost 与原方案融合 | 459.0714 | 448.9124 | 459.8574 | 489.9699 | 跨窗口收益不稳定，未替换 |
-| 仅替换原融合中的 CatBoost 为原始／清洗双视角模型 | 458.9820 | 448.8126 | — | 491.6949 | 没有稳定改善 |
-| 25% 历史转售特征模型融合 | 459.9034 | 448.7620 | — | 491.4728 | 公开数据可匹配，但未带来稳定增益 |
-| 25% 分层空间与时间模型融合 | 458.9495 | 448.0982 | — | 489.8158 | 经授权提交；公榜未刷新最佳成绩 |
-| 25% 分层模型与残差 LightGBM 融合 | 459.0581 | 447.8825 | — | 489.8082 | 主验证略低，但未达较早季度替换门槛，未提交 |
-
-近期训练窗口、时间衰减权重、历史租金统计、区域趋势、房型专属模型及 COE／股票特征也已试验，
-没有形成稳定的正式替换方案。全部已完成配方的逐项指标、MAE、平均偏差和选择记录保存在下列目录，
-不只保留表现最好的结果：
-
-- 位置消融：[24 组结果](reports/experiments/location_ablation_v1/ablation_results.csv)；阶段 5：[46 条结果](reports/experiments/stage5_v1/results.csv)。
-- 树模型调参：[结果](reports/experiments/tree_tuning_v1/results.csv)、[长跨度对比](reports/experiments/tree_tuning_v1/comparison.csv)。
-- 轮数／近期窗口／历史租金／趋势融合：[55 条结果](reports/experiments/rmse_improvement_v1/results.csv)。
-- 分组修正／专属模型／宏观特征：[58 条结果](reports/experiments/segment_v1/results.csv)。
-- 单位面积与空间近邻：[48 条结果](reports/experiments/neighborhood_v1/results.csv)；XGBoost 原生类别：[53 条结果](reports/experiments/xgboost_native_v1/results.csv)。
-- 数据处理复查／公开转售／分层模型：[61 条结果](reports/experiments/data_rethink_v3/results.json)。三个起点的 16 个月回测使用单独的 LightGBM 对照，见后文长跨度表，不与上表混算。
-
-数据重检前两轮与早期 XGBoost 混合编码试验未完整完成，仅保留 `attempt_status.json` 说明中断原因。
-不将其部分输出视为完整评估，也不据此评价尚未跑完的独热编码方法。
-
-### Kaggle 提交与最佳成绩
-
-2026-10-19 按要求新增一次提交，使用“75% 原趋势融合＋25% 分层空间与时间模型”。
-它是本轮数据重检中较早季度 RMSE 最低的新候选，但改善未达正式替换门槛，
-本次属于明确授权的单次公榜检验，没有根据公榜反复调权重。
-
-| 提交版本 | 主时间验证 RMSE | Kaggle 公榜 RMSE | 当前状态 |
-| --- | ---: | ---: | --- |
-| 早期 Ridge | 约 562.59 | 633.16539 | 历史基线 |
-| 原趋势融合 | 448.3346 | 437.44368 | 10-19 至 10-29 的 PB，原文件保留 |
-| 新增 25% 分层模型融合 | 448.0982 | 437.45640 | 成功提交，但比 PB 高 0.01272 |
-| 75% 四变体目标编码模型 + 25% 原趋势融合 | 443.65 | 435.26895 | 模型改进（10-29） |
-| 上一行 × (1.017 + 0.002 × 距中心月份数) | — | **431.07006** | **当前 PB**，水平系数由公榜探测得到 |
-
-本地与公榜样本、时间构成不同，不能将两列分数直接相减衡量提升。
-新版本使用全部 150,000 行训练，50,000 行预测的编号、行序与原始测试集一致，
-已核对缺失、非有限值、模型重载和旧提交校验值。没有改动 Kaggle 的最终提交选择，保持自动选优。
-提交凭据见 `reports/submissions/hierarchy25_20261019/submission_manifest.json`，
-PB 记录见 `reports/submissions/personal_best.json`，[提交结果截图](reports/submissions/hierarchy25_20261019/kaggle_result.jpg)显示两次实际分数。
-
-### 尝试了什么，解决了什么
-
-| 方向 | 遇到的问题 | 处理与得到的结论 |
-| --- | --- | --- |
-| 主表与辅助数据清洗 | 格式不统一、缺失或无效数值、相似记录是否应删除不明确 | 统一文本、日期和数值，保留原始数据及行序；不将同楼栋同户型误当作同一套房而去重。逐行验证未发现清洗导致标签错位或数值改变 |
-| 地址与地理特征 | 地址写法不一致，合并可能增加行数，静态设施存在历史可用性问题 | 校验多对一合并；提供的 HDB 地址和坐标覆盖率达 100%。构造楼栋、区域、MRT、学校、商场特征，并通过消融决定是否保留，而非全部加入模型 |
-| 非线性回归与调参 | Ridge 难以表达房型、区位、面积的交互，单纯增加训练轮数可能过拟合 | 比较 CatBoost、LightGBM 与融合，主验证从约 562.67 降至 452.17，再经调参与趋势分解降至 448.33。2400 轮上限未比 1600 带来额外收益 |
-| 时间验证与市场趋势 | 随机切分难以反映未来预测，树模型对未见月份外推有限 | 按月切分，训练内部选择轮数；加入衰减趋势模型，检查 6/12 个月及三个起点的 16 个月预测。解决了评估跨度过短的问题，但没有消除未来市场不确定性 |
-| 分组分析与针对性修正 | 总 RMSE 无法说明误差来自哪个群体，可能存在地区或房型偏差 | 分析城镇、房型、月份和尾部贡献；试验历史 OOF 偏差修正、区域趋势与房型专属模型。发现大量误差仍在组内，按组统一加减租金没有稳定改善 |
-| 历史分布、空间近邻与单位面积租金 | 同一区域价格差异大，历史同楼栋样本稀疏，目标变换可能改变损失含义 | 仅使用过去月份构造分位数、离散度及近邻楼栋统计；单位面积目标采用面积平方权重保持原币值平方误差方向。最佳混合主验证为 448.88，未优于原方案 |
-| COE、股票及额外公开数据 | 宏观量与租金未必有独立预测信息，外部地址缩写导致漏匹配，最新快照可能含未来变化 | 对比宏观信息可用性；统一官方缩写与城镇名称；历史转售特征采用两个月滞后及冻结快照。楼栋构成地址匹配率达 99.866%，但旧版本未核实，暂不入模。转售模型混合主验证为 448.76，未改善 |
-| XGBoost 与编码 | 更深模型未必改善泛化，未知类别与稀疏数值零的处理影响正确性，完整独热编码计算昂贵 | 完成 7 个原生类别配方及固定比例融合，最好新混合主验证为 448.91；独热编码的一项拟合因耗时中断，另一项未运行，不把未完成方案记为已评估 |
-| 原始格式与分层模型复查 | 怀疑清洗丢失信号，怀疑单一树模型没有充分表达空间层级和时间变化 | 保留原始街道与户型另做对照，未带来稳定收益；分层模型在早期长跨度窗口改善，但最后起点变差。本次公榜也未刷新 PB |
-| 实验实现与交付 | 中断后混用缓存、残差整数类型错误、提交行序和文件覆盖风险 | 用输入与源码校验值隔离实验，修复浮点残差转换并新增回归测试；模型重载复核、逐月指标核对、独立新文件及提交凭据，使结果可追溯 |
-
-### 为什么 RMSE 暂时难以继续下降
-
-目前证据支持“现有信息和已试验方法下出现性能平台”，**不支持“448 或 437 是不可突破的数学下限”**。
-
-1. **同一组可观测条件仍对应不同租金。** 2025 年第一季度有 996 组完全相同的规范化输入对应不同租金。
-   同一楼栋与户型的面积、房屋模型、起租年份又都是固定值，不能区分具体住宅。
-   单元号、实际楼层、装修和租约条件等缺失信息可能解释部分差异，但尚不能确认各自贡献，不能把全部残差归为噪声。
-2. **少量低价租赁贡献大量平方误差，却尚不能提前识别。** 实际租金不超过 2000 的记录占 5.52%，贡献 35.20% 的主验证 SSE。
-   识别“将被高估超过 1000”的固定诊断器在三个窗口的 AUC 仅为 0.491–0.529，未形成稳定路由规则。
-   这不证明所有模型都无法识别，也不能根据已知真实租金给测试样本事后降价或删去难例。
-3. **换模型后仍在犯相似的错误。** 主验证的 CatBoost 与 LightGBM 残差相关系数为 0.9707，原融合与最佳单位面积 XGBoost 为 0.9730。
-   因而新增相似树模型的平均组合只能抵消少量差异，不能补足模型共同缺少的信息。更低训练误差也没有稳定转化为更低时间验证误差。
-4. **长期预测存在额外的市场外推风险。** 测试集大部分样本在训练末月之后 1–16 个月，而短验证只有三个月。
-   分层与残差模型在前两个长跨度起点的加权 RMSE 从单个 LightGBM 的 604.38 降至 577.41，最后起点却从 496.00 升至 500.16。
-   这说明过去某段趋势的改善不保证适用于另一市场阶段；历史宏观及转售特征也没有稳定提供足够增益。
-5. **达到 200 需要消除大部分剩余误差，不是再调整一点参数。** 从本地 448.33 降至 200，需要减少约 80.10% 的现有 SSE。
-   即使事后将最差 5% 样本的误差全部归零，保留全部样本计算的 RMSE 仍约 338.03。
-   这是诊断量级，不是可实现的方案，也不是证明 200 不可达。
-
-因此，后续若继续优化，应优先寻找能区分同组住宅和合同条件的新信息，并检验其跨时间可用性，
-而不是依靠删除低价样本、反复查看公榜或只增加树深度。尚未证明 200 不可达到，也没有证据解释其他队伍为何能达到该分数。
-
-依据：[大误差诊断](reports/experiments/error_diagnosis_v1/error_diagnosis.md)、
-[高估样本识别诊断](reports/experiments/overprediction_probe_v1/probe_report.md)、
-[数据重检与长跨度实验](reports/experiments/data_rethink_v3/results.json)，以及
-[残差相关性与误差缩减量级复核](reports/submissions/hierarchy25_20261019/plateau_evidence.json)。
-
-## 第 4、5 阶段交付索引
-
-本次交付包括地址与位置特征、固定 Ridge 消融实验、阶段 5 模型/辅助特征比较，
-以及后续 CatBoost / LightGBM 参数调优。保留各轮独立目录，不用新分数覆盖历史结果。
-
-| 内容 | 代码入口 | 关键结果 |
-| --- | --- | --- |
-| 第 4 阶段：地址匹配与位置特征 | [build_location_features.py](src/features/build_location_features.py) | [覆盖率与限制](reports/location_features/location_features_report.md)、[配置与输入指纹](reports/location_features/location_features_manifest.json) |
-| 位置特征 Ridge 消融 | [run_location_ablation.py](src/models/run_location_ablation.py) | [报告](reports/experiments/location_ablation_v1/location_ablation_report.md)、[24 组结果](reports/experiments/location_ablation_v1/ablation_results.csv) |
-| 第 5 阶段：非线性模型、特征扩展 | [build_stage5_features.py](src/features/build_stage5_features.py)、[run_stage5.py](src/models/run_stage5.py) | [报告与图表](reports/experiments/stage5_v1/stage5_report.md)、[46 条结果](reports/experiments/stage5_v1/results.csv) |
-| CatBoost / LightGBM 调优 | [run_tree_tuning.py](src/models/run_tree_tuning.py) | [调优报告](reports/experiments/tree_tuning_v1/tuning_report.md)、[前后对比](reports/experiments/tree_tuning_v1/comparison.csv) |
-| 后续顺序优化：轮数、近期数据、历史租金、趋势融合 | [run_rmse_improvement.py](src/models/run_rmse_improvement.py)、[独立核验](src/models/inspect_rmse_improvement.py) | [顺序实验报告](reports/experiments/rmse_improvement_v1/improvement_report.md)、[汇总结果](reports/experiments/rmse_improvement_v1/results.csv) |
-| 输出核验与测试 | [inspect_stage5.py](src/models/inspect_stage5.py)、[inspect_tree_tuning.py](src/models/inspect_tree_tuning.py)、[tests](tests) | [阶段 5 核验](reports/experiments/stage5_v1/output_validation.json)、[调优核验](reports/experiments/tree_tuning_v1/output_validation.json) |
-
-关键结论（主时间验证为 2025-01 至 2025-03，RMSE 单位为 SGD/月）：
-
-- 训练与测试地址匹配率及有效坐标覆盖率均为 100%；这不代表辅助信息满足历史可用性。
-- 位置特征对固定 Ridge 的改善较小；含 MRT 的最低 RMSE 为 562.0281，因使用静态开放状态，仅作探索性结果。
-- 阶段 5 通过较早季度选择的 housing 50/50 融合 RMSE 为 452.1702；不按主验证最低分事后换选。
-- 本轮调优后，较早季度选定的新 50/50 融合 RMSE 为 **450.4735**；相对原融合改善约 0.38%，MAE 基本不变。
-- 后续顺序实验选定的趋势融合 RMSE 为 **448.3346**，较 450.4735 改善约 0.47%；MAE 从 331.1260 降至 326.4557。
-- 2025 年第一季度已在多个阶段被查看，不是完全未触碰的最终测试；尚未证明对测试集远期月份同样有效。
-
-**仓库保留的内容：**源代码、87 项合成数据测试、依赖版本、Markdown 报告、汇总 CSV、
-配置／选择记录、核验摘要、报告图表、中期幻灯片最终版，以及 Kaggle 提交凭据与公榜截图。`.gitignore` 只逐项放行经过检查的
-汇总 CSV，仍排除训练/测试/辅助数据、加工后的数据、逐行真实租金与预测、月度宏观特征表、
-训练模型、提交文件和本地构建依赖。仅克隆仓库无法直接重算历史核验：逐行预测与模型必须先在本地重建。
-
-### 从私有数据复现
-
-建议使用 Python 3.12 独立环境，安装 `requirements-stage5.txt`；图表依赖 matplotlib。
-私有数据目录应包含 `train.csv`、`test.csv` 与 `auxiliary/`，不要提交到 Git。
-以下命令在仓库根目录运行，输入路径替换为自己的数据位置：
-
-```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-stage5.txt
-.\.venv\Scripts\python.exe src/data/clean_data.py --input-dir "D:\path\to\competition-data"
-.\.venv\Scripts\python.exe src/features/build_location_features.py
-.\.venv\Scripts\python.exe src/models/run_location_ablation.py
-.\.venv\Scripts\python.exe src/models/run_stage5.py
-.\.venv\Scripts\python.exe src/models/inspect_stage5.py
-.\.venv\Scripts\python.exe src/models/run_tree_tuning.py --output-dir reports/experiments/tree_tuning_local
-.\.venv\Scripts\python.exe src/models/inspect_tree_tuning.py --output-dir reports/experiments/tree_tuning_local
-.\.venv\Scripts\python.exe -m unittest discover -s tests -v
-```
-
-调优依赖 `stage5_v1` 的逐行基准预测，必须先运行阶段 5，不能只下载汇总结果跳过训练。
-前面的默认命令会在工作区重新生成阶段 4/5 报告及对应配置；Git 保留已提交的历史版本。
-调优使用新的 `tree_tuning_local` 目录，避免与本次发布的历史调优目录混用。
-输入、版本、源码字节或配置不一致时，历史指纹不应被强行改写为“核验通过”；应重新运行对应实验。
-`.gitattributes` 固定被核验源码及结果的换行策略，以降低跨平台检出造成的无意义指纹差异。
-
-## 项目阶段
-
-### 1. 数据审计与清洗
-
-- 检查 `train.csv` 与 `test.csv` 的数据类型、缺失值、重复记录、异常值及分布差异。
-- 统一城镇、楼号、街道、房型、房屋模型和装修状态等文本字段。
-- 解析租赁批准日期、规范数值字段，并构造房龄等基础特征；检查费用字段是否存在足够变异，仅在有信息量时构造费用标记。
-- 清洗所有辅助数据：
-  - HDB 楼栋地址、坐标及无效竣工年份；
-  - MRT 站点坐标与开放状态；
-  - 学校与商场坐标；
-  - COE 货币字段与月度轮次；
-  - 股票价格的日期与数值字段；月度聚合指标留待阶段 5 按验证结果构造。
-- 保持 `data/raw/` 不变，并使每一步清洗都能由脚本重复执行。
-
-### 2. 探索性数据分析与基线模型
-
-- 分析租金分布、时间趋势、城镇和房型差异、建筑面积及房龄。
-- 以时间切分作为主要验证方案；随机切分仅作辅助参考。
-- 先建立简单基线，再用主表特征训练 CatBoost 或 LightGBM 等监督回归基线模型。
-- 记录验证 RMSE、模型配置和特征集合，并生成格式正确的测试集预测文件。
-
-当前阶段可运行：
-
-```bash
-python src/eda/run_eda.py
-python src/models/train_baseline.py
-```
-
-EDA 输出在 `reports/figures/` 和 `reports/tables/`；baseline 的 RMSE 与配置在
-`reports/experiments/`，测试集预测在 `submissions/`。提交文件使用竞赛要求的
-`Id,Predicted` 两列，其中 `Id` 按 `test.csv` 原始行顺序从 0 编号。首要验证集是训练数据的最后
-3 个批准月份，随机 80/20 切分只作为辅助参考。`train_baseline.py` 在安装
-CatBoost 时优先使用 CatBoost；若当前环境没有 CatBoost，则自动运行可复现的
-one-hot Ridge fallback，并在结果中标明实际模型。
-
-### 3. 中期进展汇报幻灯片
-
-- 说明问题定义、数据概况和数据清洗决策。
-- 展示关键探索性分析结论、验证设计和基线 RMSE。
-- 介绍辅助数据及规划中的位置特征方案。
-- 说明当前局限、数据泄漏风险和下一步计划。
-
-### 4. 地址匹配与位置特征
-
-- 用 `TOWN + BLOCK + STREET` 与 HDB 楼栋数据匹配，并报告匹配覆盖率。
-- 加入坐标、规划区、区域、竣工年份和地址匹配状态。
-- 构造到已开放 MRT 站、学校和商场的距离与密度特征。
-- 可选：测试地理聚类，并将聚类结果作为额外回归特征。
-
-已实现 `src/features/build_location_features.py`。先将竞赛数据放回 `data/raw/`
-并运行清洗，再生成第一版位置特征（需要 NumPy、pandas，与已有 EDA 一致）：
-
-```bash
-python src/data/clean_data.py
-python src/features/build_location_features.py
-```
-
-输入为 `data/interim/train_clean.csv`、`test_clean.csv`，以及 `auxiliary/` 下清洗后的
-HDB、MRT、学校、商场表。输出包括：
-
-- `data/processed/train_location_features.csv` 和 `test_location_features.csv`：保留原行序、
-  重复观测和所有原始主表字段，追加位置特征，不修改原始数据。
-- `data/processed/train_unmatched_addresses.csv` 和 `test_unmatched_addresses.csv`：未匹配地址，
-  便于检查，仍按私有数据排除在 Git 之外。
-- `reports/location_features/location_features_report.md`：本次训练/测试行级匹配率、
-  按城镇覆盖情况、有效坐标数量及数据限制。
-- `reports/location_features/location_features_manifest.json`：新增特征列表、输入 SHA-256、
-  半径设置及辅助数据去重/无效坐标统计。
-
-新增特征包括 `LATITUDE`、`LONGITUDE`、`SUBZONE`、`PLANNING_AREA`、`REGION`、
-`YEAR_COMPLETED`、`MAX_FLOOR`、`POSTAL_CODE`、`ADDRESS_MATCHED`、
-`LOCATION_COORDINATES_VALID`，以及 `BUILDING_AGE` 和相关缺失标记。
-`BUILDING_AGE` 从竣工年计算，与从租约起始年计算的 `FLAT_AGE` 不同。
-距离特征为 `NEAREST_OPEN_MRT_DISTANCE_KM`、`NEAREST_SCHOOL_DISTANCE_KM`、
-`NEAREST_MALL_DISTANCE_KM`；密度代理为各类设施在 **500m / 1000m** 内的数量，
-例如 `OPEN_MRT_COUNT_WITHIN_1000M`。距离使用 Haversine 大圆距离，单位 km，
-不是步行路程。MRT 同坐标的多个线路代码仅计一个位置。
-
-默认 `--mrt-mode snapshot` 只使用当前 `STATUS=open` 的站点。这排除了规划站点，
-但**不能保证消除历史时间泄漏**：当前已开放的站点在 2021 年可能还未开放。
-正式时间验证建议准备以站点代码为键的 `CODE,OPENING_DATE` CSV（ISO 日期，例如
-`2020-01-31`），然后运行：
-
-```bash
-python src/features/build_location_features.py --mrt-mode historical --mrt-opening-dates path/to/mrt_opening_dates.csv
-```
-
-也支持在清洗后的 MRT 输入表直接附带 `OPENING_DATE`。historical 模式要求所有 open
-站点都有有效开放日期，仅使用在**租赁批准月份第一天**已开放的站点，同月中途开放的站点
-从下月起计入。学校、商场和 HDB 区域属性仍来自静态快照，报告会明确这一限制。
-地址不匹配或坐标无效时，保留该行并将距离与计数置空，不以 0 冒充已知距离。
-HDB 重复地址键会报错，避免合并导致行数膨胀。尚未实现可选地理聚类。
-
-可通过 `--interim-dir`、`--output-dir`、`--report-dir` 指定其他目录，
-通过 `--radii-m 500 1000 2000` 调整半径。没有输入 CSV 时脚本会明确列出缺失文件，
-不会生成虚构的覆盖率或 RMSE。测试使用小型合成数据：
-
-```bash
-python -m unittest discover -s tests -v
-```
-
-**建模衔接：**原 `train_baseline.py` 仍只读取 `data/interim/` 的主表字段，
-重跑它不会自动使用这些位置特征。已完成的消融实验与阶段 5 读取本阶段的 processed 文件，
-显式选择新增特征，仅在训练折拟合填补器与编码器，并使用相同时间窗口比较。
-固定 Ridge 的位置消融主验证 RMSE 从同环境基线 562.6666 降至 562.0281，改善约 0.11%；
-含 MRT 的方案仍按静态快照探索结果记录，详见位置消融报告。
-
-### 5. 特征扩展与模型优化
-
-- 加入时间、房龄、费用、地址层级和位置衍生特征。
-- 评估月度 COE 特征及经筛选聚合后的市场指标。
-- 在同一验证集上比较 CatBoost、LightGBM/XGBoost 和可选的模型集成。
-- 通过特征重要性与分组误差分析指导优化。
-
-已实现位置特征的 Ridge 消融实验脚本，固定原基线参数，比较以下六组特征：
-主表、主表加 HDB 属性、加 MRT、加 MRT 和学校、加全部设施、加学校与商场但不加 MRT。
-`ADDRESS_KEY` 和 `POSTAL_CODE` 不作为新增输入。运行：
-
-```bash
-python src/models/run_location_ablation.py --reference-rmse 562.5887838225482
-```
-
-默认使用最新 3 个月作为主验证集，额外回测之前两个互不重叠的 3 个月窗口，并报告
-随机 80/20 切分作为辅助。每个时间窗口均只使用其之前的记录训练，填补器、标准化器和
-One-hot 编码器也仅在各训练折拟合。共运行 6 组特征乘以 4 个划分的 24 组实验。
-可用 `--backtest-windows`、`--skip-random` 和 `--variants` 控制范围，但必须保留 `main_only`。
-
-结果位于 `reports/experiments/location_ablation_v1/`，包括：
-
-- `location_ablation_report.md`：各组 RMSE、同环境基线改善、回测与时间可用性限制。
-- `ablation_results.csv`：RMSE、MAE、预测偏差、运行耗时及各划分的日期与行数。
-- `experiment_manifest.json`：特征集合、配置、依赖版本、输入文件 SHA-256。
-- `group_errors.csv`：主表及主要候选按城镇、房型、月份和区域的误差。
-- `primary_validation_predictions.csv`：主验证逐行预测，包含原训练行号与真实租金，属于
-  私有 CSV，受 `.gitignore` 保护。
-
-脚本不覆盖原 baseline 配置或生成竞赛提交。先前 RMSE 仅作历史参考，改善以本次同环境
-复跑为准。MRT snapshot 方案分数仅作探索性比较，不能据此宣称排除了历史时间泄漏；
-报告另列不含 MRT 的最低分候选。
-
-第 5 阶段完整实验入口为 `src/models/run_stage5.py`，依赖固定在
-`requirements-stage5.txt`（本次运行使用 Python 3.12 的项目独立环境）。Windows 运行：
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-stage5.txt
-.\.venv\Scripts\python.exe src/models/run_stage5.py
-```
-
-该实验包含：
-
-- 原始 Ridge 和限制时间外推的样条 Ridge，用于检查线性时间趋势是否导致整体高估。
-- CatBoost 与 LightGBM 比较主表、房屋/地址/HDB 属性及学校/商场，宏观扩展与
-  单独标注的 MRT 快照方案由 LightGBM 完整筛选，以控制训练成本。
-  房屋扩展包括对数面积、月份周期、每房间面积、固定房龄分组和
-  `TOWN + BLOCK + STREET` 组合地址。FEE/FURNISHED 无变异，不增加无信息标记。
-- 月度 COE 各轮溢价均值与投标/配额比，及股票等权月收益率、平均日波动率、上涨证券占比
-  和证券覆盖数。股票使用未复权 CLOSE，不用未来价格填补缺失。
-- 宏观特征滞后 **2 个月**。预测完整验证窗口时冻结于训练截止时可用的源月份，
-  不能直接使用辅助表中已经包含的未来月份数值。由于缺乏真实发布时间，此规则仍是可用性假设。
-- 每个外层训练集内部保留最后 3 个月进行早停轮数选择，再重训完整外层训练数据。
-  CatBoost/LightGBM 等权融合固定为 50/50，不在主验证集调权重。
-- 仅用 2024 年第三、四季度两个较早验证窗口的合并 RMSE 选择候选，在计算 2025 年第一季度
-  主验证分数前写入 `selection_locked.json`。MRT 快照方案不参与推荐选择，随机切分仅为辅助。
-
-输出位于 `reports/experiments/stage5_v1/`：`stage5_report.md`、`results.csv`、
-`experiment_manifest.json`、`selection_backtests.csv`、逐窗口预测、分组误差及特征重要性。
-特征重要性包括树模型训练重要性和主验证固定样本的成组置换重要性，不把重要性解释为因果效应。
-`models/stage5/` 保存主验证截止时训练的候选诊断模型和输入 schema，受 Git 忽略规则保护，
-不是阶段 6 的全量训练最终模型。本脚本不生成或上传竞赛提交。
-
-可通过 `--tree-iterations` 限制早停搜索上限，`--threads` 限制 CPU 并行度，
-`--workers` 控制同时训练的独立候选数（默认 3，每个候选 4 个线程），
-`--schemes` 缩小特征比较范围，或 `--output-dir` 将不同实验配置分开保存。
-已完成拟合缓存于 `models/stage5_cache/`，按数据、配置、依赖版本和训练/特征实现文件的 SHA-256
-生成键，中断后同配置重跑可恢复，修改实现不会误用旧缓存。
-实验完成后独立核对导出的预测/误差，并生成模型对比、特征组重要性与月度偏差图片：
-
-```powershell
-.\.venv\Scripts\python.exe src/models/inspect_stage5.py
-```
-
-#### CatBoost / LightGBM 参数调优
-
-保持阶段 5 的 housing 特征不变，执行有界时间验证搜索：
-
-```powershell
-.\.venv\Scripts\python.exe src/models/run_tree_tuning.py
-.\.venv\Scripts\python.exe src/models/inspect_tree_tuning.py
-```
-
-先在 2024 年第二季度筛选 8 组配置，包括原参数对照、CatBoost 更高轮数/深度，
-以及 LightGBM 不同叶子数、学习率、叶子最小样本数与正则强度。
-每种算法选出一个新配置，在第三、四季度复核，并与原算法、预设的 25/50/75%
-融合权重共同比较；按两个较早窗口合并 RMSE 锁定选择后，才评估 2025 年第一季度。
-每次外层训练仍使用内部最后三个月选择早停轮数，不用外层验证标签早停。
-旧的 50/50 融合始终可以被保留；调参不保证改善，也不据主验证结果事后换选。
-
-结果单独保存在 `reports/experiments/tree_tuning_v1/`，包含筛选表、逐窗口预测、
-锁定选择、前后比较、分组误差和 `tuning_report.md`，不覆盖阶段 5。
-原模型预测仅在输入数据与实现校验一致、验证行序及标签完全对齐时复用。
-诊断模型缓存于 `models/tree_tuning_cache/`，同配置中断后重跑可以恢复；
-更改配置或实现时使用新的 `--output-dir`，避免覆盖已有实验。
-默认同时运行 3 个候选、每个 4 线程，可通过 `--workers` 和 `--threads` 降低资源占用。
-核查脚本独立重算误差、核对选择规则，并验证保存模型重新加载后的逐行预测一致。
-本轮不读取测试数据、不训练全量最终模型、不生成或上传竞赛提交。
-
-本轮实际主时间验证（2025-01 至 2025-03）结果：CatBoost 从 457.2788 降至
-455.2215，LightGBM 从 455.1987 降至 453.0133；较早窗口预先选出的新 50/50
-融合从原来的 452.1702 降至 **450.4735**，改善约 0.38%。融合 MAE 基本不变
-（331.1601 → 331.1260），不能将这一结果解释为所有误差指标均明显改善。
-新 CatBoost 主验证训练使用 depth=8、learning_rate=0.05、l2_leaf_reg=10、800 轮，
-仍达到本次上限；新 LightGBM 使用 num_leaves=15、min_child_samples=80、
-reg_lambda=10、learning_rate=0.04，内部早停选择 481 轮。
-44 项单元测试通过；独立核查 38 条外层结果及 326,504 个导出预测值，
-两个模型重新加载后的主验证逐行预测一致。完整结果与限制见
-`reports/experiments/tree_tuning_v1/tuning_report.md`。
-
-#### 后续降低 RMSE 的顺序实验
-
-实际主时间验证结果如下，均为同环境运行，并按较早季度锁定方案后计算：
-
-| 方案 | 较早季度合并 RMSE | 2025 年第一季度 RMSE | 主验证 MAE |
-| --- | ---: | ---: | ---: |
-| 原 800 轮上限融合对照 | 460.4831 | 450.4735 | 331.1260 |
-| 提高到 1600 轮上限的等权融合 | 460.1692 | 449.3854 | 330.0369 |
-| 加入 25% 趋势分解模型的锁定融合 | **459.1748** | **448.3346** | **326.4557** |
-
-2400 轮上限在较早季度与 1600 轮选中了相同的实际轮数，没有额外收益。
-近期窗口/权重未稳定改善；历史统计通过 LightGBM 初筛，但 CatBoost 融合确认后未改善，均未纳入。
-锁定组合为 CatBoost 37.5%、直接预测租金的 LightGBM 37.5%、趋势分解 LightGBM 25%。
-趋势模型使用过去 24 个月的月度均值拟合斜率，向未来以 6 个月时间常数衰减增长速度，
-静态房屋模型负责预测与月度整体水平之间的差异。主验证平均偏差由 -37.3837 变为 -20.7300。
-
-| 长跨度诊断窗口 | 原融合 RMSE | 新融合 RMSE |
+| Submission | Main local validation RMSE (Jan–Mar 2025) | Kaggle public RMSE |
 | --- | ---: | ---: |
-| 2024-07 至 2024-12，训练截至 2024-06 | 462.3438 | 460.0744 |
-| 2024-01 至 2024-12，训练截至 2023-12 | 492.2118 | 491.7916 |
+| Ridge baseline (main table only) | 562.67 | 633.17 |
+| Tuned CatBoost + LightGBM trend blend | 448.33 | 437.44 |
+| Final model: target-encoding LightGBM, 75/25 blend with the trend blend | **443.65** | 435.27 |
+| Final model + market-level calibration (**final submission**) | — | **431.07** |
 
-12 个月窗口的 RMSE 改善很小，平均偏差由 -45.3456 变为 +39.6462，
-表明趋势修正也可能带来远期高估；不能仅凭主验证的改善保证测试集表现。
-本轮 55 条汇总结果、模型选择记录和逐行预测由独立脚本核验，主验证保存模型重新加载后的预测一致。
-含新增的时间防泄漏与模型检查在内，共 53 项合成数据测试通过。
+The final submission is `submission_te_avg4_blend75_trendprobe_20261029.csv`. Its checksum and every
+leaderboard probe are recorded in
+[reports/submissions/te_trend_20261030/submission_manifest.json](reports/submissions/te_trend_20261030/submission_manifest.json).
 
-新增入口 `src/models/run_rmse_improvement.py`，将新实验保存在
-`reports/experiments/rmse_improvement_v1/`。按以下顺序执行：
+Local and public scores use different rows and months, so they are not directly comparable.
 
-1. 对比 CatBoost 的 800、1600、2400 轮上限，并与调优后的 LightGBM 等权融合。
-2. 测试最近 24/36 个月训练窗口，以及 12/24 个月半衰期的近期样本权重。
-3. 加入过去 6/12 个月的城镇、街道、楼栋与房型组合租金均值及样本量；均值向同期历史全局均值收缩。
-4. 测试静态房屋残差模型与月度租金水平分解，以及固定比例的趋势模型融合。
+## Approach
 
-每阶段根据 2024 年第三、四季度的合并 RMSE 选择，旧方案始终保留为候选。
-近期方案与历史统计先由 LightGBM 筛选，再用 CatBoost 确认一个新方案，属于有界顺序调优。
-所有选择锁定后才计算 2025 年第一季度分数及 6/12 个月跨度的诊断结果；
-这些长窗口与较早调优时段重叠，不能称为完全独立的最终测试。
+1. **Cleaning** ([src/data/clean_data.py](src/data/clean_data.py)): normalises text, flat types, dates
+   and numbers without dropping rows. Identical inputs with different rents are kept because they are
+   not necessarily the same flat.
+2. **Location features** ([src/features/build_location_features.py](src/features/build_location_features.py)):
+   exact `TOWN + BLOCK + STREET` matching to the HDB block table (100% coverage), coordinates, planning
+   area, building age, and Haversine distances and counts for MRT stations, schools and malls.
+3. **Housing and time features** ([src/features/build_stage5_features.py](src/features/build_stage5_features.py),
+   [src/features/build_temporal_features.py](src/features/build_temporal_features.py)).
+4. **Trend blend** ([src/models/run_rmse_improvement.py](src/models/run_rmse_improvement.py)): tuned
+   CatBoost and LightGBM plus a LightGBM model on rent with the monthly market level removed. This was
+   the previous best model and is 25% of the final blend.
+5. **Out-of-fold target encoding** ([src/models/run_te_experiments.py](src/models/run_te_experiments.py)):
+   - Rent is divided by a mix-adjusted monthly market level.
+   - Five-fold out-of-fold smoothed means are computed for block × flat type,
+     block × flat type × floor area, block, street × flat type, subzone × flat type and
+     town × flat type × flat model. Query rows are encoded from the whole training window and never
+     see their own labels.
+   - Two public data.gov.sg tables are added: block-level resale price per square metre, using only
+     transactions at least two months before the cut-off, and HDB block composition (unit mix,
+     rental-unit share, facilities).
+   - LightGBM predicts the level-adjusted rent. Future months use the last three months' level.
+   - Four feature variants, each averaged over five seeds, are averaged together and blended 75/25
+     with the trend blend. The weight is chosen on the 2024 Q3/Q4 backtests.
+6. **Market-level calibration** ([src/models/export_te_submission.py](src/models/export_te_submission.py)):
+   - The public MSE is an exact quadratic function of a global prediction scale, so four
+     leaderboard probes identify the best level and monthly trend: about +1.7% overall and +0.18% per
+     month.
+   - These two parameters are the only quantities fitted to the public leaderboard. Every model and
+     blending choice uses local temporal validation.
 
-历史租金特征对训练行排除整个当月及未来月份；验证窗口内冻结在训练截止时，
-不使用验证真实租金滚动更新。趋势分解的月度均值可能受房型、区位构成变化影响，
-因此只是待验证方案，不当作独立市场指数。
+The HDB "Renting Out of Flats" dataset on data.gov.sg was deliberately **not** used, because it
+contains the test-period rents themselves.
 
-在仓库根目录使用项目独立环境运行：
+### Validation
 
-```bash
-.venv/bin/python src/features/build_location_features.py --report-dir reports/location_features_local
-.venv/bin/python src/models/run_rmse_improvement.py --threads 3
-.venv/bin/python src/models/inspect_rmse_improvement.py
-.venv/bin/python -m unittest discover -s tests -v
-```
+The test period (March 2025 – July 2026) lies after the training period (January 2021 – March 2025),
+so all model selection uses forward temporal splits:
 
-输入为 `data/processed/train_location_features.csv`；原始数据和历史实验目录不覆盖。
-`results.csv`、各 `selection_*.csv`、`stage_decisions.json` 与 `selection_locked.json`
-保存分数与选择过程；`improvement_report.md` 汇总结果，`output_validation.json` 保存独立核验。
-模型缓存位于 `models/rmse_improvement_cache/`，同配置中断重跑可恢复。
-逐行真实租金、预测文件和模型仅保存在本地；该实验不生成 Kaggle 提交。
+- **Selection windows**: 2024 Q3 and 2024 Q4, each trained only on earlier months; squared errors
+  are pooled.
+- **Main validation**: January–March 2025, used for reporting rather than selection.
+- **Long-horizon check**: train to 2023-12, validate on all of 2024 (12 months ahead).
+- Boosting rounds are chosen on an inner split of the last three training months.
 
-#### 分组诊断与针对性优化实验
-
-上一轮锁定的 37.5% CatBoost、37.5% LightGBM 与 25% 趋势模型已用全部训练集重训，
-于 2026-10-19 提交一次 Kaggle，公榜 RMSE **437.44368**，提交时排名 **20/35**，
-优于原有历史提交的 633.16539。本地 448.3346 与公榜属于不同样本，不能直接视为同一评估。
-提交文件及训练记录保存在本地 `submissions/` 和 `reports/submissions/rmse448_20261019/`。
-
-新增 `src/models/run_segment_experiments.py`，完成分组误差贡献排序、历史 OOF 偏差修正、
-分组残差趋势、房型专属 LightGBM 与宏观信息可用性对照。结果如下：
-
-| 方案 | 较早季度合并 RMSE | 2025 年第一季度 RMSE | 六个月窗口 RMSE |
-| --- | ---: | ---: | ---: |
-| 当前已提交模型的本地对照 | 459.1748 | 448.3346 | 460.0744 |
-| 城镇与房型收缩偏差修正 | 459.0770 | 448.3390 | 459.9859 |
-
-本次尝试未发现有实际意义的稳定改善，不自动替换已提交模型，也未进行新的 Kaggle 提交。
-分组趋势、房型专属模型，以及同期 COE/股票特征，在本次有界搜索中均未胜出。
-同期辅助信息模型属于“已知对应月份协变量”的回测，不等同于在截止日期预测未知未来宏观信息。
-
-合并 2024 年 Q3/Q4，3/4/5 房型贡献约 89.85% 的总平方误差；其中 4 房型约占 37.45%。
-城镇与房型组均值偏差仅占各季度 SSE 的 4.25%/2.80%，主要差异仍在组内。
-最差 5% 样本贡献约 41%–45% SSE，后续应检查这些误差与可观测特征的关系，不能直接删除难例或按未知测试租金分组预测。
-
-修正器使用预测窗口之前六个月的扩展时间 OOF 残差；小样本组及未见组回退原模型。
-选择仍只用较早两个季度，锁定后检查主验证及六个月窗口。这些时期已多次被查看，不能称为全新独立测试。
-59 项测试通过，独立核对 58 条分数及 96 个分组方案，并重新加载 14 个新增原生模型确认预测。
-本轮未重跑十二个月窗口，也不读取竞赛测试集。
-
-```bash
-.venv/bin/python src/models/run_segment_experiments.py --threads 3 --output-dir reports/experiments/segment_reproduction
-.venv/bin/python src/models/inspect_segment_experiments.py --output-dir reports/experiments/segment_reproduction
-.venv/bin/python -m unittest discover -s tests
-```
-
-报告与汇总结果在 `reports/experiments/segment_v1/`，主要说明见 `segment_report.md`。
-上面的复跑命令使用新目录以保留已完成结果；代码集合、输入或配置改变后，旧目录会拒绝混用，需另选输出目录。
-逐行标签、预测和模型仍仅保存在本地。下一步重点是细粒度区位/近邻特征、目标变换及大误差成因，而非仅按组加减固定租金。
-
-#### 大误差成因与可识别性诊断
-
-继续分析当前模型的 2024 年 Q3/Q4 和 2025 年 Q1 本地预测，没有重训租金模型、删除样本或提交 Kaggle。
-
-- 2025 年 Q1 实际租金 ≤2000 的样本占 5.52%，贡献 35.20% 总平方误差；高估超过 1000 的有 308 条，低估超过 1000 的有 49 条。
-- 最差 5% 样本中 98.21% 有历史可比记录；但可比条件不含单元号，且只有 35.42% 的全体验证样本有至少 5 条近期同楼栋同房型记录，不能将“出现过可比房屋”等同于“掌握同一套房的充分历史”。
-- 主验证有 996 组完全相同的规范化输入对应不同租金。事后组均值 RMSE 为 171.86，但这是有限样本上的描述性约束，不是可部署预测或新样本不可约误差估计，不能据此解释当前全部误差。
-- 原始空格房型写法只出现在 2021 年。格式之间的租金均值差异与年份混杂，不能直接认定清洗合并格式损失了有效信号。已逐行核对规范化主输入、租金标签及行序，无错位。
-
-额外训练了固定参数的二分类诊断器，仅检验能否提前识别原模型将高估超过 1000 的记录。
-诊断器使用更早六个月的 OOF 误差作训练标签，对比房屋属性，以及房屋属性＋过去租金分布＋原模型预测。
-三个窗口的 ROC-AUC 为 0.491–0.529，没有稳定识别能力；主验证历史扩展版本的最高风险 5% 告警准确率只有 2.24%，
-全体发生率为 3.45%。该诊断器没有用于修正或替换租金预测，其失败也不证明所有模型都无法利用这些特征。
-
-因此，当前证据不支持自动删除低价样本、按真实租金分组预测，或实施两阶段自动降价。
-后续应优先验证能否获得同组内部差异的可迁移信息；历史分布、空间近邻及目标变换是否改善，仍需实际时间回测，不能由本次分析保证。
-
-主报告在 `reports/experiments/error_diagnosis_v1/error_diagnosis.md`，识别测试见
-`reports/experiments/overprediction_probe_v1/probe_report.md`。
-65 项测试通过，核对 25,984 条验证记录及 36 个分组方案；六组识别分数在全新训练后复现。
-汇总诊断在项目环境与另一 pandas 版本下复算一致。包含逐行实际租金的 `tail_samples_*.csv` 仅保存在本地，不加入 Git。
-
-```bash
-.venv/bin/python src/eda/analyze_error_mechanisms.py --output-dir reports/experiments/error_diagnosis_reproduction
-.venv/bin/python src/eda/probe_large_overprediction.py --output-dir reports/experiments/overprediction_probe_reproduction
-.venv/bin/python -m unittest discover -s tests
-```
-
-#### 单位面积租金与历史空间特征补充实验
-
-在原模型不变的前提下，新增单位面积租金目标、过去 12 个月租金分布、最近 16/64 个
-同房型楼栋的租金统计，并比较更灵活的 LightGBM 和浅层 CatBoost。训练特征只用过去月份，
-验证期冻结历史快照；单位面积方案使用面积平方权重，保持与原币值平方误差一致的优化方向。
-
-7 个新配方分别以 25%、50%、100% 权重与当前模型混合，共比较 22 个方案。
-最佳挑战者为“75% 当前模型＋25% 单位面积及历史空间模型”：
-
-| 验证窗口 | 当前模型 RMSE | 最佳新挑战者 RMSE |
+| Window | Trend blend | Final 75/25 blend |
 | --- | ---: | ---: |
-| 2024 年第三、第四季度合并 | 459.1748 | 458.8237 |
-| 2025 年第一季度 | 448.3346 | 448.8767 |
-| 6 个月整体预测 | 460.0744 | 459.5564 |
+| 2024 Q3 | 474.68 | 472.54 |
+| 2024 Q4 | 442.11 | 437.75 |
+| 2025 Q1 (main) | 448.33 | 443.65 |
+| 2024 full year (12-month horizon) | 491.79 | 486.95 |
 
-历史合并改善仅 0.3511，未达到预设的至少 1.0 改善门槛，且 2025 年初变差，**不替换当前模型**。
-本轮没有生成或上传新提交，原公榜 437.44368 不变。这些历史窗口已重复查看，不能视为全新留出集。
-后续优先按测试跨度设计多起点长跨度验证，再测试地标身份和区域交互等不同区位表达；
-不将低价样本事后识别或删样当作改善方法，也不能承诺现有信息足以降至 200。
+The target-encoding model is the only change in the project that improved every window by more than
+one point.
 
-详情见[单位面积与历史空间实验报告](reports/experiments/neighborhood_v1/neighborhood_report.md)。
-72 项测试通过，独立核验 48 条结果、22 个选型方案和 18 个保存模型；原提交文件哈希不变。
+## Repository layout
 
-```bash
-.venv/bin/python src/models/run_neighborhood_experiments.py --threads 3 --output-dir reports/experiments/neighborhood_reproduction
-.venv/bin/python src/models/inspect_neighborhood_experiments.py --output-dir reports/experiments/neighborhood_reproduction
+```text
+src/
+  data/       cleaning, data audit, public HDB download
+  eda/        exploratory figures and error diagnostics
+  features/   location, housing, temporal, resale and neighbourhood features
+  models/     baselines, tree models, experiments, submission export
+tests/        unit tests on synthetic data (python -m unittest)
+reports/
+  experiments/   per-experiment summaries (results.csv, selection, reports)
+  submissions/   submission manifests, checksums and leaderboard records
+  figures/       EDA figures used in the report
+  progress_report/  mid-term slides
+requirements-*.txt   pinned dependencies
 ```
 
-#### XGBoost 补充实验
+Private competition data, processed features, row-level predictions, trained models and submission
+CSVs are excluded by `.gitignore` and must be rebuilt locally.
 
-已在项目虚拟环境安装 XGBoost 3.4.1，完成 7 种原生类别配方：树深度 4、6、8、10，
-以及单位面积租金、过去信息构造的历史空间特征、阻尼趋势分解。每个配方分别以
-25%、50%、100% 权重与当前模型混合，加上当前模型共比较 22 个方案。
-类别范围只从训练数据建立，未知类别按缺失处理；轮数仅由内部时间验证选择。
+## Setup
 
-两个历史季度选出的最佳单模型为“深度 6 的单位面积 XGBoost”，最佳新混合方案为
-“75% 当前模型＋25% 该 XGBoost”。先锁定两者，再检查后续窗口：
-
-| 本地验证范围 | 当前模型 RMSE | 最佳 XGBoost 单模型 | 最佳新混合方案 |
-| --- | ---: | ---: | ---: |
-| 2024 年第三、第四季度合并 | 459.1748 | 471.3936 | 459.0714 |
-| 2025 年第一季度 | 448.3346 | 460.0835 | 448.9124 |
-| 6 个月整体预测 | 460.0744 | 473.5076 | 459.8574 |
-| 12 个月整体预测 | 491.7916 | 508.5778 | 489.9699 |
-
-**没有进入 200 多，亦未形成值得替换当前模型的改善。** 历史混合改善仅约 0.10，
-2025 年初变差；12 个月混合 RMSE 虽略降，MAE 却由 358.28 升到 360.47。
-更深模型降低了训练误差，但两个季度的验证误差并未随之下降，不能只凭训练拟合更好继续加大模型。
-这些历史窗口此前已多次查看，结果不代表全新独立留出集，也不能证明所有 XGBoost 配方都无效。
-本轮不更换现有方案、不生成或上传新提交，原公榜 437.44368 不变。
-
-完整数据的独热编码配方曾启动，但单个设置的内部拟合耗时过长，已主动停止；
-另一独热编码设置未运行。不能据此判断独热编码预测效果。
-部分尝试记录在 `reports/experiments/xgboost_v1/attempt_status.json`，
-完成的原生类别实验单独保存在 `reports/experiments/xgboost_native_v1/`，不混淆两者结果。
-
-源代码为 [run_xgboost_experiments.py](src/models/run_xgboost_experiments.py)，
-汇总见[模型与混合方案比较](reports/experiments/xgboost_native_v1/selection.csv)、
-[各窗口结果](reports/experiments/xgboost_native_v1/results.csv)。
-依赖单独记录在 `requirements-xgboost.txt`，没有修改其他已安装依赖版本。
-原生模型、类别编码和逐行预测仅本地缓存，不纳入 Git。
+Python 3.12 is used.
 
 ```bash
-uv pip install --python .venv/bin/python -r requirements-xgboost.txt
-.venv/bin/python src/models/run_xgboost_experiments.py --threads 3 --output-dir reports/experiments/xgboost_native_reproduction
-.venv/bin/python src/models/inspect_xgboost_experiments.py --output-dir reports/experiments/xgboost_native_reproduction
-.venv/bin/python -m unittest discover -s tests
+python3.12 -m venv .venv
+.venv/bin/pip install -r requirements-stage5.txt
 ```
 
-该阶段完成时 78 项测试通过；未安装可选 XGBoost 依赖时，其中新增 6 项测试会明确跳过。
-独立核验重算 53 条指标、22 个选型方案，并重新加载 17 个保存模型核对预测；原提交文件哈希不变。
-若需要完整数据独热编码试验，可加 `--include-onehot` 并指定新的输出目录，需预留更多计算时间。
+Optional extras: `requirements-xgboost.txt`, `requirements-keras.txt` and `requirements-tabm.txt`, only
+for the corresponding experiments.
 
-#### 从数据处理重新检查的补充实验
+Place the competition files under `data/raw/`:
 
-2026-10-19，根据组员确认，课程允许使用额外公开数据。本轮不覆盖原始文件，
-不下载或匹配公开的测试期租赁真实租金，也不自动生成或上传新提交。
+```text
+data/raw/train.csv
+data/raw/test.csv
+data/raw/auxiliary/   (sg-hdb-block.csv, sg-mrt-stations.csv, sg-schools.csv,
+                       sg-shopping-malls.csv, sg-coe-prices.csv, sg-stock-prices.csv)
+```
 
-**数据审计与双视角：**重新验证 150,000 行训练数据、50,000 行测试数据的行序与清洗结果。
-租金、面积、起租年份等数值未改变。训练集街道类别从 1,146 合并为 576，户型格式从 11 合并为 6；
-面积与费用的字符串写法变化不代表数值变化。`STREET` 没有被丢弃：仍作为类别特征和地址匹配键；
-另在对照模型中加入原始街道、原始户型与格式变化标记。
-`FEE`、`FURNISHED` 为常量，不进入当前模型。日期拆分、面积和年份的数值特征继续保留。
-
-14,828 个“城镇＋楼号＋街道＋户型”组合内，面积、房屋模型、起租年份各自都只有一个值。
-这说明这些字段呈现楼栋与户型级的固定属性，不能把它们理解为每套实际住宅的精确测量；
-尚未核实本届数据的逐字段上游生成过程。没有住宅单元编号，因此不因观测重复而删除租赁记录。
-
-**新增公开数据：**
-
-- [HDB 历史转售成交](https://data.gov.sg/datasets/d_8b84c4ee58e3cfc0ece0d773c8ca6abc/view)：
-  本次下载 242,955 行。按楼栋与户型、街道与户型、城镇与户型，构造过去 24 个月的成交数、
-  每平方米转售价格中位数、面积均值与标准差、高楼层成交占比。成交数不是不同住宅的数量。
-  训练样本只使用其月份至少提前两个月的成交，验证样本统一冻结在训练末月减两个月，
-  不读取验证期后续成交。最新文件可能修订过历史记录，两个月滞后不能证明历史发布版本完全可得。
-- [HDB 楼栋构成](https://data.gov.sg/datasets/d_17f5382f26140b1fdae0ba2ef6239d2f/view)：
-  本次下载 13,392 行。统一完整街道名与官方缩写后，训练地址匹配率为 99.866%，地址键无冲突。
-  官方历史入口只列出导入时间，未提供可下载的旧文件；目前仅作审计，不加入本轮模型。
-  其中出租房库存数量不能当作某笔租赁合同的类型标签。
-
-公开下载保存在 `data/raw/external/hdb_20261019/`，每份文件附有来源、下载时间和校验值。
-额外街道键采用明确的词元替换和命名映射，不覆盖竞赛原有街道字段，不做模糊地址猜测。
-
-**模型与验证：**保留相同训练协议比较原始／清洗双视角 CatBoost；
-另比较加入历史转售特征的 LightGBM，以及“分层空间效应＋衰减时间趋势”的岭回归近似模型，
-并测试其与残差 LightGBM 的组合。分层模型同时拟合城镇、街道、楼栋与户型效应和收缩后的区域趋势，
-不是贝叶斯后验模型，也不使用验证租金构造输入。
-
-除既有季度、2025 年第一季度和全年 2024 回测外，新增三个起点：
-
-| 最后训练月份 | 预测区间 | 跨度 | 用途 |
-| --- | --- | --- | --- |
-| 2022-12 | 2023-01 至 2024-04 | 16 个月 | 长跨度方法比较 |
-| 2023-06 | 2023-07 至 2024-10 | 16 个月 | 长跨度方法比较 |
-| 2023-11 | 2023-12 至 2025-03 | 16 个月 | 后一起点检查，不用于选型 |
-
-长跨度实验的对照是相同配置的单个房屋特征 LightGBM，不是已提交的三分量融合。
-前两个起点的预测任务加权 RMSE 用于长跨度方法比较，后一起点只作检查。
-季度比较仍沿用既有已提交方案为对照，不把两套对照混称为同一个模型。
-这些窗口有重复样本、彼此重叠且历史数据已多次查看，不能当作相互独立的全新测试集。
-真实测试集除 380 行与训练末月同为 2025-03 外，其余 49,620 行延伸至未来第 1–16 个月。
-
-季度选型已锁定为保留原方案：最佳新混合方案的较早季度加权 RMSE 为 458.9495，
-对照为 459.1748，仅改善 0.2253，未达到预先设定的 3 点改善门槛。
-下列 2025 年第一季度结果仅作锁定后的诊断，不用于改选模型：
-
-| 方法 | 较早两个季度加权 RMSE | 2025 年第一季度 RMSE |
-| --- | ---: | ---: |
-| 已提交方案的本地对照 | 459.1748 | 448.3346 |
-| 仅替换其中 37.5% 的 CatBoost 为原始／清洗双视角版本 | 458.9820 | 448.8126 |
-| 75% 当前方案＋25% 历史转售模型 | 459.9034 | 448.7620 |
-| 75% 当前方案＋25% 分层时间模型 | 458.9495 | 448.0982 |
-| 75% 当前方案＋25% 分层与残差树模型 | 459.0581 | 447.8825 |
-
-这些差异没有实现接近 200 的目标，不能把小于 1 点的变化表述为有效突破。
-全年 2024 回测中，25% 分层与残差树混合方案从对照的 491.7916 降至 489.8082，改善同样有限。
-
-长跨度的前两个起点选出“分层空间与时间模型＋残差 LightGBM”，任务加权 RMSE
-从单个 LightGBM 对照的 604.3837 降至 577.4135，但后一起点没有保持改善：
-
-| 最后训练月份 | 单个房屋特征 LightGBM | 分层模型＋残差 LightGBM |
-| --- | ---: | ---: |
-| 2022-12 | 658.9786 | 617.0916 |
-| 2023-06 | 543.9711 | 534.5412 |
-| 2023-11（未用于选型） | 496.0008 | 500.1640 |
-
-结论：长期预测需要单独检查时间外推与市场变化，但本轮改善不稳定，仍未接近目标。
-该轮验证没有自动替换原模型。随后按用户要求，将 25% 分层模型融合全量训练并提交一次，
-公榜 437.45640，未刷新 437.44368 的 PB；详见前面的提交总结。
-
-复现入口（首次运行先下载，先声明长跨度选型方案，再开始训练）：
+Download the two public HDB tables, resale prices and property information, into
+`data/raw/external/hdb_20261019/`:
 
 ```bash
 .venv/bin/python src/data/download_public_hdb.py
-.venv/bin/python src/models/select_long_horizon.py --plan-only --output-dir reports/experiments/data_rethink_reproduction
-.venv/bin/python src/models/run_data_rethink.py --threads 3 --output-dir reports/experiments/data_rethink_reproduction
-.venv/bin/python src/models/select_long_horizon.py --output-dir reports/experiments/data_rethink_reproduction
-.venv/bin/python src/models/inspect_data_rethink.py --output-dir reports/experiments/data_rethink_reproduction
 ```
 
-本轮记录位于 `reports/experiments/data_rethink_v3/`；原始公开数据、特征缓存、模型和逐行预测只保存在本地。
-前两个尝试目录仅保留中断原因，其重复材料与中断缓存已移出工作区，不作为已完成实验。第三轮复用了三个经反向补丁校验、确认不受残差类型修正影响的模型，
-来源和目标运行编号记录在 `cache_migration.json`，其余模型重新训练。
-本轮完成 28 条模型训练记录与 61 条方案指标；新增 9 项测试，项目合计 87 项通过。
-独立核验已重算全部指标、检查逐月汇总、重新加载 28 个模型核对预测，并确认改变查询租金或编号不影响预测、原提交文件校验值未变。
+## Reproducing the final submission
 
-### 6. 最终评估与交付
+Run from the repository root. Steps 4–5 train many models and take a few hours on a laptop CPU.
 
-已有主表、位置、设施、宏观特征的消融实验，以及按城镇、房型、房龄、面积、月份、
-区域和地址匹配状态的误差分析，可直接用于最终报告。后续任务为：
+```bash
+# 1. Clean data and build features
+.venv/bin/python src/data/clean_data.py
+.venv/bin/python src/features/build_location_features.py
 
-- 已完成 6/12 个月诊断及三个起点的 16 个月回测，需结合远期偏差与跨起点稳定性确定最终方案；历史窗口仍不能保证对测试集延伸至 2026-07 的月份有效。
-- 确定最终特征与参数，记录静态辅助数据的历史可用性限制；任何新增调整应先在较早窗口验证。
-- 已完成上一轮锁定方案的全量重训、预测校验和一次 Kaggle 提交，公榜 437.44368；这不表示最终方案已确定。
-- 后续若产生值得提交的新方案，重新训练并按原行序生成 `Id,Predicted`，检查行数、编号、缺失值及预测范围，记录模型版本与分数。
-- 整合已有消融实验、误差分析和图表，完成方法、结果、局限及复现说明。
+# 2. Baselines, model comparison and tuning (the trend blend builds on these)
+.venv/bin/python src/models/train_baseline.py
+.venv/bin/python src/models/run_stage5.py
+.venv/bin/python src/models/run_tree_tuning.py --output-dir reports/experiments/tree_tuning_local
 
-当前 `models/stage5/` 等目录中的模型属于验证诊断产物；阶段 4、5 的原脚本不生成竞赛提交。
-后续导出入口 `src/models/export_rmse_submission.py` 已生成并提交上一轮锁定模型的预测；
-分组、近邻与 XGBoost 等实验仍仅作本地比较。数据重检中的 25% 分层融合已按要求提交一次，
-但未刷新 PB，因此原趋势融合仍是当前公榜最佳版本。
+# 3. Trend-blend experiment and its full-data submission
+.venv/bin/python src/models/run_rmse_improvement.py --output-dir reports/experiments/rmse_improvement_local
+.venv/bin/python src/models/export_rmse_submission.py
 
-## 数据处理、探索性分析与基线模型
+# 4. Target-encoding variants: backtests (omit --export) and full-data test predictions
+.venv/bin/python src/models/run_te_experiments.py --export --seeds 5 --resale --property --out reports/experiments/te_v2_property
+.venv/bin/python src/models/run_te_experiments.py --export --seeds 5 --resale --property --stats --out reports/experiments/te_v3_stats
+.venv/bin/python src/models/run_te_experiments.py --export --seeds 5 --resale --property --knn --out reports/experiments/te_v3_knn
+.venv/bin/python src/models/run_te_experiments.py --export --seeds 5 --resale --property --volume --out reports/experiments/te_v5_volume
 
-### 数据流
-
-原始文件不能被后续流程覆盖；所有转换均由脚本完成，并按以下层级保存：
-
-```text
-data/raw/        → 原始 Kaggle 主数据和辅助数据，只读保存
-data/interim/    → 格式统一、完成基础清洗的主表和辅助表
-data/processed/  → 已按实验方案合并特征、可直接训练模型的数据表
+# 5. Average, blend and calibrate
+.venv/bin/python src/models/export_te_submission.py
 ```
 
-典型输出包括 `train_clean`、`test_clean`、清洗后的 HDB/MRT/学校/商场/COE 表，以及不同特征版本的 `train_features`、`test_features`。这些数据文件不进入 Git，因为它们都必须能够由脚本从 `data/raw/` 重新生成。
+Backtest mode (without `--export`) compares against the trend blend's row-level validation
+predictions in the `incumbent` column of `reports/experiments/keras_v1/predictions_*.csv`. Those files
+are written by `src/models/run_keras_experiments.py` and kept local only.
 
-### 探索性数据分析的作用
+`export_te_submission.py` reproduces the submitted file from the saved predictions (verified to within
+1e-12). Use `--level 1 --trend 0` to get the uncalibrated blend.
 
-探索性数据分析不是独立的预测方法，而是用来理解数据、发现质量问题并决定特征和验证策略。至少应检查：
+**Source fingerprints.** The experiment manifests record SHA-256 hashes of the source files at run
+time. `export_rmse_submission.py` refuses to run if those files changed. A later commit translated
+the comments and report strings in the code to English. An AST comparison confirms that only string
+literals changed, not logic. To regenerate the trend blend with matching fingerprints, check out the
+pre-translation commit `05e8ddf` for step 3.
 
-- 租金的分布和极端值；
-- 不同年月的租金趋势；
-- 不同城镇、房型和房屋模型的租金差异；
-- 建筑面积、房龄与租金的关系；
-- 训练集和测试集在时间、区域和房型上的分布差异。
+## Experiment index
 
-由于测试集包含训练集之后的批准月份，应优先采用按批准月份切分的验证方案。这是
-为了模拟未来月份的分布变化，并不意味着把数据当成纯时间序列；每条记录仍是一个
-带有时间属性的横截面租赁观测，且没有可识别的具体 flat ID。
+Every experiment keeps its own directory with summary metrics; row-level outputs stay local.
+Except `te_report.md`, the per-experiment write-ups listed below are in Chinese; their tables and
+`results.csv` files are language-neutral.
 
-### 基线模型与特征逐步接入
+| Experiment | Entry point | Results | Outcome |
+| --- | --- | --- | --- |
+| Data audit | `src/data/audit_cleaning.py` | [report](reports/data_quality_after_cleaning.md) | 100% address match, no rows dropped |
+| Location ablation (Ridge) | `src/models/run_location_ablation.py` | [location_ablation_v1](reports/experiments/location_ablation_v1/) | 562.67 → 562.03 |
+| Model and feature comparison | `src/models/run_stage5.py` | [stage5_v1](reports/experiments/stage5_v1/) | Tree models ≈ 452 |
+| CatBoost / LightGBM tuning | `src/models/run_tree_tuning.py` | [tree_tuning_v1](reports/experiments/tree_tuning_v1/) | 450.47 |
+| Rounds, recency, history, trend | `src/models/run_rmse_improvement.py` | [rmse_improvement_v1](reports/experiments/rmse_improvement_v1/) | 448.33, public 437.44 |
+| Segment correction, macro | `src/models/run_segment_experiments.py` | [segment_v1](reports/experiments/segment_v1/) | No stable gain |
+| Neighbourhood, unit-area target | `src/models/run_neighborhood_experiments.py` | [neighborhood_v1](reports/experiments/neighborhood_v1/) | No stable gain |
+| XGBoost | `src/models/run_xgboost_experiments.py` | [xgboost_native_v1](reports/experiments/xgboost_native_v1/) | No stable gain |
+| Raw views, resale history, hierarchical model | `src/models/run_data_rethink.py` | [data_rethink_v3](reports/experiments/data_rethink_v3/) | Public 437.46 |
+| Error diagnosis | `src/eda/analyze_error_mechanisms.py`, `src/eda/probe_large_overprediction.py` | [error_diagnosis_v1](reports/experiments/error_diagnosis_v1/), [overprediction_probe_v1](reports/experiments/overprediction_probe_v1/) | Residual floor from unobserved unit differences |
+| Keras embedding networks | `src/models/run_keras_experiments.py` | [keras_v1](reports/experiments/keras_v1/) | No stable gain |
+| TabM | `src/models/run_tabm_experiments.py` | [tabm_v1](reports/experiments/tabm_v1/) | No stable gain |
+| **Target encoding + external data** | `src/models/run_te_experiments.py` | [te_report.md](reports/experiments/te_report.md), `te_v*/` | **443.65, public 435.27 / 431.07** |
 
-基线模型的目标是先建立一个可靠的参照。它使用基础清洗后的主数据训练监督回归模型，并以 `MONTHLY_RENT` 为目标；首版不必接入辅助数据。CatBoost 或 LightGBM 是合适的首个模型选择。
+`inspect_*.py` scripts independently reload saved models and recompute metrics for the matching
+experiments.
 
-后续在完全相同的验证集上逐步比较以下特征版本：
+## Main limitations
 
-1. **基线模型**：清洗后的主表字段；
-2. **时间与房屋特征**：租赁年月、房龄、面积、费用等；
-3. **地理特征**：HDB 坐标、区域、到 MRT 的距离；
-4. **设施特征**：学校和商场距离或密度；
-5. **宏观特征**：COE 与经过聚合筛选的市场指标；
-6. **最终模型**：只保留能稳定改善验证 RMSE 的特征，并可测试模型集成。
+- Rows with identical observable inputs still differ by several hundred SGD; floor, unit condition
+  and contract terms are not in the data. Different models' residuals correlate at about 0.98–0.999.
+- Static auxiliary tables (MRT, schools, malls, HDB property) are snapshots, not historical versions.
+- The level calibration was fitted on the public leaderboard subset and assumes the private split
+  covers the same months.
 
-每个版本都应记录特征集合、模型参数和验证 RMSE。聚类可作为区域或社区类型的额外特征，但不能替代带有租金标签训练的监督回归模型。
+## Tests
 
-预测后处理指模型输出后的结果处理，例如将不合理的负租金截断；它不用于存放清洗后的数据。
-
-## 仓库结构
-
-```text
-project/
-├── data/
-│   ├── raw/                 # Kaggle 原始数据及辅助数据；只读，不修改，不上传 Git
-│   ├── interim/             # 清洗、地址匹配等中间结果；可由脚本重新生成，不上传 Git
-│   └── processed/           # 最终用于建模的特征数据；可由脚本重新生成，不上传 Git
-├── src/
-│   ├── data/                # 数据审计、清洗、合并辅助数据的脚本
-│   ├── eda/                 # 探索性分析、误差成因分析与独立核验脚本
-│   ├── features/            # 日期、地址、地理距离、COE 等特征工程脚本
-│   ├── models/              # 训练、验证、预测和生成提交文件的脚本
-│   └── utils/               # 可复用的路径、评估、日志等辅助函数
-├── notebooks/               # 探索性分析和展示用 Notebook；正式流程应迁移到 src/
-├── configs/                 # 模型参数、数据路径和实验配置
-├── reports/
-│   ├── figures/             # 报告与幻灯片使用的图表
-│   ├── tables/              # 探索性分析的汇总表
-│   ├── location_features/   # 地址匹配、坐标覆盖率和位置特征配置
-│   ├── experiments/         # 消融、模型比较、调参结果、误差分析及实验记录
-│   ├── submissions/         # 提交凭据与公榜成绩截图；不包含逐行预测文件
-│   ├── maintenance/         # 工作区清理与可恢复归档清单
-│   └── progress_report/     # 中期报告幻灯片和相关材料
-├── tests/                   # 合成数据测试，检查特征、时间切分和模型选择规则
-├── models/                  # 本地模型及训练缓存；不上传 Git
-├── submissions/             # 本地生成的 Kaggle 提交文件；不上传 Git
-├── requirements-stage5.txt  # 第 4、5 阶段复现实验的依赖版本
-├── requirements-xgboost.txt # 后续 XGBoost 实验的补充依赖
-├── README.md                # 项目目标、流程和协作说明
-└── .gitignore               # 排除数据、模型、提交文件和凭据
+```bash
+.venv/bin/python -m unittest discover -s tests
 ```
 
-原则：原始数据只保存在 `data/raw/`；所有清洗、特征工程和训练结果都应能由 `src/` 中的脚本复现。Notebook 用于探索和呈现，不应是唯一的正式实现；密钥、Kaggle 凭据和私有竞赛数据不得提交到仓库。
-
-### 文件保留与清理规则
-
-2026-10-19 已将无关课程讲义副本、临时图片、旧幻灯片候选、重复诊断输出、一次性迁移工具和中断实验缓存移出工作区，
-合计 81 个文件、约 615.6 MB。采用项目同级的可恢复归档，不永久删除；移动前后均核对文件校验值。
-清单及恢复说明见[清理记录](reports/maintenance/cleanup_20261019.json)。
-
-有效实验代码、全部已完成结果、独立核验记录和中期幻灯片最终版均保留；原始数据、成功模型与两份正式提交 CSV 未改动。
-成功实验缓存包含后续实验所需的基准预测，暂不作为“无关文件”删除。
-`tmp/`、`output/` 和训练进度文件以后不进入 Git；正式证据统一保存到 `reports/`。
-仅仓库根目录的 `submissions/` 被排除，`reports/submissions/` 中的成绩凭据正常纳入版本管理。
-同组成员首次克隆后需自行放入私有数据并重建模型，不能只靠汇总表运行依赖逐行预测的核验脚本。
-
-## 协作流程
-
-1. 从 `main` 创建聚焦于单一任务的分支。
-2. 保证改动可复现，并在本地完成相关检查。
-3. 合并到 `main` 前创建拉取请求，供组员审阅。
-4. 记录每次实验的数据版本、验证方案、特征集合、模型配置和 RMSE。
+103 tests run on synthetic data and do not need the competition files.

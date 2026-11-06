@@ -398,32 +398,32 @@ class Experiment:
         primary = rows.loc[rows.split.eq("primary_2025")]
         before = float(primary.loc[primary.candidate.eq(baseline), "rmse"].iloc[0])
         after = float(primary.loc[primary.candidate.eq(selected), "rmse"].iloc[0])
-        lines = ["# 降低 RMSE 的顺序实验", "", "## 实验规则", "",
-            "- 以同环境复跑的 800 轮 CatBoost / 调优 LightGBM 等权融合为对照；历史分数 450.4735 只作参考。",
-            "- 各阶段仅按 2024 年第三、四季度的合并平方误差选择；保留旧方案作为候选。后续阶段依赖前一阶段选择，属于有界顺序调优，不是全面搜索。",
-            "- 近期方案与历史统计先由 LightGBM 筛选，再用 CatBoost 确认一个新方案，以控制计算成本。",
-            "- CatBoost 在内部更早的三个月验证上早停；800/1600/2400 上限共享一条 2400 轮上限轨迹，按各上限前的最佳轮数分别重训。",
-            "- 训练行的租金统计只使用更早月份；整段验证查询冻结在训练截止时。未按同月其他行或未来验证租金更新。",
-            "- 趋势实验将训练月份的整体租金水平移除，以静态房屋特征拟合残差；未来水平使用最近三个月常数或最近 12/24 个月的六个月阻尼趋势。",
-            "- 选定后才报告 2025 年第一季度及 6/12 个月窗口。主验证以前已被查看；长窗口与调优季度存在重叠，只是不同训练起点的诊断。",
-            "- 不读取竞赛测试集、不生成提交、不删除重复观测或极端租金。", "", "## 阶段选择", "",
-            "| 阶段 | 选定方案 | 较早季度合并 RMSE |", "| --- | --- | ---: |"]
+        lines = ["# Sequential Experiments to Reduce RMSE", "", "## Rules", "",
+            "- The control is a same-environment rerun of the equal-weight 800-round CatBoost / tuned LightGBM blend; the historical score 450.4735 is reference only.",
+            "- Each stage selects only on pooled squared error over 2024 Q3 and Q4, keeping the previous option as a candidate. Later stages depend on earlier choices; this is bounded sequential tuning, not an exhaustive search.",
+            "- Recency options and history statistics are screened with LightGBM first, then one new option is confirmed with CatBoost to limit compute.",
+            "- CatBoost early-stops on an earlier inner three-month validation; the 800/1600/2400 caps share one 2400-round trajectory and are refitted with the best rounds below each cap.",
+            "- Rent statistics for training rows use earlier months only; the whole validation query is frozen at the training cut-off and never updated with same-month or future validation rents.",
+            "- Trend experiments remove the overall monthly rent level and fit residuals on static housing features; future levels use the last-three-month constant or a six-month damped trend from the last 12/24 months.",
+            "- 2025 Q1 and the 6/12-month windows are reported only after selection. The main validation has been viewed before; long windows overlap the tuning quarters and are diagnostics from different origins.",
+            "- The competition test set is not read, no submission is generated, and duplicates or extreme rents are not removed.", "", "## Stage selection", "",
+            "| Stage | Selected option | Earlier-quarter pooled RMSE |", "| --- | --- | ---: |"]
         for stage in self.stages:
             lines.append(f"| {stage['stage']} | {stage['selected']} | {stage['pooled_rmse']:.4f} |")
-        lines += ["", "## 主时间验证：2025 年 1–3 月", "", "| 方案 | RMSE | MAE | 平均偏差 |", "| --- | ---: | ---: | ---: |"]
+        lines += ["", "## Main temporal validation: January-March 2025", "", "| Option | RMSE | MAE | Mean bias |", "| --- | ---: | ---: | ---: |"]
         for row in primary.itertuples():
             lines.append(f"| {row.candidate} | {row.rmse:.4f} | {row.mae:.4f} | {row.bias:+.2f} |")
-        lines += ["", f"本地对照 RMSE {before:.4f}，预先锁定方案 {after:.4f}；降低 {before-after:+.4f}（{(before-after)/before:+.2%}）。负值表示新方案在主验证变差，仍保留原先选择，不按主验证事后重选。",
-            "", "## 长跨度诊断", "", "| 窗口 | 方案 | RMSE | MAE | 偏差 |", "| --- | --- | ---: | ---: | ---: |"]
+        lines += ["", f"Local control RMSE {before:.4f}, pre-locked option {after:.4f}; reduction {before-after:+.4f} ({(before-after)/before:+.2%}). A negative value means the new option is worse on the main validation; the earlier choice is still kept and not reselected on the main validation.",
+            "", "## Long-horizon diagnostics", "", "| Window | Option | RMSE | MAE | Bias |", "| --- | --- | ---: | ---: | ---: |"]
         for row in rows.loc[rows.split.str.startswith("long_")].itertuples():
             lines.append(f"| {row.split} | {row.candidate} | {row.rmse:.4f} | {row.mae:.4f} | {row.bias:+.2f} |")
-        lines += ["", "## 局限与产物", "",
-            "- 租金统计不识别单个住房；同楼栋同房型仍可有不同真实租金。窗口开始处无历史的行保留空值，不能用未来均值填补。",
-            "- 月度平均租金可能受房型和区位构成变化影响，趋势分解不是独立市场价格指数。",
-            "- 只尝试预设窗口、权重和融合比例；未试完所有组合，也不保证排行榜表现。静态 HDB 信息仍有历史可用性限制。",
-            "- `results.csv` 与各 `selection_*.csv` 为汇总分数；`stage_decisions.json`、`selection_locked.json` 记录选择。",
-            "- `predictions_*.csv`、`group_errors_*.csv` 和 `models/rmse_improvement_cache/` 为本地诊断产物；逐行租金/预测和模型不进入 Git。",
-            "- 配置、输入及实现 SHA-256 与依赖版本见 `experiment_manifest.json`；相同配置中断重跑可恢复。", ""]
+        lines += ["", "## Limitations and artefacts", "",
+            "- Rent statistics do not identify individual flats; the same block and flat type can still have different rents. Rows without history at the start of a window stay empty and are never filled with future means.",
+            "- Monthly mean rent can shift with flat-type and location mix, so the trend decomposition is not an independent market price index.",
+            "- Only preset windows, weights and blend ratios were tried; not every combination was tested and leaderboard performance is not guaranteed. Static HDB information still has historical-availability limits.",
+            "- `results.csv` and `selection_*.csv` hold summary scores; `stage_decisions.json` and `selection_locked.json` record the selections.",
+            "- `predictions_*.csv`, `group_errors_*.csv` and `models/rmse_improvement_cache/` are local diagnostics; row-level rents, predictions and models are not committed to Git.",
+            "- Configuration, input and implementation SHA-256 values and dependency versions are in `experiment_manifest.json`; interrupted runs with the same configuration resume.", ""]
         (self.output / "improvement_report.md").write_text("\n".join(lines), encoding="utf-8")
 
 

@@ -179,7 +179,7 @@ class LocationFeaturesTests(unittest.TestCase):
             self.assertEqual(result["sites"]["mrt"]["usable_locations"], 2)
             manifest = json.loads((report / "location_features_manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["mrt_mode"], "snapshot")
-            self.assertIn("时间泄漏", manifest["limitations"][0])
+            self.assertIn("temporal leakage", manifest["limitations"][0])
             self.assertIn("NEAREST_OPEN_MRT_DISTANCE_KM", manifest["feature_columns"])
             train = read_table(output / "train_location_features.csv")
             test = read_table(output / "test_location_features.csv")

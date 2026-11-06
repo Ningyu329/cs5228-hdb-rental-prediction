@@ -100,15 +100,15 @@ def run(output: Path):
             "all diagnostic windows have previously been inspected", "top-5% alert quota is fixed without true query labels"])
     (output/"probe.json").write_text(json.dumps(result,indent=2)+"\n",encoding="utf-8")
     pd.DataFrame(rows).to_csv(output/"probe_results.csv",index=False)
-    lines=["# 大幅高估样本的可识别性诊断","",
-        "固定 LightGBM 二分类诊断器识别原模型会高估超过 1000 的样本，不修改原租金预测。训练目标来自严格更早的 OOF 误差。", "",
-        "| 窗口 | 输入 | 高估>1000 的比例 | ROC-AUC | AP | 最高风险 5% 的准确率 | 对正例的召回率 | 相对随机提升 |",
+    lines=["# Identifiability of Large Overpredictions","",
+        "A fixed LightGBM binary diagnostic predicts which rows the original model will overpredict by more than 1000; rent predictions are not modified. Training targets come from strictly earlier OOF errors.", "",
+        "| Window | Inputs | Share overpredicted >1000 | ROC-AUC | AP | Precision in top-5% risk | Recall of positives | Lift over random |",
         "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |"]
     for row in rows:
         lines.append(f"| {row['split']} | {row['variant']} | {row['prevalence']:.2%} | {row['roc_auc']:.3f} | {row['average_precision']:.3f} | {row['alert_precision']:.2%} | {row['alert_recall']:.2%} | {row['alert_lift']:.2f}x |")
-    lines += ["", "AP 为 average precision。随机排序的期望 AP 接近正例比例；最高风险 5% 是固定告警预算，不使用真实验证标签来选阈值。", "",
-        "历史扩展输入包括原模型预测、过去十二个月同楼栋同房型租金均值/中位数/标准差/分位数，以及历史覆盖量。每个历史 OOF 季度的输入均只由其之前的训练数据构造。", "",
-        "本实验只检验这一固定诊断器的识别能力，不证明所有特征或模型都无法识别便宜租赁；概率也未用于修正租金预测。没有把真实租金分箱、误差或样本编号作为输入。", ""]
+    lines += ["", "AP is average precision. The expected AP of a random ranking is close to the positive share; the top-5% risk set is a fixed alert budget, so no true validation label is used to pick a threshold.", "",
+        "History-extended inputs include the original prediction, the mean/median/std/quantiles of same-block same-flat-type rents over the past twelve months, and history coverage. Each historical OOF quarter is built only from earlier training data.", "",
+        "This experiment only tests this fixed diagnostic; it does not prove that no feature or model can identify cheap rentals, and the probabilities are not used to correct rent predictions. True rent bins, errors and row ids are never inputs.", ""]
     (output/"probe_report.md").write_text("\n".join(lines),encoding="utf-8")
     print(pd.DataFrame(rows).round(4).to_string(index=False),flush=True)
 

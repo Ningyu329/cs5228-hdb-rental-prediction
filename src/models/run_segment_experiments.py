@@ -301,34 +301,34 @@ class SegmentExperiment:
 
     def report(self, selected: str):
         results = pd.DataFrame(self.rows)
-        lines = ["# 分组诊断与针对性优化实验", "", "## 结论与模型选择", "",
-            f"锁定方案：`{selected}`。未生成新提交，也未读取竞赛测试集。", "",
-            "| 阶段 | 锁定方案 | 较早季度合并 RMSE |", "| --- | --- | ---: |"]
+        lines = ["# Group Diagnostics and Targeted Optimisation", "", "## Conclusion and model selection", "",
+            f"Locked option: `{selected}`. No new submission was generated and the competition test set was not read.", "",
+            "| Stage | Locked option | Earlier-quarter pooled RMSE |", "| --- | --- | ---: |"]
         for row in self.decisions:
             lines.append(f"| {row['stage']} | {row['selected']} | {row['pooled_rmse']:.4f} |")
-        lines += ["", "| 窗口 | 方案 | RMSE | MAE | 平均偏差 |", "| --- | --- | ---: | ---: | ---: |"]
+        lines += ["", "| Window | Option | RMSE | MAE | Mean bias |", "| --- | --- | ---: | ---: | ---: |"]
         for split in EARLIER + ["primary_2025", "long_6m"]:
             for name in dict.fromkeys([BASE, selected]):
                 row = results.loc[results.split.eq(split) & results.candidate.eq(name)].iloc[0]
                 lines.append(f"| {split} | {name} | {row.rmse:.4f} | {row.mae:.4f} | {row.bias:+.2f} |")
-        lines += ["", "## 优先分组：仅使用较早回测", "",
-            "平方误差贡献率分母为该窗口全部样本 SSE。同一分组方案内贡献率和为 100%，不同分组方案互相重叠，不可相加。",
-            "偏差取预测减真实值；正值为高估。组内均值偏差的平方贡献仅为描述性分解，不是可实现的降分保证。", "",
-            "| 窗口 | 分组 | 样本数 | RMSE | 偏差 | 总 SSE 占比 |", "| --- | --- | ---: | ---: | ---: | ---: |"]
+        lines += ["", "## Priority groups: earlier backtests only", "",
+            "The denominator of the squared-error share is the SSE of all rows in the window. Shares sum to 100% within one grouping; different groupings overlap and cannot be added.",
+            "Bias is prediction minus actual; positive means overprediction. The squared contribution of group mean bias is a descriptive decomposition, not an achievable gain.", "",
+            "| Window | Group | Rows | RMSE | Bias | Share of total SSE |", "| --- | --- | ---: | ---: | ---: | ---: |"]
         for split in EARLIER:
             table = pd.read_csv(self.output / f"segments_control_{split}.csv")
             for row in table.loc[table.partition.eq("town_flat") & table.rows.ge(100)].head(6).itertuples():
                 lines.append(f"| {split} | {row.segment} | {row.rows} | {row.rmse:.2f} | {row.bias:+.2f} | {row.sse_share:.1%} |")
-        lines += ["", "## 方法与防泄漏约定", "",
-            "- 按城镇、房型、区域、面积、房龄、月份、历史地址样本数及交叉组统计 RMSE、MAE、偏差、P90 绝对误差、SSE 贡献率和大误差数量。",
-            "- 修正器只使用预测窗口之前六个月的扩展时间 OOF 残差。每条校准预测的基础模型仅使用该季度之前的标签；不使用训练内拟合误差。",
-            "- 常数修正向零收缩；趋势修正拟合组内月度 OOF 残差，斜率限制为每月 ±25，新窗口增长以六个月时间常数衰减，最终修正限制为 ±200。",
-            "- 小样本组不修正，未见组回退原全局模型。分段模型按历史 OOF 的 SSE 选最多四种房型；每组至少 3000 条外层训练样本，内部验证至少 100 条，迭代轮数只用内部时间切分选择。",
-            "- 分段及宏观 LightGBM 均使用同一 15 叶正则化配置，与当前方案以 25%/50%/100% 权重比较。",
-            "- 对比对应月份已提供的 COE、COE+股票，以及滞后两个月并冻结截止时点的 COE+股票。同期辅助信息条件下的回测不是严格实时预测；不涉及验证租金标签。",
-            "- 各阶段按 2024 年 Q3/Q4 合并 SSE 贪心选择，始终保留上一方案。锁定后才计算 2025 年 Q1 和六个月窗口；所有这些时期先前已被查看，不能称为全新独立测试。",
-            "- 本轮不重跑十二个月窗口；不能将旧方案的十二个月结果移用于本轮新方案，也不能据本地改进推断 Kaggle 一定改善。",
-            "- 原始数据、原实验目录、已提交文件均不覆盖；逐行标签/预测及模型只保存在本地。", ""]
+        lines += ["", "## Method and leakage rules", "",
+            "- RMSE, MAE, bias, P90 absolute error, SSE share and large-error counts are computed by town, flat type, region, floor area, flat age, month, historical address sample count and their crosses.",
+            "- Correctors use only expanding-time OOF residuals from the six months before the prediction window. Each calibration prediction's base model uses only labels before that quarter; in-sample training errors are never used.",
+            "- Constant corrections are shrunk towards zero; trend corrections fit monthly within-group OOF residuals with slopes capped at +/-25 per month, new-window growth decays with a six-month time constant, and the final correction is capped at +/-200.",
+            "- Small groups are not corrected and unseen groups fall back to the global model. Segment models are chosen for at most four flat types by historical OOF SSE; each needs at least 3000 outer training rows and 100 inner validation rows, and rounds are chosen on an inner time split only.",
+            "- Segment and macro LightGBM models share one regularised 15-leaf configuration and are compared with the current option at 25%/50%/100% weights.",
+            "- Compares same-month COE, COE plus stocks, and COE plus stocks lagged two months and frozen at the cut-off. Backtests with same-period auxiliary data are not strict real-time forecasts; validation rent labels are never used.",
+            "- Each stage greedily selects on pooled 2024 Q3/Q4 SSE and always keeps the previous option. 2025 Q1 and six-month windows are computed only after locking; all periods have been viewed before and are not fresh independent tests.",
+            "- The twelve-month window is not rerun here; old twelve-month results cannot be transferred to new options, and local gains do not guarantee a Kaggle gain.",
+            "- Raw data, earlier experiment directories and submitted files are not overwritten; row-level labels, predictions and models stay local.", ""]
         (self.output / "segment_report.md").write_text("\n".join(lines), encoding="utf-8")
 
 

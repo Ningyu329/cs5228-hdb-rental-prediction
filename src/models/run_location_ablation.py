@@ -46,12 +46,12 @@ VARIANTS = {
     "hdb_school_mall": (HDB_CATEGORICAL, HDB_NUMERIC + SCHOOL_NUMERIC + MALL_NUMERIC),
 }
 LABELS = {
-    "main_only": "原主表 Ridge",
-    "hdb": "+ HDB 坐标与楼栋属性",
+    "main_only": "Main-table Ridge",
+    "hdb": "+ HDB coordinates and block attributes",
     "hdb_mrt": "+ HDB + MRT",
-    "hdb_mrt_school": "+ HDB + MRT + 学校",
-    "hdb_mrt_school_mall": "+ HDB + MRT + 学校 + 商场",
-    "hdb_school_mall": "+ HDB + 学校 + 商场（无 MRT）",
+    "hdb_mrt_school": "+ HDB + MRT + schools",
+    "hdb_mrt_school_mall": "+ HDB + MRT + schools + malls",
+    "hdb_school_mall": "+ HDB + schools + malls (no MRT)",
 }
 
 
@@ -137,42 +137,42 @@ def group_errors(train: pd.DataFrame, predictions: dict[str, pd.Series], variant
 def render_report(results: pd.DataFrame, manifest: dict) -> str:
     primary = results.loc[results["split"].eq("temporal")]
     baseline = primary.loc[primary["variant"].eq("main_only"), "rmse"].iloc[0]
-    lines = ["# 位置特征 Ridge 消融实验", "", "## 实验设计", ""]
+    lines = ["# Location Feature Ridge Ablation", "", "## Design", ""]
     for split in manifest["splits"]:
-        lines.append(f"- {split['split']}: {split['fit_start']} 至 {split['fit_end']} 训练（{split['fit_rows']:,} 行），{split['validation_start']} 至 {split['validation_end']} 验证（{split['validation_rows']:,} 行）。")
+        lines.append(f"- {split['split']}: train {split['fit_start']} to {split['fit_end']} ({split['fit_rows']:,} rows), validate {split['validation_start']} to {split['validation_end']} ({split['validation_rows']:,} rows).")
     lines.extend([
-        "", "所有方案使用相同 Ridge 参数和固定划分，填补器、标准化和 One-hot 编码仅在各训练折拟合。", "",
-        "## 主要时间验证结果", "",
-        "| 特征方案 | 字段数 | RMSE | 相对本次主表基线改善 | 改善比例 |",
+        "", "All variants use the same Ridge parameters and fixed splits; imputer, scaler and one-hot encoder are fitted on each training fold only.", "",
+        "## Main temporal validation", "",
+        "| Feature set | Fields | RMSE | Improvement over this run's main-table baseline | Improvement % |",
         "| --- | ---: | ---: | ---: | ---: |",
     ])
     for _, row in primary.iterrows():
         lines.append(f"| {LABELS[row['variant']]} | {row['feature_count']} | {row['rmse']:.4f} | {row['rmse_improvement']:+.4f} | {row['improvement_pct']:+.2f}% |")
-    lines.extend(["", "## 更早时间窗口与随机切分", "", "| 特征方案 | 验证划分 | RMSE | 相对同划分主表基线改善 |", "| --- | --- | ---: | ---: |"])
+    lines.extend(["", "## Earlier windows and random split", "", "| Feature set | Split | RMSE | Improvement over same-split baseline |", "| --- | --- | ---: | ---: |"])
     for _, row in results.loc[~results["split"].eq("temporal")].iterrows():
         lines.append(f"| {LABELS[row['variant']]} | {row['split']} | {row['rmse']:.4f} | {row['rmse_improvement']:+.4f} |")
-    lines.extend(["", "## 结果解释与限制", ""])
+    lines.extend(["", "## Interpretation and limitations", ""])
     reference = manifest.get("previous_reference_rmse")
     if reference is not None:
-        lines.append(f"- 先前记录的 Ridge 时间 RMSE 为 {reference:.4f}；本次相同配置复跑为 {baseline:.4f}。运行环境不同，所有改善均以本次同环境复跑为参照。")
+        lines.append(f"- The previously recorded Ridge temporal RMSE is {reference:.4f}; this rerun with the same configuration gives {baseline:.4f}. Environments differ, so all improvements use this same-environment rerun as reference.")
     best = manifest["best_primary_variant"]
     without_mrt = manifest["best_primary_variant_without_mrt"]
     best_row = primary.loc[primary["variant"].eq(best)].iloc[0]
     baseline_row = primary.loc[primary["variant"].eq("main_only")].iloc[0]
     earlier = results.loc[results["split"].str.startswith("temporal_backtest_") & results["variant"].eq(best)]
     lines.extend([
-        f"- 本次主要时间验证得分最低的方案为 {best}；未使用 MRT 的方案中得分最低的是 {without_mrt}。",
-        f"- 主验证最佳方案相对本次基线降低 RMSE {best_row['rmse_improvement']:.4f}（{best_row['improvement_pct']:.2f}%），提升有限。它在 {len(earlier)} 个更早窗口中有 {int(earlier['rmse_improvement'].gt(0).sum())} 个窗口优于对应基线。",
-        f"- 主验证集平均预测减真实租金：主表基线 {baseline_row['bias_predicted_minus_actual']:+.2f}，最低 RMSE 方案 {best_row['bias_predicted_minus_actual']:+.2f}。正值表示整体高估，位置特征尚未解决这一偏差。",
-        "- 上述最低分只用于确定后续实验候选，不能替代独立测试集表现或证明统计显著性。更早时间窗口用于检查表现稳定性，随机切分仅为辅助。",
-        f"- MRT 时间策略：{manifest['mrt_mode']}。若为 snapshot 或 unknown，含 MRT 的结果仅为探索，当前 open 站点可能在早期租赁月份尚未开放。",
-        "- 学校、商场及部分楼栋属性也来自静态快照，移除 MRT 不能证明其他辅助字段完全满足历史可用性。",
-        "- 验证窗口为 3 个月（默认），测试集延伸至更远月份，长期外推误差可能更大。",
-        "- 不使用 ADDRESS_KEY 或 POSTAL_CODE 做新模型输入。地址匹配标记等常量保留在预设方案内，Ridge 正则化和标准化处理与基线相同。",
-        "- 未调节模型参数，未修改 baseline_config.json，未生成或上传 Kaggle 提交。", "",
-        "分组误差见 group_errors.csv，包含主表基线与主要候选按城镇、房型、月份及区域的 RMSE、MAE 和有方向偏差。", "",
-        "## 下一步实验", "",
-        "优先比较能够表达非线性时间变化的模型或时间特征方案，检查预测整体高估是否与长期线性趋势外推有关。这个原因目前仅为待验证假设，不能从平均偏差直接推断。继续使用同样的时间窗口，MRT 保留为带历史可用性限制的独立对照。", "",
+        f"- Lowest main temporal validation score: {best}; lowest without MRT: {without_mrt}.",
+        f"- The best main-validation variant lowers RMSE by {best_row['rmse_improvement']:.4f} ({best_row['improvement_pct']:.2f}%) against this baseline, a limited gain. It beats the matching baseline in {int(earlier['rmse_improvement'].gt(0).sum())} of {len(earlier)} earlier windows.",
+        f"- Mean prediction minus actual rent on the main validation: baseline {baseline_row['bias_predicted_minus_actual']:+.2f}, lowest-RMSE variant {best_row['bias_predicted_minus_actual']:+.2f}. Positive values mean overall overprediction, which location features do not fix.",
+        "- The lowest score only selects candidates for later experiments; it does not replace independent test performance or show statistical significance. Earlier windows check stability; the random split is auxiliary.",
+        f"- MRT temporal mode: {manifest['mrt_mode']}. With snapshot or unknown, MRT results are exploratory because currently open stations may not have been open in early rental months.",
+        "- School, mall and some block attributes are also static snapshots, so removing MRT does not prove the other auxiliary fields are historically available.",
+        "- Validation windows are 3 months by default while the test set extends further, so long-horizon extrapolation error may be larger.",
+        "- ADDRESS_KEY and POSTAL_CODE are not used as model inputs. Constant flags such as address-match indicators stay in the preset variants; Ridge regularisation and scaling match the baseline.",
+        "- No hyperparameters were tuned, baseline_config.json was not modified, and no Kaggle submission was generated.", "",
+        "Group errors are in group_errors.csv: RMSE, MAE and signed bias by town, flat type, month and region for the baseline and main candidates.", "",
+        "## Next experiments", "",
+        "First compare models or time features that capture nonlinear time changes, and check whether overall overprediction relates to long-term linear trend extrapolation. This is only a hypothesis and cannot be inferred from mean bias alone. Keep the same windows and keep MRT as a separate control with its availability caveat.", "",
     ])
     return "\n".join(lines)
 

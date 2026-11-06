@@ -58,7 +58,7 @@ def canonical_number(value: str, *, integer: bool = False) -> str:
     try:
         number = Decimal(cleaned)
     except InvalidOperation as error:
-        raise ValueError(f"无法解析数值：{value!r}") from error
+        raise ValueError(f"Cannot parse numeric value: {value!r}") from error
     if integer:
         return str(int(number))
     rendered = format(number.normalize(), "f")
@@ -266,11 +266,11 @@ def clean_file(source: Path, target: Path, cleaner, **kwargs: object) -> None:
     rows, _ = read_csv(source)
     cleaned_rows, fields = cleaner(rows, **kwargs)
     write_csv(target, cleaned_rows, fields)
-    print(f"已写入 {target.relative_to(PROJECT_ROOT)}：{len(cleaned_rows):,} 行")
+    print(f"Wrote {target.relative_to(PROJECT_ROOT)}: {len(cleaned_rows):,} rows")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="清洗项目 CSV 数据并写入 data/interim。")
+    parser = argparse.ArgumentParser(description="Clean the project CSV files and write them to data/interim.")
     parser.add_argument("--input-dir", type=Path, default=PROJECT_ROOT / "data" / "raw")
     parser.add_argument("--output-dir", type=Path, default=PROJECT_ROOT / "data" / "interim")
     args = parser.parse_args()

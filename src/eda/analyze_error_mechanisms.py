@@ -201,36 +201,36 @@ def run(output: Path) -> dict:
 
 
 def write_report(output: Path, manifest: dict, combined: pd.DataFrame, formatting: pd.DataFrame):
-    lines = ["# 大误差成因诊断", "", "本轮只分析当前已提交模型的本地验证误差，不训练或修改租金模型、不删除样本、不读取竞赛测试集。", "",
-        "## 误差方向与租金水平", "", "| 窗口 | RMSE | 高估超过 1000 | 低估超过 1000 | 实际租金 ≤2000 的样本占比 | 其 SSE 占比 |", "| --- | ---: | ---: | ---: | ---: | ---: |"]
+    lines = ["# Large Error Mechanism Diagnosis", "", "This round only analyses local validation errors of the submitted model; it trains or modifies no rent model, removes no rows and does not read the competition test set.", "",
+        "## Error direction and rent level", "", "| Window | RMSE | Overpredicted >1000 | Underpredicted >1000 | Share with actual rent <=2000 | Their SSE share |", "| --- | ---: | ---: | ---: | ---: | ---: |"]
     for split,row in manifest["summary"].items():
         lines.append(f"| {split} | {row['rmse']:.2f} | {row['error_over_1000']} | {row['error_under_minus1000']} | {row['actual_below_2000_row_share']:.1%} | {row['actual_below_2000_sse_share']:.1%} |")
-    lines += ["", "按实际租金分组会天然出现低租金高估、高租金低估，即使条件均值模型合理也可能如此。因此这只是误差集中位置，不能据此直接给未知低租金测试样本降价。", "",
-        "## 历史可比房屋覆盖", "", "可比条件为城镇、楼栋、街道、房型、房屋型号、面积、租约起始年，不包含单元号；历史窗口严格早于整个验证窗口。", "",
-        "| 窗口 | 全体验证样本有历史可比记录 | 最差 5% 有历史可比记录 | 有至少 5 条近期楼栋房型记录 | 历史离散度与绝对误差 Spearman 相关 |", "| --- | ---: | ---: | ---: | ---: |"]
+    lines += ["", "Grouping by actual rent naturally shows low rents overpredicted and high rents underpredicted, even for a sound conditional-mean model. This only locates where errors concentrate and cannot justify lowering predictions for unknown low-rent test rows.", "",
+        "## Historical comparable coverage", "", "Comparable conditions are town, block, street, flat type, flat model, floor area and lease commencement year, excluding unit number; the history window ends strictly before the whole validation window.", "",
+        "| Window | Validation rows with historical comparables | Worst 5% with historical comparables | With at least 5 recent block/flat-type records | Spearman correlation of historical dispersion and absolute error |", "| --- | ---: | ---: | ---: | ---: |"]
     for split,row in manifest["summary"].items():
         lines.append(f"| {split} | {row['all_known_exact_house_share']:.1%} | {row['tail5_known_exact_house_share']:.1%} | {row['reliable_historical_spread_coverage']:.1%} | {row['historical_spread_absolute_error_spearman']:.3f} |")
-    lines += ["", "历史离散度在过去十二个月的同楼栋同房型内计算，并先减去各历史月同房型的平均租金。相关性不代表因果；样本稀少时估计不可靠，未来若用作训练特征，必须对每条训练记录另做过去信息/OOF 构造。", "",
-        "## 完全相同可观测输入仍有多少租金差异", "", "| 窗口 | 重复输入涉及的样本数 | 租金冲突的输入组数 | 事后组均值的全样本 RMSE | 原始未规范化输入的同类 RMSE |", "| --- | ---: | ---: | ---: | ---: |"]
+    lines += ["", "Historical dispersion is computed within the same block and flat type over the past twelve months, after subtracting each historical month's flat-type mean rent. Correlation is not causation and estimates are unreliable for sparse groups; any future training feature must be built from past/OOF information for every training row.", "",
+        "## Rent variation among identical observable inputs", "", "| Window | Rows in repeated input groups | Input groups with conflicting rents | Full-sample RMSE of post-hoc group means | Same RMSE on raw unnormalised inputs |", "| --- | ---: | ---: | ---: | ---: |"]
     for split,row in manifest["summary"].items():
         col,raw=row["normalized_identical_inputs"],row["raw_identical_inputs"]
         lines.append(f"| {split} | {col['repeated_rows']} | {col['conflicting_groups']} | {col['retrospective_constant_rmse']:.2f} | {raw['retrospective_constant_rmse']:.2f} |")
-    lines += ["", "此处用验证集自身的标签计算每个完整输入组的事后均值，仅用于描述。它是当前有限样本、给定输入下确定性预测的经验约束，不是可部署预测，也不是新样本不可约误差估计。单例组在此统计中误差为零，不能因此推断它们可预测。", "",
-        "## 尾部误差的影响", "", "| 窗口 | 最差 5% SSE 占比 | 假设该 5% 误差全部归零后的整体 RMSE | 最差 10% SSE 占比 | 假设该 10% 误差归零后的整体 RMSE |", "| --- | ---: | ---: | ---: | ---: |"]
+    lines += ["", "The post-hoc mean of each complete input group uses the validation labels themselves and is descriptive only. It is an empirical bound for deterministic predictions given these inputs and this finite sample, not a deployable prediction or an estimate of irreducible error for new rows. Singleton groups have zero error here, which does not mean they are predictable.", "",
+        "## Impact of tail errors", "", "| Window | Worst 5% SSE share | Overall RMSE if that 5% had zero error | Worst 10% SSE share | Overall RMSE if that 10% had zero error |", "| --- | ---: | ---: | ---: | ---: |"]
     for split,row in manifest["summary"].items():
         a,b=row["tails"]["0.05"],row["tails"]["0.1"]
         lines.append(f"| {split} | {a['sse_share']:.1%} | {a['hypothetical_rmse_if_tail_errors_zero']:.2f} | {b['sse_share']:.1%} | {b['hypothetical_rmse_if_tail_errors_zero']:.2f} |")
-    lines += ["", "上表保留全体样本作分母，不是删除难例后的分数。它依赖事后已知误差，不能作为实际可实现的提升承诺。", "",
-        "## 清洗与原始格式复查", "",
-        "- 已将规范化后的全部主输入列与原始训练表按行重新计算核对，训练标签及行序一致。",
-        f"- FURNISHED 与 FEE 各只有 {manifest['constant_fields']['FURNISHED']}、{manifest['constant_fields']['FEE']} 个不同取值，无法提供样本间区分信息。",
-        f"- 空格形式房型共 {int(formatting.loc['space','rows'])} 条，只出现在 {formatting.loc['space','first_month']} 至 {formatting.loc['space','last_month']}；2024/2025 验证样本没有该形式。原始房型均值差异与年份、房型结构混杂，不能单凭均值认定合并格式损害模型。", "",
-        "## 使用限制与下一步", "",
-        "- 真实租金分箱、尾部样本及冲突组属于标签已知后的诊断，不可直接用于测试集路由、删样本或标记廉价房屋。",
-        "- 历史覆盖、过去租金分布和区位邻域可在预测时获得；是否改善需按时间回测实际验证，不能由相关性保证。",
-        "- 若缺少单元号、实际楼层、装修/租约条件等信息，它们可能解释部分同组差异，但本次数据不能验证具体原因，不能把所有残差归为噪声。",
-        "- 优先评估过去租金分布/近邻特征是否能区分同区位内部差异；同时审查大误差是否集中在历史便宜租赁或特定可观测属性。未经确认不删除低租金记录。",
-        "- 所有验证窗口已被多次查看，本报告不能充当独立最终测试。", ""]
+    lines += ["", "The table keeps all rows in the denominator; it is not a score after removing hard rows. It relies on errors known after the fact and is not an achievable improvement.", "",
+        "## Cleaning and raw-format review", "",
+        "- All normalised main input columns were recomputed row by row against the raw training table; labels and row order match.",
+        f"- FURNISHED and FEE have only {manifest['constant_fields']['FURNISHED']} and {manifest['constant_fields']['FEE']} distinct values and carry no information between rows.",
+        f"- {int(formatting.loc['space','rows'])} rows use the space-separated flat type, only from {formatting.loc['space','first_month']} to {formatting.loc['space','last_month']}; no 2024/2025 validation row uses it. Raw flat-type mean differences are confounded with year and flat-type mix, so means alone cannot show that merging formats hurts the model.", "",
+        "## Usage limits and next steps", "",
+        "- Actual-rent bins, tail rows and conflicting groups are label-dependent diagnostics and cannot be used to route test rows, drop rows or flag cheap flats.",
+        "- Historical coverage, past rent distributions and neighbourhoods are available at prediction time; any gain must be verified with temporal backtests, not assumed from correlation.",
+        "- Missing unit number, actual floor, renovation or contract terms may explain part of the within-group variation, but these data cannot verify the cause, so not all residuals can be called noise.",
+        "- First evaluate whether past rent distributions or neighbour features separate rows within the same location, and check whether large errors concentrate on historically cheap rentals or specific observable attributes. Do not drop low-rent records without confirmation.",
+        "- All validation windows have been inspected several times, so this report is not an independent final test.", ""]
     (output/"error_diagnosis.md").write_text("\n".join(lines),encoding="utf-8")
 
 
